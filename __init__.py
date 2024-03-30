@@ -1,0 +1,43 @@
+from flask import Flask, render_template
+
+from flask_wtf.csrf import CSRFProtect
+from flask_login import LoginManager 
+from config import DevelopmentConfig
+
+if __name__ == "__main__":
+    from models import db
+    
+    app = Flask(__name__)
+    app.config.from_object(DevelopmentConfig)
+    
+    csrf=CSRFProtect()
+    
+    csrf.init_app(app)
+    db.init_app(app)
+    
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Por favor inicie sesión para acceder a esta página.'
+    login_manager.init_app(app)
+    
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template("notFound.html"),404
+
+    from models import Usuarios
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return Usuarios.query.filter_by(id=int(user_id)).first()
+
+    from auth import auth as auth_blueprint
+    app.register_blueprint(auth_blueprint)
+
+    from main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+    
+    with app.app_context():
+        db.create_all()
+        
+    app.run(port=4000)
+    

@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{%from "macros.html" import render_field%}
+{% block content %}
+
+<form method="POST" action="/signup">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+    <div>
+        {{ render_field(form.correo, class="form-control") }}<br>
+    </div>
+    <div>
+        {{ render_field(form.nombre, class="form-control") }}<br>
+    </div>
+    <div>
+        {{ render_field(form.contrasenia, class="form-control") }}<br>
+    </div>
+    <div>
+        {{ render_field(form.confirmacion, class="form-control") }}<br>
+    </div>
+    <div>
+        <input type="submit" class="btn btn-secondary" value="Registrar">
+    </div>
+</form>
+
+{% endblock%}
