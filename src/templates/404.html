@@ -1,0 +1,21 @@
+{% extends "layout.html" %} {% block content %}
+<link rel="stylesheet" href="../static/css/404.css">
+
+<div class="cookie">
+  <img src="../static/img/cookie_19.png" alt="">
+</div>
+
+
+<div class="error">
+  <div class="error__title">404</div>
+  <div class="error__subtitle">Hmmm...</div>
+  <div class="error__description">¿Quieres ver una página que si existe?</div>
+  <div class="button-group">
+    <div class="button">
+      <a href="{{ url_for('main.index' )}}"> Si </a>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

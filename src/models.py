@@ -1,18 +1,59 @@
+
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 import datetime
 
 db = SQLAlchemy()
 
-class Usuario(db.Model):
-    __tablename__ = 'usuarios'
+asignacion_rol_usuario = db.Table('asignacion_rol_usuario',                           
+    
+    db.Column('idUsuario', db.Integer, db.ForeignKey('usuarios.id')),
+    db.Column('idRol', db.Integer, db.ForeignKey('roles.id')))
+
+class Rol(db.Model):
+    __tablename__="roles"
     
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(45), nullable=False)
-    rol = db.Column(db.Integer, nullable=False)
-    correo = db.Column(db.String(45), unique=True, nullable=False)
-    contrasenia = db.Column(db.String(45), nullable=False)
-    token = db.Column(db.String(45))
+    nombre = db.Column(db.String(45), unique=True, nullable=False)
+    descripcion = db.Column(db.String(255))
+    usuarios = db.relationship('Usuario', secondary=asignacion_rol_usuario, back_populates='roles')
     
+    def __repr__(self):
+        return '<{}>'.format(self.nombre)
+    
+
+class Usuario(UserMixin, db.Model):
+    __tablename__="usuarios"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    correo = db.Column(db.String(255), unique=True, nullable=False)
+    nombre = db.Column(db.String(255), unique=True, nullable=False)
+    contrasenia = db.Column(db.String(255), nullable=False)
+    token = db.Column(db.String(255), nullable=True)
+    last_login_at = db.Column(db.DateTime)
+    current_login_at = db.Column(db.DateTime)
+    #last_login_ip = db.Column(db.String(100))
+    #current_login_ip = db.Column(db.String(100))
+    #login_count = db.Column(db.Integer)
+    is_active = db.Column(db.Boolean(), default=True)
+    is_authenticated = db.Column(db.Boolean(), default=True)
+    is_anonymous = db.Column(db.Boolean(), default=False)
+    estatus = db.Column(db.Boolean(), nullable=False, default=True)
+    #fs_uniquifier = db.Column(db.String(64), unique=True, nullable=False)
+    confirmed_at = db.Column(db.DateTime)
+    roles = db.relationship('Rol', secondary=asignacion_rol_usuario, back_populates='usuarios', overlaps="usuarios")
+    def __repr__(self):
+        return '<{}>'.format(self.nombre)
+    
+    #metodo para flask-login
+    def get_id(self):
+        return str(self.id)
+    
+    #metodo para acelerar la validacion de roles
+    def has_roles(self, role):
+        return bool(Rol.query.join(Rol.usuarios).filter_by(nombre=role and Usuario.id == self.id).first())
+    
+
 class Insumo(db.Model):
     __tablename__ = 'insumos'
     
@@ -41,12 +82,6 @@ class Receta(db.Model):
     piezas = db.Column(db.Integer, nullable=False)
     descripcion = db.Column(db.String(500))
     nombre = db.Column(db.String(50), nullable=False)
-
-class AsignacionRolUsuario(db.Model):
-    __tablename__ = 'asignaciones_rol_usuario'
-    
-    idRol = db.Column(db.Integer, db.ForeignKey('roles.id'), primary_key=True)
-    idUsuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'), primary_key=True)
 
 class Compra(db.Model):
     __tablename__ = 'compras'
@@ -136,14 +171,6 @@ class LoteInsumo(db.Model):
     
     idInsumo = db.Column(db.Integer, db.ForeignKey('insumos.id'), primary_key=True)
     idCompra = db.Column(db.Integer, db.ForeignKey('compras.id'), primary_key=True)
-
-class Rol(db.Model):
-    __tablename__ = 'roles'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(45), nullable=False)
-    descripcion = db.Column(db.String(45), nullable=False)
-    permisos = db.Column(db.Text)
 
 class SolicitudProduccion(db.Model):
     __tablename__ = 'solicitudes_produccion'

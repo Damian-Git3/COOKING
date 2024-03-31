@@ -1,10 +1,12 @@
-class CommonConfig:
-    SECRET_KEY = "MySecretKey"
+import os
+from sqlalchemy import create_engine
 
-class DevelopmentConfig(CommonConfig):
-    DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:root@localhost/don_galleto_bd'
+class Config:
+    SECRET_KEY = 'CLAVE SECRETA'
+    SESSION_COOKIE_SECURE = False
     
-config = {
-    'development': DevelopmentConfig
-}
+class DevelopmentConfig(Config):
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://IDGS802:IDGS802@localhost:3306/cooking'
+
+
