@@ -1,0 +1,59 @@
+{% extends "layout.html" %} {% block content %}
+<link rel="stylesheet" href="../static/css/login.css" />
+<div class="box-form">
+  <div class="left">
+    <div class="overlay text-center">
+      <a href="{{ url_for('main.index') }}"
+        ><img src="../static/img/logo.png" class="logo" alt="Logo"
+      /></a>
+
+      <h1>Bienvenido a COOKING</h1>
+      <p>Inicia sesión para empezar a crear tus recetas favoritas</p>
+    </div>
+  </div>
+
+  <div class="right">
+    <h5>Iniciar Sesión</h5>
+    <br />
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <div class="notification is-danger">{{ messages[0] }}</div>
+    {% endif %} {% endwith %}
+    <form method="POST" action="/login">
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+      <div class="inputs">
+        <div class="mb-3">
+          <input
+            class="input is-large"
+            type="text"
+            class="form-control"
+            id="usuario"
+            name="usuario"
+            aria-describedby="Usuario"
+            placeholder="Nombre de usuario"
+          />
+        </div>
+        <div class="mb-3">
+          <input
+            class="input is-large"
+            type="password"
+            class="form-control"
+            name="contrasenia"
+            id="contrasenia"
+            placeholder="Contraseña"
+          />
+        </div>
+      </div>
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="recordarme" />
+        <label class="form-check-label" for="recordarme">Recordarme</label>
+      </div>
+      <br />
+      <div class="button-control">
+        <div class="button-outline">
+          <input class="button" type="submit" value="Ingresar" id="login" />
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
