@@ -51,7 +51,7 @@ def signup_post():
     user = Usuario.query.filter_by(correo=correo).first()
 
     if user:
-        flash('Email address already exists.')
+        flash('Este correo ya existe.')
         return redirect(url_for('auth.signup'))
 
     new_user = Usuario(correo=correo, nombre=nombre, contrasenia=generate_password_hash(contrasenia))
