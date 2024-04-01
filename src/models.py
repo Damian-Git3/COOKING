@@ -5,12 +5,10 @@ import datetime
 
 db = SQLAlchemy()
 
-class AsignacionRolUsuario(db.Model):
-    __tablename__ = 'asignaciones_rol_usuario'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    idUsuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'))
-    idRol = db.Column(db.Integer, db.ForeignKey('roles.id'))
+asignacion_rol_usuario = db.Table('asignaciones_rol_usuario',
+    db.Column('idUsuario', db.Integer, db.ForeignKey('usuarios.id')),
+    db.Column('idRol', db.Integer, db.ForeignKey('roles.id'))
+)
 
 class Rol(db.Model):
     __tablename__="roles"
@@ -18,7 +16,7 @@ class Rol(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(45), unique=True, nullable=False)
     descripcion = db.Column(db.String(255))
-    usuarios = db.relationship('Usuario', secondary=AsignacionRolUsuario.__tablename__, back_populates='roles')
+    usuarios = db.relationship('Usuario', secondary=asignacion_rol_usuario, back_populates='roles')
     
     # Método para obtener solo el nombre
     def __str__(self):
@@ -45,7 +43,7 @@ class Usuario(UserMixin, db.Model):
     #fs_uniquifier = db.Column(db.String(64), unique=True, nullable=False)
     confirmed_at = db.Column(db.DateTime)
     
-    roles = db.relationship('Rol', secondary=AsignacionRolUsuario.__tablename__, back_populates='usuarios', overlaps="usuarios")
+    roles = db.relationship('Rol', secondary=asignacion_rol_usuario, back_populates='usuarios')
     
     # Método para obtener solo el nombre
     def __str__(self):
