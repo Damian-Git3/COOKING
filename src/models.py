@@ -5,10 +5,12 @@ import datetime
 
 db = SQLAlchemy()
 
-asignacion_rol_usuario = db.Table('asignacion_rol_usuario',                           
+class AsignacionRolUsuario(db.Model):
+    __tablename__ = 'asignaciones_rol_usuario'
     
-    db.Column('idUsuario', db.Integer, db.ForeignKey('usuarios.id')),
-    db.Column('idRol', db.Integer, db.ForeignKey('roles.id')))
+    id = db.Column(db.Integer, primary_key=True)
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'))
+    idRol = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
 class Rol(db.Model):
     __tablename__="roles"
@@ -16,10 +18,11 @@ class Rol(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(45), unique=True, nullable=False)
     descripcion = db.Column(db.String(255))
-    usuarios = db.relationship('Usuario', secondary=asignacion_rol_usuario, back_populates='roles')
+    usuarios = db.relationship('Usuario', secondary=AsignacionRolUsuario.__tablename__, back_populates='roles')
     
-    def __repr__(self):
-        return '<{}>'.format(self.nombre)
+    # Método para obtener solo el nombre
+    def __str__(self):
+        return self.nombre
     
 
 class Usuario(UserMixin, db.Model):
@@ -41,9 +44,12 @@ class Usuario(UserMixin, db.Model):
     estatus = db.Column(db.Boolean(), nullable=False, default=True)
     #fs_uniquifier = db.Column(db.String(64), unique=True, nullable=False)
     confirmed_at = db.Column(db.DateTime)
-    roles = db.relationship('Rol', secondary=asignacion_rol_usuario, back_populates='usuarios', overlaps="usuarios")
-    def __repr__(self):
-        return '<{}>'.format(self.nombre)
+    
+    roles = db.relationship('Rol', secondary=AsignacionRolUsuario.__tablename__, back_populates='usuarios', overlaps="usuarios")
+    
+    # Método para obtener solo el nombre
+    def __str__(self):
+        return self.nombre
     
     #metodo para flask-login
     def get_id(self):
