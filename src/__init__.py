@@ -5,10 +5,15 @@ from werkzeug.security import generate_password_hash
 from config import DevelopmentConfig
 from admin_config import setup_admin
 from models import db, Usuario
+from sassutils.wsgi import SassMiddleware
 
 if __name__ == "__main__":
     app = Flask(__name__)
     app.config.from_object(DevelopmentConfig)
+
+    app.wsgi_app = SassMiddleware(app.wsgi_app, {
+        '__main__': ('static/sass', 'static/css', '/static/css')
+    })
 
     csrf = CSRFProtect()
     csrf.init_app(app)
@@ -24,7 +29,7 @@ if __name__ == "__main__":
         return render_template("404.html"), 404
 
     @login_manager.user_loader
-    def load_user(user_id): 
+    def load_user(user_id):
         return Usuario.query.filter_by(id=int(user_id)).first()
 
     from auth import auth as auth_blueprint
