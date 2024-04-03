@@ -3,7 +3,7 @@ from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash
 from models import Usuario, Rol, Insumo, Proveedor
 from flask_babel import Babel
-
+from flask import flash
 
 def setup_admin(app, db):
     admin = Admin(app,  template_mode='bootstrap4', index_view=AdminIndexView(
@@ -11,6 +11,7 @@ def setup_admin(app, db):
         menu_icon_value='fa-home'
     ))
     
+    # Clase base para modelos configuration
     class BaseModelConfiguration(ModelView):
         page_size = 10
 
@@ -23,9 +24,10 @@ def setup_admin(app, db):
         def on_model_change(self, form, Usuario, is_created):
             if is_created:
                 Usuario.contrasenia = generate_password_hash('1234')
+                flash(f"La contraseña automatica para {Usuario.nombre} es 1234")
 
     # Clase de vista personalizada para Rol
-    class RolView(ModelView):
+    class RolView(BaseModelConfiguration):
         can_create = False
         can_delete = False
         form_colums = ['descripcion', 'usuarios']
