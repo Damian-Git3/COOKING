@@ -25,7 +25,6 @@ def login_post():
 
     login_user(user, remember=recordar)
     
-
     return redirect(url_for('main.menu'))
 
 @auth.route('/signup')

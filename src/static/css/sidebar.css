@@ -1,211 +1,212 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap");
 body {
-    margin: 0;
-    background: #eaeef6;
+  margin: 0;
+  background: #eaeef6;
 }
 
 * {
-    text-align: center;
-    font-family: 'Open Sans', sans-serif;
-}
-
-.TopBox {
-    width: 71px;
-    height: 5px;
-    margin: 0 auto;
-    background: #406ff3;
-    border-radius: 0 0 12px 12px;
+  text-align: center;
+  font-family: "Open Sans", sans-serif;
 }
 
 .HoverBox {
-    width: 55px;
-    height: 55px;
-    margin: 0 auto;
-    background: #406ff3;
-    border-radius: 10px;
-    position: absolute;
-    z-index: 0;
-    left: 15px;
-    top: 20px;
-    transition: 250ms;
+  width: 56px;
+  height: 55px;
+  margin: 0 auto;
+  background: #406ff3;
+  border-radius: 10px;
+  position: absolute;
+  z-index: 0;
+  left: 16px;
+  top: 16px;
+  transition: 250ms;
 }
 
 .PageContact {
-    margin-left: 200px;
-    margin-right: 103px;
-    margin-top: 47px;
+  margin-left: 200px;
+  margin-right: 103px;
+  margin-top: 47px;
 }
 
-.MenuBox>ul>li>span {
-    position: absolute;
-    left: 80%;
-    display: none;
-    top: 12px;
-    margin-left: 2rem;
-    color: #406ff3;
-    background: #fff;
-    transition: 250ms ease all;
-    border-radius: 17.5px;
-    line-height: 0;
-    padding: 16px 15px;
-    z-index: 3;
+.MenuBox > ul > li > span {
+  position: absolute;
+  left: 80%;
+  display: none;
+  top: 12px;
+  margin-left: 2rem;
+  white-space: nowrap;
+  border: solid 1px #3a3a3a81;
+  color: #406ff3;
+  background: #fff;
+  transition: 250ms ease all;
+  border-radius: 17.5px;
+  line-height: 0;
+  padding: 16px 15px;
+  z-index: 3;
 }
 
-.MenuBox>ul>li {
-    display: block;
-    width: 55px;
-    height: 55px;
-    border-radius: 10px;
-    position:relative;
-    cursor: pointer;
-    z-index: 1;
-    margin-bottom: 12px;
-    line-height: 68px;
+.MenuBox > ul > li {
+  display: block;
+  width: 57px;
+  height: 57px;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  z-index: 1;
+  margin-bottom: 12px;
+  line-height: 68px;
 }
 
 .MenuBox:not(:hover),
-.MenuBox>ul>li:hover svg {
-    color: white;
+.MenuBox > ul > li:hover svg {
+  color: white;
 }
 
-.MenuBox>ul>li:hover span {
-    display: block;
-    left: 100%;
-    
+.MenuBox > ul > li:hover span {
+  display: block;
+  left: 100%;
 }
 
-.Active>svg {
-    color: white;
+.Active > svg {
+  color: white;
 }
 
 .feather {
-    color: #6e6c6c;
-    width: 25px;
-    transition: 1s;
+  color: #6e6c6c;
+  width: 25px;
+  transition: 1s;
 }
 
 .MenuBox {
-    background: white;
-    position: fixed;
-    scrollbar-width: none;
-    overflow-x: initial;
-    margin: 5vh 3vw;
-    height: 90vh;
-    border-radius: 9px;
-    box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
-    padding-bottom: 6px;
+  background: white;
+  position: absolute;
+  scrollbar-width: none;
+  margin: 2rem 1rem;
+  height: calc(100% - 4rem);
+  border-radius: 9px;
+  box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
+  padding-bottom: 6px;
 }
 .MenuBox::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
-
+.MenuContent {
+  background: white;
+  position: fixed;
+  scrollbar-width: thin;
+  overflow-x: initial;
+  margin: 1rem 0 1rem calc(106px + 1rem);
+  min-height: calc(100% - 2rem);
+  min-width: calc(100% - 106px - 2rem);
+  border-radius: 9px;
+  box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
+  padding-bottom: 6px;
+}
 .Contact {
-    display: flex;
+  display: flex;
 }
 
-.MenuBox>ul {
-    padding: 0 15px;
-    margin-top: 15px;
+.MenuBox > ul {
+  padding: 0 15px;
+  margin-top: 15px;
 }
 
-.PageContact>div {
-    transition: .5s;
+.PageContact > div {
+  transition: 0.5s;
 }
 
 @keyframes Effect_0 {
-    0% {
-        transform: scale(1, 1);
-    }
-    50% {
-        transform: scale(0.5, 1.5);
-    }
-    100% {
-        transform: scale(1, 1);
-    }
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.5, 1.5);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
 }
 
 @keyframes Effect_1 {
-    0% {
-        transform: scale(1, 1);
-    }
-    50% {
-        transform: scale(0.5, 1.5);
-    }
-    100% {
-        transform: scale(1, 1);
-    }
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.5, 1.5);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
 }
 
 @keyframes Effect_2 {
-    0% {
-        transform: scale(1, 1);
-    }
-    50% {
-        transform: scale(0.5, 1.5);
-    }
-    100% {
-        transform: scale(1, 1);
-    }
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.5, 1.5);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
 }
 
 @keyframes Effect_3 {
-    0% {
-        transform: scale(1, 1);
-    }
-    50% {
-        transform: scale(0.5, 1.5);
-    }
-    100% {
-        transform: scale(1, 1);
-    }
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.5, 1.5);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
 }
 
 @keyframes Effect_4 {
-    0% {
-        transform: scale(1, 1);
-    }
-    50% {
-        transform: scale(0.5, 1.5);
-    }
-    100% {
-        transform: scale(1, 1);
-    }
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.5, 1.5);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
 }
 
 @keyframes Effect_5 {
-    0% {
-        transform: scale(1, 1);
-    }
-    50% {
-        transform: scale(0.5, 1.5);
-    }
-    100% {
-        transform: scale(1, 1);
-    }
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.5, 1.5);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
 }
-
 
 /* Style About Box  */
 
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@500&display=swap");
 .linkAbout {
-    text-decoration: auto;
-    margin: 0 5px;
-    color: black;
+  text-decoration: auto;
+  margin: 0 5px;
+  color: black;
 }
 
 .about {
-    position: absolute;
-    top: 0;
-    background: #ffffff;
-    padding: 10px;
-    border-radius: 0 0 15px 15px;
-    font-size: 1em;
-    font-family: 'Heebo', sans-serif;
-    right: 31px;
+  position: absolute;
+  top: 0;
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 0 0 15px 15px;
+  font-size: 1em;
+  font-family: "Heebo", sans-serif;
+  right: 31px;
 }
 
 .linkAbout:hover {
-    color: #406ff3;
+  color: #406ff3;
 }
-
