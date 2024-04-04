@@ -19,12 +19,17 @@ def login_post():
 
     user = Usuario.query.filter_by(nombre=usuario).first()
     
-    if not user or not check_password_hash(user.contrasenia, contrasenia) or not user.estatus:
-        flash('Credenciales incorrectas, por favor intente de nuevo.')
+    if not user:
+        flash('No se ha encontrado un usuario con esas credenciales. Por favor, verifica la información')
+        return render_template('login.html')
+    elif not check_password_hash(user.contrasenia, contrasenia):
+        flash('Credenciales incorrectas. Por favor, inténtelo de nuevo.')
+        return render_template('login.html')
+    elif not user.estatus:
+        flash('Usuario no activo. Por favor, consulta con tu administrador.')
         return render_template('login.html')
 
     login_user(user, remember=recordar)
-    
     return redirect(url_for('main.menu'))
 
 @auth.route('/signup')
@@ -45,7 +50,7 @@ def signup_post():
     user = Usuario.query.filter_by(correo=correo).first()
 
     if user:
-        flash('Email address already exists.')
+        flash('Este correo ya existe.')
         return redirect(url_for('auth.signup'))
 
     new_user = Usuario(correo=correo, nombre=nombre, contrasenia=generate_password_hash(contrasenia))
