@@ -1,7 +1,7 @@
 from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash
-from models import Usuario, Rol, Insumo, Proveedor
+from database.models import Usuario, Rol, Insumo, Proveedor
 from flask_babel import Babel
 from flask import flash
 
