@@ -2,9 +2,9 @@ from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
-from config import DevelopmentConfig
-from admin_config import setup_admin
-from models import db, Usuario
+from config.config import DevelopmentConfig
+from config.admin_config import setup_admin
+from database.models import db, Usuario
 from sassutils.wsgi import SassMiddleware
 
 if __name__ == "__main__":
@@ -32,10 +32,10 @@ if __name__ == "__main__":
     def load_user(user_id):
         return Usuario.query.filter_by(id=int(user_id)).first()
 
-    from auth import auth as auth_blueprint
+    from routes.auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
 
-    from main import main as main_blueprint
+    from routes.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
     with app.app_context():
