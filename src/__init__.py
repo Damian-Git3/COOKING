@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
@@ -38,10 +38,28 @@ if __name__ == "__main__":
     from routes.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    from routes.cocina import cocina
+    app.register_blueprint(cocina)
+
     with app.app_context():
         db.create_all()
 
     setup_admin(app, db)
 
-    app.run(port=4000)
+    def has_no_empty_params(rule):
+        defaults = rule.defaults if rule.defaults is not None else ()
+        arguments = rule.arguments if rule.arguments is not None else ()
+        return len(defaults) >= len(arguments)
 
+    @app.route("/site-map")
+    def site_map():
+        links = []
+        for rule in app.url_map.iter_rules():
+            # Filter out rules we can't navigate to in a browser
+            # and rules that require parameters
+            if "GET" in rule.methods and has_no_empty_params(rule):
+                url = url_for(rule.endpoint, **(rule.defaults or {}))
+                links.append((url, rule.endpoint))
+        print(links)
+
+    app.run(port=4000)
