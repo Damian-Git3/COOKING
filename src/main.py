@@ -10,7 +10,12 @@ def index():
 @main.route('/menu')
 @login_required
 def menu():
-    return render_template('menu.html')
+    
+    admin = current_user.has_rol('Administrador')
+    cocinero = current_user.has_rol('Cocinero')
+    vendedor = current_user.has_rol('Vendedor')
+    
+    return render_template('menu.html', admin=admin, cocinero=cocinero, vendedor=vendedor)
 
 
 

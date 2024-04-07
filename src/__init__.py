@@ -44,3 +44,4 @@ if __name__ == "__main__":
     setup_admin(app, db)
 
     app.run(port=4000)
+

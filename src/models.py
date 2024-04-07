@@ -54,8 +54,11 @@ class Usuario(UserMixin, db.Model):
         return str(self.id)
     
     #metodo para acelerar la validacion de roles
-    def has_roles(self, role):
-        return bool(Rol.query.join(Rol.usuarios).filter_by(nombre=role and Usuario.id == self.id).first())
+    def has_rol(self, role):
+        return bool(Rol.query.join(asignacion_rol_usuario).join(Usuario).filter(Rol.nombre == role, Usuario.id == self.id).first())
+    
+    def get_roles(self):
+        return [role.nombre for role in self.roles]
     
 
 class Insumo(db.Model):

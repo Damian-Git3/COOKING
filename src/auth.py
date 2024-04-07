@@ -30,7 +30,6 @@ def login_post():
         return render_template('login.html')
 
     login_user(user, remember=recordar)
-
     return redirect(url_for('main.menu'))
 
 @auth.route('/signup')

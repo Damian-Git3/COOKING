@@ -18,26 +18,26 @@ function Action_s(Index, Top) {
     clearTag(Index)
 }
 button_s[0].addEventListener("mouseover", function() {
-    Action_s(0, "20px");
+    Action_s(0, "16px");
 });
 
 button_s[1].addEventListener("mouseover", function() {
-    Action_s(1, "87px");
+    Action_s(1, "85px");
 });
 
 button_s[2].addEventListener("mouseover", function() {
-    Action_s(2, "154px");
+    Action_s(2, "153px");
 });
 
 button_s[3].addEventListener("mouseover", function() {
-    Action_s(3, "221px");
+    Action_s(3, "222px");
 });
 
 button_s[4].addEventListener("mouseover", function() {
-    Action_s(4, "288px");
+    Action_s(4, "291px");
 });
 
 button_s[5].addEventListener("mouseover", function() {
-    Action_s(5, "355px");
+    Action_s(5, "359px");
 
 });
