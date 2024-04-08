@@ -4,6 +4,12 @@ ol {
   margin: 0;
   list-style: none; }
 
+.solicitudes-vacias {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+
 .titulo-cocina {
   text-align: center;
   margin-top: 1rem;
@@ -34,7 +40,8 @@ ol {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   -ms-border-radius: 10px;
-  -o-border-radius: 10px; }
+  -o-border-radius: 10px;
+  background-color: #fff; }
   .order-card img {
     width: 50%;
     height: 50%; }

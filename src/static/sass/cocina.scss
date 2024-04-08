@@ -7,6 +7,13 @@ ol {
   list-style: none;
 }
 
+.solicitudes-vacias{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .titulo-cocina {
   text-align: center;
   margin-top: 1rem;
@@ -41,6 +48,7 @@ ol {
   -moz-border-radius: $border-radius;
   -ms-border-radius: $border-radius;
   -o-border-radius: $border-radius;
+  background-color: #fff;
 
   img {
     width: 50%;

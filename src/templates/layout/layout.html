@@ -16,6 +16,9 @@
   <link rel="stylesheet" href="../static/css/layout.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+  <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jqueryui.js') }}"></script>
   {% block styles %}{% endblock %}
 </head>
 
@@ -165,7 +168,7 @@
         </li>
       </ul>
     </div>
-    
+
     <div class="MenuContent">
       {% block content %}
       {% endblock %}

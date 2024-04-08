@@ -1,7 +1,8 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-import datetime
+from datetime import datetime
+from sqlalchemy import func
 
 db = SQLAlchemy()
 
@@ -14,10 +15,10 @@ class InsumosReceta(db.Model):
     __tablename__ = 'insumos_receta'
     idReceta = db.Column(db.Integer, db.ForeignKey('recetas.id'), primary_key=True)
     idInsumo = db.Column(db.Integer, db.ForeignKey('insumos.id'), primary_key=True)
-    cantidad = db.Column(db.Float, nullable = False)
+    cantidad = db.Column(db.Float, nullable=False)
     
     receta = db.relationship('Receta', backref='recetas')
-    insumo = db.relationship('Insumo', backref='insumos')
+    insumo = db.relationship('Insumo', backref='insumos', overlaps="insumos")
     
 class Receta(db.Model):
     __tablename__ = 'recetas'
@@ -28,9 +29,9 @@ class Receta(db.Model):
     piezas = db.Column(db.Integer, nullable=False)
     descripcion = db.Column(db.String(500))
     nombre = db.Column(db.String(50), nullable=False)
-    imagen = db.Column(db.String(255))
+    imagen = db.Column(db.String(255), nullable=False)
     
-    insumos = db.relationship('Insumo', secondary='insumos_receta', backref=db.backref('insumo', lazy='dynamic'))
+    insumos = db.relationship('Insumo', secondary='insumos_receta', backref=db.backref('insumo', lazy='dynamic'), overlaps="receta,recetas")
     
 class Insumo(db.Model):
     __tablename__ = 'insumos'
@@ -189,16 +190,34 @@ class SolicitudProduccion(db.Model):
     __tablename__ = 'solicitudes_produccion'
     
     id = db.Column(db.Integer, primary_key=True)
-    fecha_produccion = db.Column(db.Date, nullable=False)
     mensaje = db.Column(db.String(50))
-    status = db.Column(db.Boolean)
-    tandas = db.Column(db.Integer)
+    tandas = db.Column(db.Integer, nullable=False)
     merma = db.Column(db.Integer)
-    fecha_solicitud = db.Column(db.Date)
     
+    fecha_solicitud = db.Column(db.DateTime, default=datetime.now)
+    fecha_produccion = db.Column(db.Date)
+    
+    posicion = db.Column(db.Integer, default=1)
+    
+    status = db.Column(db.Integer, nullable=False)
     idReceta = db.Column(db.Integer, db.ForeignKey('recetas.id'), nullable=False)
     idUsuarioSolictud = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    idUsuarioProduccion = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    idUsuarioProduccion = db.Column(db.Integer, db.ForeignKey('usuarios.id'))
+    
+    receta = db.relationship('Receta', foreign_keys=[idReceta])
+    usuarioSolicitud = db.relationship('Usuario', foreign_keys=[idUsuarioSolictud])
+    usuarioProduccion = db.relationship('Usuario', foreign_keys=[idUsuarioProduccion])
+    
+    @staticmethod
+    def get_next_position():
+        # Obtiene la siguiente posición disponible
+        max_position = db.session.query(func.max(SolicitudProduccion.posicion)).scalar()
+        return (max_position or 0) + 1
+
+    def __init__(self, *args, **kwargs):
+        super(SolicitudProduccion, self).__init__(*args, **kwargs)
+        if self.posicion is None:  # Si no se proporciona una posición, asigna la siguiente disponible
+            self.posicion = self.get_next_position()
 
 class TransaccionCaja(db.Model):
     __tablename__ = 'transacciones_caja'
