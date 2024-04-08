@@ -9,6 +9,9 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login')
 def login():
+    if current_user.is_authenticated:
+        # Si el usuario ya está autenticado, redirige al menú
+        return redirect(url_for('main.menu'))
     return render_template('login.html')
 
 @auth.route('/login', methods=['POST'])
@@ -64,4 +67,4 @@ def signup_post():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main.index'))
+    return redirect(url_for('auth.login'))

@@ -8,8 +8,7 @@ body {
 }
 
 .box-form {
-  margin: 0 auto;
-  width: 80%;
+  height: 77vh;
   background: #ffffff;
   border-radius: 10px;
   overflow: hidden;
@@ -18,16 +17,23 @@ body {
   align-items: stretch;
   justify-content: space-between;
   box-shadow: 0 0 60px 10px #3b3b3b49;
+  margin: 0 15vw;
 }
 @media (max-width: 980px) {
   .box-form {
+    height: 100%;
     flex-flow: wrap;
     text-align: center;
     align-content: center;
     align-items: center;
+    margin: 20px 0;
+  }
+  .box-form .right {
+    width: 100%;
   }
 }
 .box-form div {
+  width: auto;
   height: auto;
 }
 .box-form .left {
@@ -46,8 +52,12 @@ body {
   overflow: hidden;
   box-sizing: border-box;
 }
+.box-form .left .overlay img {
+  width: 50%;
+  height: auto;
+}
 .box-form .left .overlay h1 {
-  font-size: 5vmax;
+  font-size: 4vmax;
   line-height: 1;
   font-weight: 900;
   margin-top: 40px;
@@ -72,16 +82,17 @@ body {
   margin-left: 30px;
 }
 .box-form .right {
-  padding: 40px;
+  width: 70%;
+  height: fit-content;
+  padding: 20px 40px;
   overflow: hidden;
 }
-@media (max-width: 980px) {
-  .box-form .right {
-    width: 100%;
-  }
-}
 .box-form .right h5 {
-  font-size: 6rem;
+  font-size: 2rem;
+  line-height: 1;
+  text-align: center;
+  font-weight: 900;
+  margin-top: 20px;
 }
 .logo {
   height: 250px;
@@ -97,7 +108,7 @@ body {
 .box-form .right .inputs input {
   width: 100%;
   padding: 10px;
-  margin-top: 25px;
+  margin-top: 15px;
   font-size: 16px;
   border: none;
   outline: none;
@@ -114,13 +125,13 @@ input[type="checkbox"]:focus {
 }
 
 .form-check label {
-    margin-left: 6px;
+  margin-left: 6px;
 }
 
 .form-check {
-    display: flex;
-    justify-content: end;
-    align-items: normal;
+  display: flex;
+  justify-content: end;
+  align-items: normal;
 }
 
 .text-center {
@@ -132,81 +143,92 @@ input[type="checkbox"]:focus {
 }
 
 .button-control {
-    display: flex;
-    justify-content: center;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  width: 70%;
+  margin-bottom: 20px;
 }
 
 .button-outline {
-    position: relative;
-    display: flex;
-    width: 14rem;
-    height: 5rem;
-    justify-content: center;
+  position: relative;
+  display: flex;
+  width: 14rem;
+  height: 5rem;
+  justify-content: center;
+}
+
+.button-control {
+  animation: heroButton 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+}
+
+.button {
+  color: white !important;
+  font-family: Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 26px;
+  text-align: center;
+  text-decoration: none;
+  background-color: #ffa12b;
+  display: block;
+  position: relative;
+  padding: 5px 30px;
+  width: 100%;
+
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  text-shadow: 0px 1px 0px #000;
+  filter: dropshadow(color=#000, offx=0px, offy=1px);
+
+  -webkit-box-shadow: inset 0 1px 0 #ffe5c4, 0 10px 0 #915100;
+  -moz-box-shadow: inset 0 1px 0 #ffe5c4, 0 10px 0 #915100;
+  box-shadow: inset 0 1px 0 #ffe5c4, 0 10px 0 #915100;
+
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.button:active {
+  top: 10px;
+  background-color: #f78900 !important;
+
+  -webkit-box-shadow: inset 0 1px 0 #ffe5c4, inset 0 -3px 0 #915100;
+  -moz-box-shadow: inset 0 1px 0 #ffe5c4, inset 0 -3pxpx 0 #915100;
+  box-shadow: inset 0 1px 0 #ffe5c4, inset 0 -3px 0 #915100;
+}
+.button:hover {
+  color: #d85234cd !important;
+}
+
+.button-outline:after {
+  content: "";
+  height: 100%;
+  width: 103%;
+  position: absolute;
+  bottom: -14px;
+  z-index: -1;
+  background-color: #2b1800;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+@keyframes heroButton {
+  from {
+    transform: scaleY(1.2) scaleX(1.2);
+    opacity: 1;
   }
-  
-   .button-control {
-    animation: heroButton 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+  to {
+    transform: scaleY(1) scaleX(1);
+    opacity: 1;
   }
-  
-  .button {
-    color: white !important;
-    font-family: Helvetica, sans-serif;
-    font-weight: bold;
-    font-size: 36px;
-    text-align: center;
-    text-decoration: none;
-    background-color: #ffa12b;
-    display: block;
-    position: relative;
-    padding: 10px 40px;
-    width: 100%;
-  
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    text-shadow: 0px 1px 0px #000;
-    filter: dropshadow(color=#000, offx=0px, offy=1px);
-  
-    -webkit-box-shadow: inset 0 1px 0 #ffe5c4, 0 10px 0 #915100;
-    -moz-box-shadow: inset 0 1px 0 #ffe5c4, 0 10px 0 #915100;
-    box-shadow: inset 0 1px 0 #ffe5c4, 0 10px 0 #915100;
-  
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-  
-  .button:active {
-    top: 10px;
-    background-color: #f78900 !important;
-  
-    -webkit-box-shadow: inset 0 1px 0 #ffe5c4, inset 0 -3px 0 #915100;
-    -moz-box-shadow: inset 0 1px 0 #ffe5c4, inset 0 -3pxpx 0 #915100;
-    box-shadow: inset 0 1px 0 #ffe5c4, inset 0 -3px 0 #915100;
-  }
-  .button:hover {
-    color: #391611 !important;
-  }
-  
-  .button-outline:after {
-    content: "";
-    height: 100%;
-    width: 103%;
-    position: absolute;
-    bottom: -14px;
-    z-index: -1;
-    background-color: #2b1800;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
- 
-  @keyframes heroButton {
-    from {
-      transform: scaleY(1.2) scaleX(1.2);
-      opacity: 1;
-    }
-    to {
-      transform: scaleY(1) scaleX(1) ;
-      opacity: 1;
-    }
-  }
+}
+
+.particles-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  opacity: 0.5;
+}
