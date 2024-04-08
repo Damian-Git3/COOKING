@@ -10,6 +10,42 @@ asignacion_rol_usuario = db.Table('asignaciones_rol_usuario',
     db.Column('idRol', db.Integer, db.ForeignKey('roles.id'))
 )
 
+class InsumosReceta(db.Model):
+    __tablename__ = 'insumos_receta'
+    idReceta = db.Column(db.Integer, db.ForeignKey('recetas.id'), primary_key=True)
+    idInsumo = db.Column(db.Integer, db.ForeignKey('insumos.id'), primary_key=True)
+    cantidad = db.Column(db.Float, nullable = False)
+    
+    receta = db.relationship('Receta', backref='recetas')
+    insumo = db.relationship('Insumo', backref='insumos')
+    
+class Receta(db.Model):
+    __tablename__ = 'recetas'
+
+    id = db.Column(db.Integer, primary_key=True)
+    peso_estimado = db.Column(db.Float, nullable=False)
+    utilidad = db.Column(db.Float)
+    piezas = db.Column(db.Integer, nullable=False)
+    descripcion = db.Column(db.String(500))
+    nombre = db.Column(db.String(50), nullable=False)
+    imagen = db.Column(db.String(255))
+    
+    insumos = db.relationship('Insumo', secondary='insumos_receta', backref=db.backref('insumo', lazy='dynamic'))
+    
+class Insumo(db.Model):
+    __tablename__ = 'insumos'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(45), nullable=False)
+    descripcion = db.Column(db.String(45), nullable=False)
+    unidad_medida = db.Column(db.String(45), nullable=False)
+    cantidad_maxima = db.Column(db.Float, nullable=False)
+    cantidad_minima = db.Column(db.Float, nullable=False)
+    merma = db.Column(db.Float, nullable=False)
+    
+    def __str__(self):
+        return self.nombre
+
 class Rol(db.Model):
     __tablename__="roles"
     
@@ -60,18 +96,6 @@ class Usuario(UserMixin, db.Model):
     def get_roles(self):
         return [role.nombre for role in self.roles]
     
-
-class Insumo(db.Model):
-    __tablename__ = 'insumos'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(45), nullable=False)
-    descripcion = db.Column(db.String(45), nullable=False)
-    unidad_medida = db.Column(db.String(45), nullable=False)
-    cantidad_maxima = db.Column(db.Float, nullable=False)
-    cantidad_minima = db.Column(db.Float, nullable=False)
-    merma = db.Column(db.Float, nullable=False)
-    
 class Proveedor(db.Model):
     __tablename__ = 'proveedores'
     
@@ -79,16 +103,6 @@ class Proveedor(db.Model):
     empresa = db.Column(db.String(45), nullable=False)
     direccion = db.Column(db.String(45), nullable=False)
     nombre_proveedor = db.Column(db.String(45), nullable=False)
-    
-class Receta(db.Model):
-    __tablename__ = 'recetas'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    peso_estimado = db.Column(db.Float, nullable=False)
-    utilidad = db.Column(db.Float)
-    piezas = db.Column(db.Integer, nullable=False)
-    descripcion = db.Column(db.String(500))
-    nombre = db.Column(db.String(50), nullable=False)
 
 class Compra(db.Model):
     __tablename__ = 'compras'
@@ -126,14 +140,6 @@ class DetalleVenta(db.Model):
     
     idVenta = db.Column(db.Integer, db.ForeignKey('ventas.id'), primary_key=True)
     idStock = db.Column(db.Integer, db.ForeignKey('lotes_galletas.id'), primary_key=True)
-
-class IngredienteReceta(db.Model):
-    __tablename__ = 'ingredientes_receta'
-    
-    cantidad = db.Column(db.Float, nullable=False)
-    
-    idReceta = db.Column(db.Integer, db.ForeignKey('recetas.id'), primary_key=True)
-    idInsumo = db.Column(db.Integer, db.ForeignKey('insumos.id'), primary_key=True)
 
 class LogAccion(db.Model):
     __tablename__ = 'logs_acciones'

@@ -101,10 +101,12 @@ body {
   overflow-x: initial;
   margin: 1rem 0 1rem calc(106px + 1rem);
   min-height: calc(100% - 2rem);
+  max-height: calc(100% - 2rem);
   min-width: calc(100% - 106px - 2rem);
   border-radius: 9px;
   box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
   padding-bottom: 6px;
+  overflow-y: auto;
 }
 .Contact {
   display: flex;

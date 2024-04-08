@@ -7,33 +7,286 @@
 {% endblock %}
 
 {% block content %}
+<h1 class="titulo-cocina">Solicitudes producción</h1>
+<div class="contenedor-solicitudes">
+    <div class="order-card">
+        <h2 class="title">Galleta 1</h2>
+        <div class="centrar-contenido">
+            <img src="{{ url_for('static', filename='img/cookies/galleta 1.png') }}" alt="">
+        </div>
+        <div class="c-body">
+            <div class="top">
+                <ul class="progress-line">
+                    <li class="green">
+                        <span>Solicitud realizada</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span>En preparación</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-fire-burner"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span>Lista recolección</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-share"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span>Solicitud entregada</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </li>
+                </ul>
 
-<section class="section">
-    <div class="container">
-        <div class="grid">
-            <article class="card">
-                <img class="card__image" src="https://i.ibb.co/RT0bjJq/food1.png" />
-                <div class="card__data">
-                    <div class="card__info">
-                        <h2>Galleta 1</h2>
-                        <p>Descripcion de la comida, con ingredientes</p>
+                <div class="contenedor-usuarios-detalles">
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-circle-user"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Solicitud</div>
+                            <div class="contenido-detalle">Jesús Luvian</div>
+                        </div>
                     </div>
-                    <h3 class="card__price">$7.50</h3>
-                    <button class="card__add">+</button>
-                </div>
-            </article>
-            <article class="card">
-                <img class="card__image" src="https://i.ibb.co/JpwBtYk/food2.png" />
-                <div class="card__data">
-                    <div class="card__info">
-                        <h2>Nombre Comida</h2>
-                        <p>Descripcion de la comida, con ingredientes</p>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-kitchen-set"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Cocinero</div>
+                            <div class="contenido-detalle">Carlos Bello</div>
+                        </div>
                     </div>
-                    <h3 class="card__price">$7.50</h3>
-                    <button class="card__add">+</button>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Fecha</div>
+                            <div class="contenido-detalle">07/02/24</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Hora</div>
+                            <div class="contenido-detalle">13:00:24</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-hashtag"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Tandas</div>
+                            <div class="contenido-detalle">2</div>
+                        </div>
+                    </div>
                 </div>
-            </article>
+            </div>
+        </div>
+
+        <div class="botones-solicitud">
+            <button type="submit" class="boton btn-cancelar">Cancelar solicitud</button>
+            <button type="submit" class="boton btn-aceptar">Aceptar solicitud</button>
         </div>
     </div>
-</section>
+
+    <div class="order-card">
+        <h2 class="title">Galleta 2</h2>
+        <div class="centrar-contenido">
+            <img src="{{ url_for('static', filename='img/cookies/galleta 1.png') }}" alt="">
+        </div>
+        <div class="c-body">
+            <div class="top">
+                <ul class="progress-line">
+                    <li class="green">
+                        <span>Solicitud realizada</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span>En preparación</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-fire-burner"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span>Lista recolección</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-share"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span>Solicitud entregada</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="contenedor-usuarios-detalles">
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-circle-user"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Solicitud</div>
+                            <div class="contenido-detalle">Jesús Luvian</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-kitchen-set"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Cocinero</div>
+                            <div class="contenido-detalle">Carlos Bello</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Fecha</div>
+                            <div class="contenido-detalle">07/02/24</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Hora</div>
+                            <div class="contenido-detalle">13:00:24</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-hashtag"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Tandas</div>
+                            <div class="contenido-detalle">2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="botones-solicitud">
+            <button type="submit" class="boton btn-cancelar">Cancelar solicitud</button>
+            <button type="submit" class="boton btn-aceptar">Aceptar solicitud</button>
+        </div>
+    </div>
+
+    <div class="order-card">
+        <h2 class="title">Galleta 3</h2>
+        <div class="centrar-contenido">
+            <img src="{{ url_for('static', filename='img/cookies/galleta 2.png') }}" alt="">
+        </div>
+        <div class="c-body">
+            <div class="top">
+                <ul class="progress-line">
+                    <li class="green">
+                        <span>Solicitud realizada</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span>En preparación</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-fire-burner"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span>Lista recolección</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-share"></i>
+                        </div>
+                    </li>
+                    <li>
+                        <span>Solicitud entregada</span>
+                        <div class="icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="contenedor-usuarios-detalles">
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-circle-user"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Solicitud</div>
+                            <div class="contenido-detalle">Jesús Luvian</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-kitchen-set"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Cocinero</div>
+                            <div class="contenido-detalle">Carlos Bello</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Fecha</div>
+                            <div class="contenido-detalle">07/02/24</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Hora</div>
+                            <div class="contenido-detalle">13:00:24</div>
+                        </div>
+                    </div>
+
+                    <div class="c-media b-border contenedor-detalles">
+                        <div class="icono">
+                            <i class="fa-solid fa-hashtag"></i>
+                        </div>
+                        <div class="details">
+                            <div class="titulo-detalle">Tandas</div>
+                            <div class="contenido-detalle">2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="botones-solicitud">
+            <button type="submit" class="boton btn-cancelar">Cancelar solicitud</button>
+            <button type="submit" class="boton btn-aceptar">Aceptar solicitud</button>
+        </div>
+    </div>
+</div>
 {% endblock %}
