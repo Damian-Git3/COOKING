@@ -1,31 +1,44 @@
-{% extends "layout.html" %} {% block content %}
-<link rel="stylesheet" href="../static/css/404.css" />
-<script src="https://unpkg.com/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
-<div class="hero-bg">
-  <div class="particles-container">
-    <canvas id="hero-particles"></canvas>
-  </div>
-</div>
-<div class="error-container">
-  <div class="cookie">
-    <img src="../static/img/cookie_19.png" alt="" />
-  </div>
-  <div class="error">
-    <div class="error__title">
-      <div class="words">
-        <span>4</span>
-        <span>0</span>
-        <span>4</span>
-      </div>
-    </div>
-    <div class="error__subtitle">Hmmm...</div>
-    <div class="error__description">¿Quieres ver una página que si existe?</div>
-    <div class="button-group">
-      <div class="button">
-        <a href="{{ url_for('main.index' )}}"> Si </a>
-      </div>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cooking - Página no encontrada</title>
+  <link rel="stylesheet" href="../static/css/404.css" />
+</head>
+
+<body>
+  <div class="hero-bg">
+    <div class="particles-container">
+      <canvas id="hero-particles"></canvas>
     </div>
   </div>
-</div>
-<script src="../static/js/404.js"></script>
-{% endblock %}
+  
+  <div class="error-container">
+    <div class="cookie">
+      <img src="../static/img/cookie_19.png" alt="" />
+    </div>
+    <div class="error">
+      <div class="error__title">
+        <div class="words">
+          <span>4</span>
+          <span>0</span>
+          <span>4</span>
+        </div>
+      </div>
+      <div class="error__subtitle">Hmmm...</div>
+      <div class="error__description">¿Quieres ver una página que si existe?</div>
+      <div class="button-group">
+        <div class="button">
+          <a href="{{ url_for('main.index' )}}"> Si </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script src="../static/js/404.js"></script>
+</body>
+
+</html>

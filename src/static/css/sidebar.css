@@ -1,11 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap");
+
 body {
   margin: 0;
   background: #eaeef6;
 }
 
 * {
-  text-align: center;
   font-family: "Open Sans", sans-serif;
 }
 
@@ -28,7 +28,8 @@ body {
   margin-top: 47px;
 }
 
-.MenuBox > ul > li > span {
+.MenuBox > ul > li > span,
+.MenuBox > ul > a > span {
   position: absolute;
   left: 80%;
   display: none;
@@ -45,7 +46,8 @@ body {
   z-index: 3;
 }
 
-.MenuBox > ul > li {
+.MenuBox > ul > li,
+.MenuBox > ul > a {
   display: block;
   width: 57px;
   height: 57px;
@@ -58,11 +60,13 @@ body {
 }
 
 .MenuBox:not(:hover),
-.MenuBox > ul > li:hover svg {
+.MenuBox > ul > li:hover svg,
+.MenuBox > ul > a:hover svg {
   color: white;
 }
 
-.MenuBox > ul > li:hover span {
+.MenuBox > ul > li:hover span,
+.MenuBox > ul > a:hover span {
   display: block;
   left: 100%;
 }
@@ -97,10 +101,12 @@ body {
   overflow-x: initial;
   margin: 1rem 0 1rem calc(106px + 1rem);
   min-height: calc(100% - 2rem);
+  max-height: calc(100% - 2rem);
   min-width: calc(100% - 106px - 2rem);
   border-radius: 9px;
   box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
   padding-bottom: 6px;
+  overflow-y: auto;
 }
 .Contact {
   display: flex;
