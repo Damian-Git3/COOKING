@@ -10,11 +10,6 @@ from markupsafe import Markup
 
 import os
 
-# Obtén la ruta absoluta al directorio donde deseas almacenar los archivos cargados
-ruta_absoluta = os.path.abspath(
-    'C:\\Users\\luvia\\OneDrive\\Escritorio\\Ingeniería\\Segundo cuatrimestre\\DWP\\COOKING-\\src\\static\\img\\cookies')
-
-
 def setup_admin(app, db):
     admin = Admin(app,  template_mode='bootstrap4', index_view=AdminIndexView(
         menu_icon_type='fa-solid',
@@ -38,16 +33,9 @@ def setup_admin(app, db):
                     f"La contraseña automatica para {Usuario.nombre} es 1234")
 
     class RecetaView(BaseModelConfiguration):
-        form_columns = ['nombre', 'descripcion', 'piezas',
-                        'utilidad', 'peso_estimado', 'imagen']
-        column_list = ['nombre', 'descripcion', 'piezas',
-                       'utilidad', 'peso_estimado', 'imagen']
-        form_extra_fields = {
-            'imagen': ImageUploadField('Imagen',
-                                       base_path="C:\\Users\\luvia\\OneDrive\\Escritorio\\Ingeniería\\Segundo cuatrimestre\\DWP\\COOKING-\\src\\static\\img\\cookies",
-                                       url_relative_path="img/cookies/",
-                                       validators=[DataRequired()])
-        }
+        form_columns = ['nombre', 'descripcion', 'piezas', 'utilidad', 'peso_estimado', 'imagen']
+        column_list = ['nombre', 'descripcion', 'piezas', 'utilidad', 'peso_estimado']
+        
         inline_models = ((
             InsumosReceta,
             {
@@ -73,7 +61,7 @@ def setup_admin(app, db):
 
     # Clase de vista personalizada para Rol
     class RolView(BaseModelConfiguration):
-        can_create = False
+        can_create = True
         can_delete = False
         form_colums = ['descripcion', 'usuarios']
         column_list = ['nombre', 'descripcion', 'usuarios']

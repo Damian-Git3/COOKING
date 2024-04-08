@@ -12,5 +12,20 @@ def index():
 def menu():
     return render_template('inicio.html')
 
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('modulos/general/dashboard.html')
+
+@main.route('/mermas')
+@login_required
+def mermas():
+    return render_template('modulos/general/mermas.html')
+
+@main.route('/inventario')
+@login_required
+def inventario():
+    return render_template('modulos/general/inventario.html')
+
 
 

@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
@@ -9,6 +10,20 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login')
 def login():
+    if current_user.is_authenticated:
+        
+        usuario_id = current_user.get_id()
+
+        # Obtiene el usuario de la base de datos
+        user = Usuario.query.filter_by(id=usuario_id).first()
+    
+        user.last_login_at = user.current_login_at
+        user.current_login_at = datetime.now()
+        
+
+        # Guarda los cambios en la base de datos
+        db.session.commit()
+        return redirect(url_for('main.menu'))
     return render_template('login.html')
 
 @auth.route('/login', methods=['POST'])
@@ -29,8 +44,14 @@ def login_post():
         flash('Usuario no activo. Por favor, consulta con tu administrador.')
         return render_template('login.html')
 
+    user.last_login_at = user.current_login_at
+    user.current_login_at = datetime.now()
+
+    # Guarda los cambios en la base de datos
+    db.session.commit()
     login_user(user, remember=recordar)
     return redirect(url_for('main.menu'))
+
 
 @auth.route('/signup')
 def signup():
@@ -64,4 +85,4 @@ def signup_post():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main.index'))
+    return redirect(url_for('auth.login'))

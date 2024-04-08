@@ -1,7 +1,163 @@
-{% extends 'layout/layout.html' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css')}}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='libs/bootstrap5/css/bootstrap.min.css')}}"
+    />
+    <title>CooKing - {% block title %}{% endblock %}</title>
+    <script src="{{ url_for('static', filename='libs/bootstrap5/js/bootstrap.bundle.js')}}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/fontawesome/css/all.css')}}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/fontawesome/js/all.js')}}" />
 
-{% block title %}Inicio{% endblock %}
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/cookie_1.png')}}" />
 
-{% block content %}
-hola desde inicio
-{% endblock %}
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='libs/sweetalert2/src/sweetalert2.scss')}}"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% block styles %}{% endblock %}
+  </head>
+  <body>
+    <div class="Menu">
+      <div class="logo-container">
+        <a href="{{url_for('main.menu')}}"
+          ><img
+            src="{{ url_for('static', filename='img/logo.png')}}"
+            alt="Logo de la empresa"
+            class="company-logo"
+        /></a>
+      </div>
+      <span class="HoverTip"></span>
+      <div class="Sidebar">
+        <ul>
+          <div class="HoverBox"></div>
+          {%if current_user.has_rol('admin') %}
+
+          <a href="/admin"
+            ><li class="Active">
+              <i class="fa-solid fa-crown"></i>
+              <span class="tooltip">Administración Avanzada</span>
+            </li></a
+          >
+
+          {% endif %} {%if current_user.has_rol('vendedor') %}
+
+          <a href="{{url_for('venta.punto_venta')}}"
+            ><li>
+              <i class="fa-solid fa-cash-register"></i>
+              <span class="tooltip">Punto de venta</span>
+            </li></a
+          >
+          <a href="{{url_for('venta.solicitud_produccion')}}"
+            ><li>
+              <i class="fa-solid fa-list-check"></i>
+              <span class="tooltip">Solicitud de Producción</span>
+            </li></a
+          >
+
+          <a href="{{url_for('venta.compras')}}"
+            ><li>
+              <i class="fa-solid fa-basket-shopping"></i>
+              <span class="tooltip">Compras</span>
+            </li></a
+          >
+
+          {% endif %} {% if current_user.has_rol('cocinero') %}
+
+          <a href="{{url_for('cocina.insumos')}}"
+            ><li>
+              <i class="fa-solid fa-egg"></i>
+              <span class="tooltip">Insumos</span>
+            </li></a
+          >
+
+          <a href="{{url_for('cocina.recetas')}}"
+            ><li>
+              <i class="fa-solid fa-book"></i>
+              <span class="tooltip">Recetas</span>
+            </li></a
+          >
+
+          <a href="{{url_for('cocina.cocinar')}}"
+            ><li>
+              <i class="fa-solid fa-kitchen-set"></i>
+              <span class="tooltip">Cocinar</span>
+            </li></a
+          >
+
+          {% endif %}
+
+          <a href="{{url_for('main.inventario')}}"
+            ><li>
+              <i class="fa-solid fa-boxes-stacked"></i>
+              <span class="tooltip">Inventario</span>
+            </li></a
+          >
+
+          <a href="{{url_for('main.mermas')}}"
+            ><li>
+              <i class="fa-solid fa-dumpster-fire"></i>
+              <span class="tooltip">Mermas</span>
+            </li></a
+          >
+
+          <a href="{{url_for('main.dashboard')}}"
+            ><li>
+              <i class="fa-solid fa-chart-line"></i>
+              <span class="tooltip">Dashboard</span>
+            </li></a
+          >
+
+          <a href="{{url_for('auth.logout')}}"
+            ><li>
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span class="tooltip">Cerrar sesión</span>
+            </li></a
+          >
+        </ul>
+      </div>
+      <div class="Content">
+        {% block content %}
+        <div
+          style="
+            display: flex;
+            height: 100%;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            background-image: url(../static/img/cookie_17.png);
+            background-size: cover;
+            overflow: hidden;
+          "
+        >
+          <h1
+            style="
+              padding: 150px 200px;
+              margin: 0 50px;
+              background: #00000095;
+              border-radius: 20px;
+              font-weight: 900;
+              font-size: 5rem;
+              text-align: center;
+              color: #ffe8bd;
+            "
+          >
+            Bievenido a CooKing
+          </h1>
+        </div>
+        <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
+        {% endblock %}
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
+  </body>
+</html>

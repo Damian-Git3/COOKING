@@ -4,6 +4,8 @@ from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
 from configu.config import DevelopmentConfig
 from configu.admin_config import setup_admin
+from configu.config import DevelopmentConfig
+from configu.admin_config import setup_admin
 from database.models import db, Usuario
 from sassutils.wsgi import SassMiddleware
 
@@ -33,6 +35,10 @@ if __name__ == "__main__":
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template("404.html"), 404
+    
+    
+    with app.app_context():
+        db.create_all()
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -49,9 +55,10 @@ if __name__ == "__main__":
 
     from routes.dashboard.dashboard import dashboard as dashboard_blueprint
     app.register_blueprint(dashboard_blueprint)
+    
+    from routes.venta import venta
+    app.register_blueprint(venta)
 
-    with app.app_context():
-        db.create_all()
 
     setup_admin(app, db)
 

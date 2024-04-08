@@ -28,10 +28,12 @@ class Receta(db.Model):
     utilidad = db.Column(db.Float)
     piezas = db.Column(db.Integer, nullable=False)
     descripcion = db.Column(db.String(500))
-    nombre = db.Column(db.String(50), nullable=False)
-    imagen = db.Column(db.String(255), nullable=False)
+    nombre = db.Column(db.String(50), nullable=False, unique=True)
+    imagen = db.Column(db.String(2550), nullable=False)
+
     
     insumos = db.relationship('Insumo', secondary='insumos_receta', backref=db.backref('insumo', lazy='dynamic'), overlaps="receta,recetas")
+    
     
 class Insumo(db.Model):
     __tablename__ = 'insumos'
@@ -81,6 +83,7 @@ class Usuario(UserMixin, db.Model):
     confirmed_at = db.Column(db.DateTime)
     
     roles = db.relationship('Rol', secondary=asignacion_rol_usuario, back_populates='usuarios')
+    
     
     # Método para obtener solo el nombre
     def __str__(self):
@@ -190,10 +193,14 @@ class SolicitudProduccion(db.Model):
     __tablename__ = 'solicitudes_produccion'
     
     id = db.Column(db.Integer, primary_key=True)
+
+    fecha_produccion = db.Column(db.Date)
     mensaje = db.Column(db.String(50))
-    tandas = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False)
+    tandas = db.Column(db.Integer)
     merma = db.Column(db.Integer)
-    
+    fecha_solicitud = db.Column(db.Date, nullable=False)
+
     fecha_solicitud = db.Column(db.DateTime, default=datetime.now)
     fecha_produccion = db.Column(db.Date)
     
@@ -201,12 +208,14 @@ class SolicitudProduccion(db.Model):
     
     status = db.Column(db.Integer, nullable=False)
     idReceta = db.Column(db.Integer, db.ForeignKey('recetas.id'), nullable=False)
-    idUsuarioSolictud = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    idUsuarioProduccion = db.Column(db.Integer, db.ForeignKey('usuarios.id'))
+
+    idUsuarioSolicitud = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    idUsuarioProduccion = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     
-    receta = db.relationship('Receta', foreign_keys=[idReceta])
-    usuarioSolicitud = db.relationship('Usuario', foreign_keys=[idUsuarioSolictud])
-    usuarioProduccion = db.relationship('Usuario', foreign_keys=[idUsuarioProduccion])
+    receta = db.relationship('Receta', backref=db.backref('solicitudes_produccion', lazy='dynamic'))
+    usuarioSolicitud = db.relationship('Usuario', foreign_keys=[idUsuarioSolicitud], backref=db.backref('solicitudes_produccion_vendedor', lazy='dynamic'))
+    usuarioProduccion = db.relationship('Usuario', foreign_keys=[idUsuarioProduccion], backref=db.backref('solicitudes_produccion_cocinero', lazy='dynamic'))
+
     
     @staticmethod
     def get_next_position():
@@ -218,6 +227,8 @@ class SolicitudProduccion(db.Model):
         super(SolicitudProduccion, self).__init__(*args, **kwargs)
         if self.posicion is None:  # Si no se proporciona una posición, asigna la siguiente disponible
             self.posicion = self.get_next_position()
+    
+
 
 class TransaccionCaja(db.Model):
     __tablename__ = 'transacciones_caja'

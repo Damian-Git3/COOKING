@@ -6,13 +6,21 @@ from database.models import db
 cocina = Blueprint('cocina', __name__, url_prefix="/cocina")
 
 
-@cocina.route('/')
+@cocina.route('/cocinar')
 @login_required
-def solicitudesProduccion():
+def cocinar():
     solicitudesProduccion = SolicitudProduccion.query.all()
+    return render_template('modulos/cocina/cocinar.html', solicitudesProduccion=solicitudesProduccion)
 
-    return render_template('modulos/cocina/solicitudes-produccion.html', solicitudesProduccion=solicitudesProduccion)
+@cocina.route('/recetas')
+@login_required
+def recetas():
+    return render_template('modulos/cocina/recetas.html')
 
+@cocina.route('/insumos')
+@login_required
+def insumos():
+    return render_template('modulos/cocina/insumos.html')
 
 @cocina.route("/aceptar-solicitud/<int:idSolicitud>")
 @login_required
@@ -45,3 +53,4 @@ def aceptarSolicitud(idSolicitud):
     else:
         flash("No se encontro la solicitud de producción con los datos proporcionados", 'info')
         return redirect(url_for('cocina.solicitudesProduccion'))
+

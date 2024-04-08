@@ -1,0 +1,313 @@
+{% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock
+%} {% block styles %} {% endblock %} {%from "macros.html" import render_field%}
+{% block content %}
+
+<div style="width: 100%; text-align: center">
+  <h1>Solicitudes de producción</h1>
+</div>
+{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
+messages %}
+<div class="alert alert-success" style="width: 90%">{{ message }}</div>
+{% endfor %} {% endif %} {% endwith %}
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a
+      href="{{ url_for('venta.solicitud_produccion') }}"
+      style="text-decoration: none; color: black"
+      ><button
+        class="nav-link {%if not nuevo %}active{%endif%}"
+        id="nav-home-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-home"
+        type="button"
+        role="tab"
+        aria-controls="nav-home"
+        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}"
+      >
+        Pendientes
+      </button></a
+    >
+    <a
+      href="{{ url_for('venta.solicitud_produccion_nuevo') }}"
+      style="text-decoration: none; color: black"
+    >
+      <button
+        class="nav-link {%if nuevo %}active{%endif%}"
+        id="nav-profile-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-profile"
+        type="button"
+        role="tab"
+        aria-controls="nav-profile"
+        aria-selected="{%if nuevo %}true{%else%}false{%endif%}"
+      >
+        Nueva
+      </button></a
+    >
+    {% if editar %}
+    <button
+      class="nav-link"
+      id="nav-edit-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-edit"
+      type="button"
+      role="tab"
+      aria-controls="nav-edit"
+      aria-selected="false"
+    >
+      Editar
+    </button>
+    {% endif %}
+  </div>
+</nav>
+
+
+<script>
+  // Inyecta recetas_imagenes como una variable JavaScript
+  var recetas_imagenes = {{ recetas_imagenes|tojson|safe }};
+</script>
+<div class="tab-content" id="nav-tabContent">
+  <div
+    class="tab-pane fade {%if not nuevo %}show active{% endif %}"
+    id="nav-home"
+    role="tabpanel"
+    aria-labelledby="nav-home-tab"
+  >
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Nombre de la Receta</th>
+          <th>Número de Tandas</th>
+          <th>Fecha de Solicitud</th>
+          <th>Estatus</th>
+          <th>Solicitante</th>
+          <th>Cocinero Responsable</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for solicitud in solicitudes %}
+        <tr>
+          <td
+            class="list-buttons-column"
+            style="display: flex; justify-content: space-around; border: none"
+          >
+            <a
+              class="icon"
+              href="/venta/solicitud_produccion/edit/{{ solicitud.id }}"
+              title="Editar Registro"
+              style="text-decoration: none; color: black"
+            >
+              <span class="fa fa-pencil glyphicon glyphicon-pencil"></span>
+            </a>
+
+            <form
+              id="deleteForm"
+              method="POST"
+              action="/venta/solicitud_produccion/delete"
+            >
+              <input
+                id="id"
+                name="id"
+                required=""
+                type="hidden"
+                value="{{solicitud.id}}"
+              />
+              <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+
+              <button
+                onclick="event.preventDefault(); confirmDelete();"
+                title="Delete record"
+                style="border: none; background: none"
+              >
+                <span class="fa-solid fa-trash"></span>
+              </button>
+            </form>
+            <script>
+              function confirmDelete() {
+                Swal.fire({
+                  title: "¿Confirmar eliminación?",
+                  text: "Si quieres recuperar la solicitud, tendrás que volver a crearla.",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#3085d6",
+                  cancelButtonColor: "#d33",
+                  confirmButtonText: "Eliminar",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    document.getElementById("deleteForm").submit();
+                  }
+                });
+              }
+            </script>
+          </td>
+          <td>{{ solicitud.receta.nombre }}</td>
+          <td>{{ solicitud.tandas }}</td>
+          <td>{{ solicitud.fecha_solicitud }}</td>
+          <td>
+            {% if solicitud.status == 0 %} Solicitud Realizada {% elif
+            solicitud.status == 1 %} Aceptada {% elif solicitud.status == 2 %}
+            En Lista de Recolección {% elif solicitud.status == 3 %} Entregada
+            {% elif solicitud.status == 4 %} Rechazada {% endif %}
+          </td>
+          <td>{{ solicitud.usuarioSolicitud.nombre }}</td>
+          <td>{{ solicitud.usuarioProduccion.nombre }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div
+    class="tab-pane fade {%if nuevo %}show active{% endif %}"
+    id="nav-profile"
+    role="tabpanel"
+    aria-labelledby="nav-profile-tab"
+  >
+    <br />
+    <form name="solicitud" id="solicitud" method="POST">
+      <div class="row">
+        <div class="col-md-6">
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{render_field(form.receta, class="form-control", id="receta")}}
+            </div>
+          </div>
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{render_field(form.tandas, class="form-control")}}
+            </div>
+          </div>
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{render_field(form.fecha_solicitud, class="form-control")}}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div
+            id="receta-imagen"
+            style="
+              height: 200px;
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              border-radius: 10px;
+            "
+          >
+            <img src="" id="imagen" style="height: auto; width: 100%" alt="" />
+          </div>
+        </div>
+
+        <script>
+          document
+            .getElementById("receta")
+            .addEventListener("change", function () {
+              var id = this.value;
+              var imagen = recetas_imagenes.find(function (receta) {
+                return receta[0] == id;
+              })[1];
+              document.getElementById("imagen").src = imagen;
+            });
+
+          document.getElementById("receta").dispatchEvent(new Event("change"));
+        </script>
+      </div>
+      <hr />
+      <input type="submit" class="btn btn-primary" value="Solicitar" />
+      <script>
+        cerrarNuevaSolicitud = function () {
+          document.getElementById("nav-home-tab").click();
+          document.getElementById("solicitud").reset();
+        };
+      </script>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="cerrarNuevaSolicitud()"
+      >
+        Cancelar
+      </button>
+    </form>
+  </div>
+  {% if editar %}
+  <div
+    class="tab-pane fade"
+    id="nav-edit"
+    role="tabpanel"
+    aria-labelledby="nav-edit-tab"
+  >
+    <br />
+    <form name="solicitud-editar" id="solicitud-editar" method="POST">
+      <div class="row">
+        <div class="col-md-6">
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{render_field(form2.tandas, class="form-control")}}
+            </div>
+          </div>
+
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{render_field(form2.fecha_solicitud, class="form-control")}}
+            </div>
+          </div>
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{render_field(form2.mensaje, class="form-control")}}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h3>Receta {{nombre_receta}}</h3>
+          <div
+            id="receta-imagen-editar"
+            style="
+              height: 200px;
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              border-radius: 10px;
+            "
+          >
+            <img
+              src=""
+              id="imagen-editar"
+              style="height: auto; width: 100%"
+              alt=""
+            />
+          </div>
+        </div>
+
+        <script>
+          document.getElementById("imagen-editar").src = "{{imagen_receta}}";
+        </script>
+      </div>
+      <hr />
+      <input type="submit" class="btn btn-primary" value="Actualizar" />
+      <script>
+        cerrarNuevaSolicitud = function () {
+          document.getElementById("nav-home-tab").click();
+          document.getElementById("solicitud").reset();
+        };
+      </script>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="cerrarNuevaSolicitud()"
+      >
+        Cancelar
+      </button>
+    </form>
+  </div>
+  <script>
+    document.getElementById("nav-edit-tab").click();
+  </script>
+  {% endif %}
+</div>
+{% endblock %}

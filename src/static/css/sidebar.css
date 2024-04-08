@@ -2,217 +2,205 @@
 
 body {
   margin: 0;
+  padding: 0;
+  font-family: "Open Sans", sans-serif;
+  color: #333333;
+  background: #eaeef6;
+}
+.Menu {
+  display: grid;
+  grid-template-columns: 100px auto;
+  grid-template-rows: 100px auto;
+  grid-gap: 1rem;
+  padding: 1rem;
+  height: 100vh;
   background: #eaeef6;
 }
 
-* {
-  font-family: "Open Sans", sans-serif;
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.logo-container > a > img {
+  height: auto;
+  width: 110px;
+}
+
+.Sidebar,
+.Content {
+  z-index: 1;
+  position: relative;
+  background: rgb(255, 255, 255);
+  border-radius: 9px;
+  box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
+  padding: 10px;
+  height: calc(100%);
+  overflow: auto;
+}
+
+.logo-container {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.Sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  overflow: hidden;
+}
+.Content {
+  grid-column: 2;
+  grid-row: span 2;
+}
+
+.Sidebar > ul > a > li {
+  list-style-type: none;
+  width: 56px;
+  min-width: 56px;
+  height: 56px;
+  min-height: 56px;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #6a778e;
+}
+
+.Sidebar > ul > a > li:hover {
+  color: white;
+}
+
+.Sidebar > ul > a > li > i {
+  width: 56px;
+  height: 56px;
+  display: flex; /* Habilita el uso de flexbox */
+  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center;
+  cursor: pointer;
+}
+
+.Sidebar > ul {
+  align-items: center;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  gap: 10px;
+  height: calc(100%);
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.Sidebar > ul::-webkit-scrollbar {
+  width: 8px; /* Ancho del scrollbar */
+  height: 8px; /* Alto del scrollbar */
+}
+
+/* Estilo para el pulgar (la parte que se desplaza) */
+.Sidebar > ul::-webkit-scrollbar-thumb {
+  background: #e9cb94; /* Color de fondo del pulgar */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+/* Estilo para el track (la parte sobre la que se desplaza el pulgar) */
+.Sidebar > ul::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color de fondo del track */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+/* Cambiar el estilo del pulgar al pasar el cursor */
+.Sidebar > ul::-webkit-scrollbar-thumb:hover {
+  background: #e6b252; /* Color de fondo del pulgar al pasar el cursor */
+}
+
+.Sidebar > ul > a > li > span {
+  display: none;
+}
+
+.Sidebar > ul > a {
+  text-decoration: none;
+  color: #6a778e;
+}
+
+@media (max-width: 768px) {
+  .Sidebar > ul {
+    flex-direction: row;
+    align-items: center;
+  }
+  .Sidebar {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .Content {
+    grid-row: 2;
+    grid-column: 1 / span 2;
+  }
+}
+
+@keyframes Effect {
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.5, 1.5);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+.Active {
+  color: white !important;
 }
 
 .HoverBox {
   width: 56px;
-  height: 55px;
+  height: 56px;
   margin: 0 auto;
-  background: #406ff3;
+  background: #e6b252;
   border-radius: 10px;
   position: absolute;
   z-index: 0;
-  left: 16px;
-  top: 16px;
   transition: 250ms;
 }
 
-.PageContact {
-  margin-left: 200px;
-  margin-right: 103px;
-  margin-top: 47px;
-}
-
-.MenuBox > ul > li > span,
-.MenuBox > ul > a > span {
+.HoverTip {
   position: absolute;
-  left: 80%;
   display: none;
-  top: 12px;
-  margin-left: 2rem;
   white-space: nowrap;
-  border: solid 1px #3a3a3a81;
-  color: #406ff3;
+  border: solid 1px #e6b252;
+  font-family: "Open Sans", sans-serif;
+  font-weight: bold;
+  color: #e6b252;
   background: #fff;
-  transition: 250ms ease all;
   border-radius: 17.5px;
   line-height: 0;
-  padding: 16px 15px;
+  padding: 20px 15px;
   z-index: 3;
+  
 }
 
-.MenuBox > ul > li,
-.MenuBox > ul > a {
-  display: block;
-  width: 57px;
-  height: 57px;
-  border-radius: 10px;
-  position: relative;
-  cursor: pointer;
-  z-index: 1;
-  margin-bottom: 12px;
-  line-height: 68px;
-}
-
-.MenuBox:not(:hover),
-.MenuBox > ul > li:hover svg,
-.MenuBox > ul > a:hover svg {
-  color: white;
-}
-
-.MenuBox > ul > li:hover span,
-.MenuBox > ul > a:hover span {
-  display: block;
-  left: 100%;
-}
-
-.Active > svg {
-  color: white;
-}
-
-.feather {
-  color: #6e6c6c;
-  width: 25px;
-  transition: 1s;
-}
-
-.MenuBox {
-  background: white;
-  position: absolute;
-  scrollbar-width: none;
-  margin: 2rem 1rem;
-  height: calc(100% - 4rem);
-  border-radius: 9px;
-  box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
-  padding-bottom: 6px;
-}
-.MenuBox::-webkit-scrollbar {
-  display: none;
-}
-.MenuContent {
-  background: white;
-  position: fixed;
-  scrollbar-width: thin;
-  overflow-x: initial;
-  margin: 1rem 0 1rem calc(106px + 1rem);
-  min-height: calc(100% - 2rem);
-  max-height: calc(100% - 2rem);
-  min-width: calc(100% - 106px - 2rem);
-  border-radius: 9px;
-  box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
-  padding-bottom: 6px;
-  overflow-y: auto;
-}
-.Contact {
-  display: flex;
-}
-
-.MenuBox > ul {
-  padding: 0 15px;
-  margin-top: 15px;
-}
-
-.PageContact > div {
-  transition: 0.5s;
-}
-
-@keyframes Effect_0 {
+@keyframes fadeRight {
   0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(0.5, 1.5);
+    opacity: 0;
+    left: 94px;
   }
   100% {
-    transform: scale(1, 1);
+    opacity: 1;
   }
 }
-
-@keyframes Effect_1 {
+@keyframes fadeDown {
   0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(0.5, 1.5);
+    opacity: 0;
+    top: 120px;
   }
   100% {
-    transform: scale(1, 1);
+    opacity: 1;
   }
-}
-
-@keyframes Effect_2 {
-  0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(0.5, 1.5);
-  }
-  100% {
-    transform: scale(1, 1);
-  }
-}
-
-@keyframes Effect_3 {
-  0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(0.5, 1.5);
-  }
-  100% {
-    transform: scale(1, 1);
-  }
-}
-
-@keyframes Effect_4 {
-  0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(0.5, 1.5);
-  }
-  100% {
-    transform: scale(1, 1);
-  }
-}
-
-@keyframes Effect_5 {
-  0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(0.5, 1.5);
-  }
-  100% {
-    transform: scale(1, 1);
-  }
-}
-
-/* Style About Box  */
-
-@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@500&display=swap");
-.linkAbout {
-  text-decoration: auto;
-  margin: 0 5px;
-  color: black;
-}
-
-.about {
-  position: absolute;
-  top: 0;
-  background: #ffffff;
-  padding: 10px;
-  border-radius: 0 0 15px 15px;
-  font-size: 1em;
-  font-family: "Heebo", sans-serif;
-  right: 31px;
-}
-
-.linkAbout:hover {
-  color: #406ff3;
 }
