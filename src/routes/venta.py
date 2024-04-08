@@ -44,8 +44,8 @@ def solicitud_produccion():
     
     solicitudes = SolicitudProduccion.query.options(
         joinedload(SolicitudProduccion.receta), # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
-        joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuario_solicitud' es el nombre de la relación en SolicitudProduccion
-        joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuario_produccion' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
     ).all()
 
         
@@ -68,14 +68,14 @@ def solicitud_produccion_nuevo():
     
     solicitudes = SolicitudProduccion.query.options(
         joinedload(SolicitudProduccion.receta), # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
-        joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuario_solicitud' es el nombre de la relación en SolicitudProduccion
-        joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuario_produccion' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
     ).all()
 
         
     return render_template('modulos/venta/solicitudes-produccion.html', form=form, recetas_imagenes=recetas_imagenes, solicitudes=solicitudes, nuevo=True)
 
-@venta.route('/solicitud_produccion', methods=['POST'])
+@venta.route('/solicitud_produccion/nuevo', methods=['POST'])
 @login_required
 def solicitud_produccion_post():
     form = forms.SolicitudProduccionForm(request.form)
@@ -125,8 +125,8 @@ def solicitud_produccion_post():
     
     solicitudes = SolicitudProduccion.query.options(
         joinedload(SolicitudProduccion.receta), # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
-        joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuario_solicitud' es el nombre de la relación en SolicitudProduccion
-        joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuario_produccion' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
     ).all()
     return render_template('modulos/venta/solicitudes-produccion.html', form=form, recetas_imagenes=recetas_imagenes, solicitudes=solicitudes)
 
@@ -160,8 +160,8 @@ def edit_solicitud_produccion(id):
     
     solicitudes = SolicitudProduccion.query.options(
         joinedload(SolicitudProduccion.receta), # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
-        joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuario_solicitud' es el nombre de la relación en SolicitudProduccion
-        joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuario_produccion' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
     ).all()
     
     # Busca la solicitud de producción específica por su ID

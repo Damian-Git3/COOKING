@@ -150,8 +150,8 @@ messages %}
             En Lista de Recolección {% elif solicitud.status == 3 %} Entregada
             {% elif solicitud.status == 4 %} Rechazada {% endif %}
           </td>
-          <td>{{ solicitud.usuario_solicitud.nombre }}</td>
-          <td>{{ solicitud.usuario_produccion.nombre }}</td>
+          <td>{{ solicitud.usuarioSolicitud.nombre }}</td>
+          <td>{{ solicitud.usuarioProduccion.nombre }}</td>
         </tr>
         {% endfor %}
       </tbody>

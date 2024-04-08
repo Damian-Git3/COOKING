@@ -15,7 +15,6 @@
     integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
   <link rel="stylesheet" href="../static/css/layout.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
   {% block styles %}{% endblock %}
 </head>
 
@@ -165,12 +164,37 @@
         </li>
       </ul>
     </div>
-    
+
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jqueryui.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <div class="MenuContent">
       {% block content %}
       {% endblock %}
     </div>
   </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            {% for category, message in messages %}
+                {% if category == 'info' %}
+                    Swal.fire({
+                        position: "top-end",
+                        title: "{{ message }}",
+                        showConfirmButton: false,
+                        timer: 1500,
+                        timerProgressBar: true,
+                    });
+                {% else %}
+                    console.log("Mensaje informativo: {{ message }}");
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endwith %}
 </body>
 
 </html>
