@@ -195,7 +195,8 @@ ol {
 //* Botón */
 
 .botones-solicitud {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   padding: 5px;
   gap: 5px;
 }
@@ -206,6 +207,15 @@ ol {
 
 .btn-cancelar {
   background: linear-gradient(-45deg, #b53000, #fe6969, #c82727, #e70303);
+}
+
+.btn-posponer {
+  color: black;
+  background: linear-gradient(-45deg, #b7b4be, #817e7e, #afacac, #d9d7d4);
+}
+
+.c-body{
+  margin-top: 10px;
 }
 
 .boton {
@@ -223,6 +233,10 @@ ol {
   -moz-border-radius: $border-radius;
   -ms-border-radius: $border-radius;
   -o-border-radius: $border-radius;
+}
+
+.botones-solicitud form:last-child {
+  grid-column: 1 / span 2; /* Ocupa dos columnas empezando desde la primera */
 }
 
 .boton:hover {

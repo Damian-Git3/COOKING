@@ -18,26 +18,45 @@
         <div class="c-body">
             <div class="top">
                 <ul class="progress-line">
+                    {% if solicitudProduccion.status >= 1 %}
                     <li class="green">
+                        {% else %}
+                    <li>
+                        {% endif %}
                         <span>Solicitud realizada</span>
                         <div class="icon">
                             <i class="fa-solid fa-check"></i>
                         </div>
                     </li>
+
+                    {% if solicitudProduccion.status >= 2 %}
+                    <li class="green">
+                        {% else %}
                     <li>
+                        {% endif %}
                         <span>En preparación</span>
                         <div class="icon">
                             <i class="fa-solid fa-fire-burner"></i>
                         </div>
                     </li>
+
+                    {% if solicitudProduccion.status >= 3 %}
+                    <li class="green">
+                        {% else %}
                     <li>
-                        <span>Lista recolección</span>
+                        {% endif %}
+                        <span>Listo para entrega</span>
                         <div class="icon">
                             <i class="fa-solid fa-share"></i>
                         </div>
                     </li>
+
+                    {% if solicitudProduccion.status >= 4 %}
+                    <li class="green">
+                        {% else %}
                     <li>
-                        <span>Solicitud entregada</span>
+                        {% endif %}
+                        <span>Producción entregada</span>
                         <div class="icon">
                             <i class="fa-solid fa-circle-check"></i>
                         </div>
@@ -77,7 +96,8 @@
                         </div>
                         <div class="details">
                             <div class="titulo-detalle">Fecha</div>
-                            <div class="contenido-detalle">{{ solicitudProduccion.fecha_solicitud.strftime('%Y-%m-%d')}}
+                            <div class="contenido-detalle">
+                                {{ solicitudProduccion.fecha_solicitud.strftime('%d de %B del %Y') }}
                             </div>
                         </div>
                     </div>
@@ -107,8 +127,45 @@
         </div>
 
         <div class="botones-solicitud">
-            <button type="submit" class="boton btn-cancelar">Cancelar solicitud</button>
-            <button type="submit" class="boton btn-aceptar">Aceptar solicitud</button>
+            {% if solicitudProduccion.status == 1 %}
+            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+                id="formAceptarSolicitud{{solicitudProduccion.id}}">
+                <button type="button" class="boton btn-aceptar"
+                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    Aceptar
+                </button>
+            </form>
+            {% endif %}
+
+            {% if solicitudProduccion.status == 2 %}
+            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+                id="formAceptarSolicitud{{solicitudProduccion.id}}">
+                <button type="button" class="boton btn-aceptar"
+                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    Finalizar producción
+                </button>
+            </form>
+            {% endif %}
+
+            {% if solicitudProduccion.status == 1 %}
+            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+                id="formAceptarSolicitud{{solicitudProduccion.id}}">
+                <button type="button" class="boton btn-posponer"
+                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    Posponer
+                </button>
+            </form>
+            {% endif %}
+
+            {% if solicitudProduccion.status == 1 %}
+            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+                id="formAceptarSolicitud{{solicitudProduccion.id}}">
+                <button type="button" class="boton btn-cancelar"
+                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    Cancelar
+                </button>
+            </form>
+            {% endif %}
         </div>
     </div>
     {% else %}
@@ -133,4 +190,33 @@
         $("#contenedor").disableSelection();
     });
 </script>
+
+<script>
+    function aceptarSolicitud(id) {
+        Swal.fire({
+            title: '¿Estás seguro de aceptar la solicitud?',
+            showCancelButton: true,
+            confirmButtonText: 'Continuar',
+            cancelButtonText: 'Cancelar',
+            icon: 'question'
+        }).then((result) => {
+            let formAceptarSolicitud = document.getElementById('formAceptarSolicitud' + id);
+            formAceptarSolicitud.submit();
+        });
+    }
+</script>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<script>
+    {% for category, message in messages %}
+    {% if category == 'receta' %}
+    Swal.fire(`{{ message }}`);
+    {% else %}
+    console.log("Mensaje diferente: {{ message }}");
+    {% endif %}
+    {% endfor %}
+</script>
+{% endif %}
+{% endwith %}
 {% endblock %}
