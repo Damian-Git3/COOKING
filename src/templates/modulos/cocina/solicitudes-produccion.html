@@ -8,35 +8,55 @@
 
 {% block content %}
 <h1 class="titulo-cocina">Solicitudes producción</h1>
-<div class="contenedor-solicitudes">
+<div class="contenedor-solicitudes" id="contenedor">
+    {% for solicitudProduccion in solicitudesProduccion %}
     <div class="order-card">
-        <h2 class="title">Galleta 1</h2>
+        <h2 class="title">{{ solicitudProduccion.receta.nombre }}</h2>
         <div class="centrar-contenido">
-            <img src="{{ url_for('static', filename='img/cookies/galleta 1.png') }}" alt="">
+            <img src="{{ url_for('static', filename='img/cookies/' ~ solicitudProduccion.receta.imagen) }}">
         </div>
         <div class="c-body">
             <div class="top">
                 <ul class="progress-line">
+                    {% if solicitudProduccion.status >= 1 %}
                     <li class="green">
+                        {% else %}
+                    <li>
+                        {% endif %}
                         <span>Solicitud realizada</span>
                         <div class="icon">
                             <i class="fa-solid fa-check"></i>
                         </div>
                     </li>
+
+                    {% if solicitudProduccion.status >= 2 %}
+                    <li class="green">
+                        {% else %}
                     <li>
+                        {% endif %}
                         <span>En preparación</span>
                         <div class="icon">
                             <i class="fa-solid fa-fire-burner"></i>
                         </div>
                     </li>
+
+                    {% if solicitudProduccion.status >= 3 %}
+                    <li class="green">
+                        {% else %}
                     <li>
-                        <span>Lista recolección</span>
+                        {% endif %}
+                        <span>Listo para entrega</span>
                         <div class="icon">
                             <i class="fa-solid fa-share"></i>
                         </div>
                     </li>
+
+                    {% if solicitudProduccion.status >= 4 %}
+                    <li class="green">
+                        {% else %}
                     <li>
-                        <span>Solicitud entregada</span>
+                        {% endif %}
+                        <span>Producción entregada</span>
                         <div class="icon">
                             <i class="fa-solid fa-circle-check"></i>
                         </div>
@@ -50,7 +70,7 @@
                         </div>
                         <div class="details">
                             <div class="titulo-detalle">Solicitud</div>
-                            <div class="contenido-detalle">Jesús Luvian</div>
+                            <div class="contenido-detalle">{{ solicitudProduccion.usuarioSolicitud.nombre }}</div>
                         </div>
                     </div>
 
@@ -60,7 +80,13 @@
                         </div>
                         <div class="details">
                             <div class="titulo-detalle">Cocinero</div>
-                            <div class="contenido-detalle">Carlos Bello</div>
+                            <div class="contenido-detalle">
+                                {% if solicitudProduccion.usuarioProduccion is not none %}
+                                {{ solicitudProduccion.usuarioProduccion.nombre }}
+                                {% else %}
+                                No asignado
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
 
@@ -70,7 +96,9 @@
                         </div>
                         <div class="details">
                             <div class="titulo-detalle">Fecha</div>
-                            <div class="contenido-detalle">07/02/24</div>
+                            <div class="contenido-detalle">
+                                {{ solicitudProduccion.fecha_solicitud.strftime('%d de %B del %Y') }}
+                            </div>
                         </div>
                     </div>
 
@@ -80,7 +108,8 @@
                         </div>
                         <div class="details">
                             <div class="titulo-detalle">Hora</div>
-                            <div class="contenido-detalle">13:00:24</div>
+                            <div class="contenido-detalle">{{ solicitudProduccion.fecha_solicitud.strftime('%H:%M:%S')
+                                }}</div>
                         </div>
                     </div>
 
@@ -90,7 +119,7 @@
                         </div>
                         <div class="details">
                             <div class="titulo-detalle">Tandas</div>
-                            <div class="contenido-detalle">2</div>
+                            <div class="contenido-detalle">{{ solicitudProduccion.tandas }}</div>
                         </div>
                     </div>
                 </div>
@@ -98,195 +127,96 @@
         </div>
 
         <div class="botones-solicitud">
-            <button type="submit" class="boton btn-cancelar">Cancelar solicitud</button>
-            <button type="submit" class="boton btn-aceptar">Aceptar solicitud</button>
+            {% if solicitudProduccion.status == 1 %}
+            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+                id="formAceptarSolicitud{{solicitudProduccion.id}}">
+                <button type="button" class="boton btn-aceptar"
+                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    Aceptar
+                </button>
+            </form>
+            {% endif %}
+
+            {% if solicitudProduccion.status == 2 %}
+            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+                id="formAceptarSolicitud{{solicitudProduccion.id}}">
+                <button type="button" class="boton btn-aceptar"
+                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    Finalizar producción
+                </button>
+            </form>
+            {% endif %}
+
+            {% if solicitudProduccion.status == 1 %}
+            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+                id="formAceptarSolicitud{{solicitudProduccion.id}}">
+                <button type="button" class="boton btn-posponer"
+                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    Posponer
+                </button>
+            </form>
+            {% endif %}
+
+            {% if solicitudProduccion.status == 1 %}
+            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+                id="formAceptarSolicitud{{solicitudProduccion.id}}">
+                <button type="button" class="boton btn-cancelar"
+                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    Cancelar
+                </button>
+            </form>
+            {% endif %}
         </div>
     </div>
-
-    <div class="order-card">
-        <h2 class="title">Galleta 2</h2>
-        <div class="centrar-contenido">
-            <img src="{{ url_for('static', filename='img/cookies/galleta 1.png') }}" alt="">
-        </div>
-        <div class="c-body">
-            <div class="top">
-                <ul class="progress-line">
-                    <li class="green">
-                        <span>Solicitud realizada</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-check"></i>
-                        </div>
-                    </li>
-                    <li>
-                        <span>En preparación</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-fire-burner"></i>
-                        </div>
-                    </li>
-                    <li>
-                        <span>Lista recolección</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-share"></i>
-                        </div>
-                    </li>
-                    <li>
-                        <span>Solicitud entregada</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
-                    </li>
-                </ul>
-
-                <div class="contenedor-usuarios-detalles">
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-circle-user"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Solicitud</div>
-                            <div class="contenido-detalle">Jesús Luvian</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-kitchen-set"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Cocinero</div>
-                            <div class="contenido-detalle">Carlos Bello</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-calendar-days"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Fecha</div>
-                            <div class="contenido-detalle">07/02/24</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-regular fa-clock"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Hora</div>
-                            <div class="contenido-detalle">13:00:24</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-hashtag"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Tandas</div>
-                            <div class="contenido-detalle">2</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="botones-solicitud">
-            <button type="submit" class="boton btn-cancelar">Cancelar solicitud</button>
-            <button type="submit" class="boton btn-aceptar">Aceptar solicitud</button>
-        </div>
+    {% else %}
+    <div class="solicitudes-vacias">
+        <h2>No se encontraron solicitudes de producción.</h2>
     </div>
-
-    <div class="order-card">
-        <h2 class="title">Galleta 3</h2>
-        <div class="centrar-contenido">
-            <img src="{{ url_for('static', filename='img/cookies/galleta 2.png') }}" alt="">
-        </div>
-        <div class="c-body">
-            <div class="top">
-                <ul class="progress-line">
-                    <li class="green">
-                        <span>Solicitud realizada</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-check"></i>
-                        </div>
-                    </li>
-                    <li>
-                        <span>En preparación</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-fire-burner"></i>
-                        </div>
-                    </li>
-                    <li>
-                        <span>Lista recolección</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-share"></i>
-                        </div>
-                    </li>
-                    <li>
-                        <span>Solicitud entregada</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
-                    </li>
-                </ul>
-
-                <div class="contenedor-usuarios-detalles">
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-circle-user"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Solicitud</div>
-                            <div class="contenido-detalle">Jesús Luvian</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-kitchen-set"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Cocinero</div>
-                            <div class="contenido-detalle">Carlos Bello</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-calendar-days"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Fecha</div>
-                            <div class="contenido-detalle">07/02/24</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-regular fa-clock"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Hora</div>
-                            <div class="contenido-detalle">13:00:24</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-hashtag"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Tandas</div>
-                            <div class="contenido-detalle">2</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="botones-solicitud">
-            <button type="submit" class="boton btn-cancelar">Cancelar solicitud</button>
-            <button type="submit" class="boton btn-aceptar">Aceptar solicitud</button>
-        </div>
-    </div>
+    {% endfor %}
 </div>
+
+<script>
+    $(document).ready(function () {
+        $("#contenedor").sortable({
+            start: function (event, div) {
+                div.item.data('start-index', div.item.index());
+            },
+            update: function (event, div) {
+                var startIndex = div.item.data('start-index');
+                var endIndex = div.item.index();
+                console.log("El elemento se movió de la posición " + (startIndex + 1) + " a la posición " + (endIndex + 1));
+            }
+        });
+        $("#contenedor").disableSelection();
+    });
+</script>
+
+<script>
+    function aceptarSolicitud(id) {
+        Swal.fire({
+            title: '¿Estás seguro de aceptar la solicitud?',
+            showCancelButton: true,
+            confirmButtonText: 'Continuar',
+            cancelButtonText: 'Cancelar',
+            icon: 'question'
+        }).then((result) => {
+            let formAceptarSolicitud = document.getElementById('formAceptarSolicitud' + id);
+            formAceptarSolicitud.submit();
+        });
+    }
+</script>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<script>
+    {% for category, message in messages %}
+    {% if category == 'receta' %}
+    Swal.fire(`{{ message }}`);
+    {% else %}
+    console.log("Mensaje diferente: {{ message }}");
+    {% endif %}
+    {% endfor %}
+</script>
+{% endif %}
+{% endwith %}
 {% endblock %}

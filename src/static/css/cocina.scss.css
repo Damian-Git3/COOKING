@@ -4,6 +4,12 @@ ol {
   margin: 0;
   list-style: none; }
 
+.solicitudes-vacias {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+
 .titulo-cocina {
   text-align: center;
   margin-top: 1rem;
@@ -34,7 +40,8 @@ ol {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   -ms-border-radius: 10px;
-  -o-border-radius: 10px; }
+  -o-border-radius: 10px;
+  background-color: #fff; }
   .order-card img {
     width: 50%;
     height: 50%; }
@@ -160,7 +167,8 @@ ol {
   text-align: center; }
 
 .botones-solicitud {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   padding: 5px;
   gap: 5px; }
 
@@ -169,6 +177,13 @@ ol {
 
 .btn-cancelar {
   background: linear-gradient(-45deg, #b53000, #fe6969, #c82727, #e70303); }
+
+.btn-posponer {
+  color: black;
+  background: linear-gradient(-45deg, #b7b4be, #817e7e, #afacac, #d9d7d4); }
+
+.c-body {
+  margin-top: 10px; }
 
 .boton {
   background-size: 800% 400%;
@@ -185,6 +200,10 @@ ol {
   -moz-border-radius: 10px;
   -ms-border-radius: 10px;
   -o-border-radius: 10px; }
+
+.botones-solicitud form:last-child {
+  grid-column: 1 / span 2;
+  /* Ocupa dos columnas empezando desde la primera */ }
 
 .boton:hover {
   animation: gradient 3s infinite;

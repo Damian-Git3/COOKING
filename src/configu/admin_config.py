@@ -4,19 +4,23 @@ from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash
 from database.models import Usuario, Rol, Insumo, Proveedor, Receta, InsumosReceta
 from flask_babel import Babel
-from flask import flash
+from flask import flash, url_for
+from wtforms.validators import DataRequired
+from markupsafe import Markup
 
 import os
 
 # Obtén la ruta absoluta al directorio donde deseas almacenar los archivos cargados
-ruta_absoluta = os.path.abspath('C:\\Users\\luvia\\OneDrive\\Escritorio\\Ingeniería\\Segundo cuatrimestre\\DWP\\COOKING-\\src\\static\\img\\cookies')
+ruta_absoluta = os.path.abspath(
+    'C:\\Users\\luvia\\OneDrive\\Escritorio\\Ingeniería\\Segundo cuatrimestre\\DWP\\COOKING-\\src\\static\\img\\cookies')
+
 
 def setup_admin(app, db):
     admin = Admin(app,  template_mode='bootstrap4', index_view=AdminIndexView(
         menu_icon_type='fa-solid',
         menu_icon_value='fa-home'
     ))
-    
+
     # Clase base para modelos configuration
     class BaseModelConfiguration(ModelView):
         page_size = 10
@@ -30,16 +34,19 @@ def setup_admin(app, db):
         def on_model_change(self, form, Usuario, is_created):
             if is_created:
                 Usuario.contrasenia = generate_password_hash('1234')
-                flash(f"La contraseña automatica para {Usuario.nombre} es 1234")
-                
+                flash(
+                    f"La contraseña automatica para {Usuario.nombre} es 1234")
+
     class RecetaView(BaseModelConfiguration):
-        form_columns = ['nombre', 'descripcion', 'piezas', 'utilidad', 'peso_estimado', 'imagen']
-        column_list = ['nombre', 'descripcion', 'piezas', 'utilidad', 'peso_estimado']
+        form_columns = ['nombre', 'descripcion', 'piezas',
+                        'utilidad', 'peso_estimado', 'imagen']
+        column_list = ['nombre', 'descripcion', 'piezas',
+                       'utilidad', 'peso_estimado', 'imagen']
         form_extra_fields = {
             'imagen': ImageUploadField('Imagen',
                                        base_path="C:\\Users\\luvia\\OneDrive\\Escritorio\\Ingeniería\\Segundo cuatrimestre\\DWP\\COOKING-\\src\\static\\img\\cookies",
-                               url_relative_path="img/cookies/")
-
+                                       url_relative_path="img/cookies/",
+                                       validators=[DataRequired()])
         }
         inline_models = ((
             InsumosReceta,
@@ -48,7 +55,11 @@ def setup_admin(app, db):
                 'form_label': 'Insumos'
             }
         ),)
-        
+
+        column_formatters = {
+            'imagen': lambda v, c, m, p: Markup(f'<img src="{url_for("static", filename="img/cookies/" + m.imagen)}" style="max-width:300px; max-height:300px;">')
+        }
+
         def delete_model(self, model):
             try:
                 # Eliminar los registros relacionados en la tabla InsumosReceta
@@ -56,7 +67,8 @@ def setup_admin(app, db):
                 # Llamar al método delete_model de la superclase para eliminar la receta
                 return super(RecetaView, self).delete_model(model)
             except Exception as e:
-                flash('Error al eliminar la receta y los registros relacionados: {}'.format(str(e)), 'error')
+                flash('Error al eliminar la receta y los registros relacionados: {}'.format(
+                    str(e)), 'error')
                 return False
 
     # Clase de vista personalizada para Rol
@@ -65,7 +77,7 @@ def setup_admin(app, db):
         can_delete = False
         form_colums = ['descripcion', 'usuarios']
         column_list = ['nombre', 'descripcion', 'usuarios']
-        
+
     babel = Babel(app)
 
     # Modificiar idioma de flask_admin
@@ -74,8 +86,13 @@ def setup_admin(app, db):
     babel.init_app(app, locale_selector=get_locale)
 
     # Agregar módulos a Flask_Admin
-    admin.add_view(UsuarioView(Usuario, db.session, menu_icon_type='fa-solid', menu_icon_value='fa-user'))
-    admin.add_view(RolView(Rol, db.session, menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
-    admin.add_view(ModelView(Insumo, db.session, menu_icon_type='fa-solid', menu_icon_value='fa-truck-field'))
-    admin.add_view(ModelView(Proveedor, db.session, menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
-    admin.add_view(RecetaView(Receta, db.session, menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
+    admin.add_view(UsuarioView(Usuario, db.session,
+                   menu_icon_type='fa-solid', menu_icon_value='fa-user'))
+    admin.add_view(RolView(Rol, db.session,
+                   menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
+    admin.add_view(ModelView(Insumo, db.session,
+                   menu_icon_type='fa-solid', menu_icon_value='fa-truck-field'))
+    admin.add_view(ModelView(Proveedor, db.session,
+                   menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
+    admin.add_view(RecetaView(Receta, db.session,
+                   menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))

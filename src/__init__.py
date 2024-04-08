@@ -13,7 +13,12 @@ if __name__ == "__main__":
     app.config.from_object(DevelopmentConfig)
 
     app.wsgi_app = SassMiddleware(app.wsgi_app, {
-        '__main__': ('static/sass', 'static/css', '/static/css')
+        '__main__': {
+            'sass_path': 'static/sass',
+            'css_path': 'static/css',
+            'wsgi_path': '/static/css',
+            'strip_extension': False
+        }
     })
 
     csrf = CSRFProtect()
