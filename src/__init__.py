@@ -2,10 +2,11 @@ from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
-from config.config import DevelopmentConfig
-from config.admin_config import setup_admin
+from configu.config import DevelopmentConfig
+from configu.admin_config import setup_admin
 from database.models import db, Usuario
 from sassutils.wsgi import SassMiddleware
+
 
 if __name__ == "__main__":
     app = Flask(__name__)
@@ -38,10 +39,12 @@ if __name__ == "__main__":
     from routes.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    from routes.dashboard.dashboard import dashboard as dashboard_blueprint
+    app.register_blueprint(dashboard_blueprint)
+
     with app.app_context():
         db.create_all()
 
     setup_admin(app, db)
 
     app.run(port=4000)
-
