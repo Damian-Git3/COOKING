@@ -1,0 +1,161 @@
+{% extends "layout/layout.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="col-12">
+        <div class="row border">
+            <div class="col-6">
+                <kbd>GALLETAS VENDIDAS POR MES</kbd>
+                <canvas id="G1"  height="400" width="600"></canvas>
+            </div>
+            <div class="col-6">
+                <kbd>VENTAS POR MES</kbd>
+                <canvas id="G2"  height="400" width="600"></canvas>
+            </div>
+        </div>
+        <div class="row border">
+            <div class="col-6">
+                <kbd>PRODUCTO MAS VENDIDO</kbd>
+                <canvas id="G3" height="400" width="600"></canvas>
+            </div>
+            <div class="col-6">
+                <kbd>VENTAS POR MES</kbd>
+                <canvas id="G4"  height="400" width="600"   ></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block jscode %}
+<script>
+    const G1 = document.getElementById('G1');
+    const G2 = document.getElementById('G2');
+    const G3 = document.getElementById('G3');
+    const G4 = document.getElementById('G4');
+
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const colorsBackground = [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(255, 159, 64, 0.2)',
+        'rgba(255, 205, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(201, 203, 207, 0.2)'
+    ];
+
+    const colorsBorder = [
+        'rgb(255, 99, 132)',
+        'rgb(255, 159, 64)',
+        'rgb(255, 205, 86)',
+        'rgb(75, 192, 192)',
+        'rgb(54, 162, 235)',
+        'rgb(153, 102, 255)',
+        'rgb(201, 203, 207)'
+    ];
+
+    let galletaVentasMes = {{ galletaVentasMes }};
+    let ventasMes = {{ ventasMes }};
+    let galletasVendidas = {{ galletasVendidas }};
+    let galletasTipos = {{ galletasTipos|tojson }};
+
+
+    const dataGalletaVentasMes = {
+        labels: meses,
+        datasets: [{
+            label: 'Galletas Vendidas por Mes',
+            data: galletaVentasMes,
+            backgroundColor: colorsBackground,
+            borderColor: colorsBorder,
+            borderWidth: 1
+        }]
+    };
+
+    const configGalletaVentasMes = {
+        type: 'bar',
+        data: dataGalletaVentasMes,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true, // Comenzar el eje Y en 0
+                    title: {
+                        display: true,
+                        text: 'Número de Galletas Vendidas'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Mes'
+                    }
+                }
+            }
+        },
+    };
+
+    const dataVentasMes = {
+        labels: meses,
+        datasets: [{
+            label: 'Ventas por Mes',
+            data: ventasMes,
+            backgroundColor: colorsBackground,
+            borderColor: colorsBorder,
+            borderWidth: 1
+        }]
+    };
+
+    const configVentasMes = {
+        type: 'bar',
+        data: dataVentasMes,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true, // Comenzar el eje Y en 0
+                    title: {
+                        display: true,
+                        text: 'Número de Ventas'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Mes'
+                    }
+                }
+            },
+
+        },
+    };
+
+    const dataGalletasVendidas = {
+        labels: galletasTipos,
+        datasets: [{
+            label: 'Galletas Vendidas en el Mes',
+            data: galletasVendidas,
+            backgroundColor: colorsBackground,
+            borderColor: colorsBorder,
+            borderWidth: 1,
+            hoverOffset: 4,
+            
+        }],
+    
+    };
+
+    const configGalletasVendidas = {
+        type: 'pie',
+        data: dataGalletasVendidas,
+        width: 600, // Ancho personalizado
+        height: 400 // Altura personalizada
+
+    };
+
+    new Chart(G1, configGalletaVentasMes);
+    new Chart(G2, configVentasMes);
+    new Chart(G3, configGalletasVendidas);
+    new Chart(G4, config);
+
+</script>
+{% endblock %}

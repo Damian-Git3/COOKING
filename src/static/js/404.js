@@ -136,11 +136,11 @@
           t.addBubble(new s(t.canvas.parentNode));
       }),
       (a.prototype.bubbleDensity = function () {
-        return 15;
+        return 30;
       }),
       window.addEventListener("load", function () {
         const t = new a("hero-particles");
-        t.start(), e.start();
+        t.start();
       }),
       (window.requestAnimFrame =
         window.requestAnimationFrame ||
