@@ -138,10 +138,10 @@
             {% endif %}
 
             {% if solicitudProduccion.status == 2 %}
-            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
-                id="formAceptarSolicitud{{solicitudProduccion.id}}">
+            <form action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
+                id="formFinalizarProduccion{{solicitudProduccion.id}}">
                 <button type="button" class="boton btn-aceptar"
-                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')">
                     Finalizar producción
                 </button>
             </form>
@@ -151,7 +151,7 @@
             <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
                 id="formAceptarSolicitud{{solicitudProduccion.id}}">
                 <button type="button" class="boton btn-posponer"
-                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    onclick="posponerSolicitud('{{ solicitudProduccion.id }}')">
                     Posponer
                 </button>
             </form>
@@ -161,7 +161,7 @@
             <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
                 id="formAceptarSolicitud{{solicitudProduccion.id}}">
                 <button type="button" class="boton btn-cancelar"
-                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
+                    onclick="cancelarSolicitud('{{ solicitudProduccion.id }}')">
                     Cancelar
                 </button>
             </form>
@@ -196,12 +196,51 @@
         Swal.fire({
             title: '¿Estás seguro de aceptar la solicitud?',
             showCancelButton: true,
-            confirmButtonText: 'Continuar',
+            confirmButtonText: 'Sí',
             cancelButtonText: 'Cancelar',
             icon: 'question'
         }).then((result) => {
             let formAceptarSolicitud = document.getElementById('formAceptarSolicitud' + id);
             formAceptarSolicitud.submit();
+        });
+    }
+
+    function finalizarSolicitud(id) {
+        Swal.fire({
+            title: '¿Estás seguro de finalizar la producción?',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'Cancelar',
+            icon: 'question'
+        }).then((result) => {
+            let formFinalizarProduccion = document.getElementById('formFinalizarProduccion' + id);
+            formFinalizarProduccion.submit();
+        });
+    }
+
+    function posponerSolicitud(id) {
+        Swal.fire({
+            title: '¿Estás seguro de posponer la solicitud?',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'Cancelar',
+            icon: 'question'
+        }).then((result) => {
+            let formFinalizarProduccion = document.getElementById('formFinalizarProduccion' + id);
+            formFinalizarProduccion.submit();
+        });
+    }
+
+    function cancelarSolicitud(id) {
+        Swal.fire({
+            title: '¿Estás seguro de cancelar la solicitud?',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'Cancelar',
+            icon: 'question'
+        }).then((result) => {
+            let formFinalizarProduccion = document.getElementById('formFinalizarProduccion' + id);
+            formFinalizarProduccion.submit();
         });
     }
 </script>

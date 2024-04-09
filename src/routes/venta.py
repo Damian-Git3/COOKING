@@ -47,7 +47,6 @@ def solicitud_produccion():
         joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
         joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
     ).all()
-
         
     return render_template('modulos/venta/solicitudes-produccion.html', form=form, recetas_imagenes=recetas_imagenes, solicitudes=solicitudes)
 
@@ -114,7 +113,7 @@ def solicitud_produccion_post():
             idUsuarioProduccion=usuario_cocinero,
             fecha_solicitud=form.fecha_solicitud.data,
             tandas=form.tandas.data,
-            status=0
+            status=1
         )
         
         db.session.add(solicitud)
@@ -128,9 +127,8 @@ def solicitud_produccion_post():
         joinedload(SolicitudProduccion.usuarioSolicitud), # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
         joinedload(SolicitudProduccion.usuarioProduccion) # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
     ).all()
-    return render_template('modulos/venta/solicitudes-produccion.html', form=form, recetas_imagenes=recetas_imagenes, solicitudes=solicitudes)
-
-
+    
+    return redirect(url_for('venta.solicitud_produccion'))
 
 @venta.route('/solicitud_produccion/edit/<int:id>', methods=['GET','POST'])
 @login_required
