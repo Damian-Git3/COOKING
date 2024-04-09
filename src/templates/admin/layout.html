@@ -44,7 +44,7 @@
             {{ menu(menu_root=[child]) }}
           {% else %}
             {% set class_name = child.get_class_name() %}
-            <li{% if class_name %} class="{{ class_name }}"{% endif %}>
+            <li {% if class_name %} class="{{ class_name }}"{% endif %}>
               {%- if child.is_active(admin_view) %}
                 <a class="dropdown-item active" href="{{ child.get_url() }}"{% if child.target %}
                    target="{{ child.target }}"{% endif %}>
@@ -82,7 +82,7 @@
 {% for item in links %}
 {% set class_name = item.get_class_name() %}
 {% if item.is_accessible() and item.is_visible() %}
-<li{% if class_name %} class="{{ class_name }}" {% endif %}>
+<li {% if class_name %} class="{{ class_name }}" {% endif %}>
     <a class="nav-link" href="{{ item.get_url() }}" {% if item.target %} target="{{ item.target }}" {% endif %}>
         {{ menu_icon(item) }}{{ item.name }}</a>
     </li>

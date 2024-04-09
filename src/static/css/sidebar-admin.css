@@ -30,8 +30,8 @@ body {
   width: 110px;
 }
 
-.Sidebar,
-.Content {
+.barra,
+.main-content {
   z-index: 1;
   position: relative;
   background: rgb(255, 255, 255);
@@ -47,17 +47,17 @@ body {
   grid-row: 1;
 }
 
-.Sidebar {
+.barra {
   grid-column: 1;
   grid-row: 2;
   overflow: hidden;
 }
-.Content {
+.main-content {
   grid-column: 2;
   grid-row: span 2;
 }
 
-.Sidebar > ul > a > li {
+.barra > .barra__menu > a > .barra__item {
   list-style-type: none;
   width: 56px;
   min-width: 56px;
@@ -73,11 +73,10 @@ body {
   transition: all 1s ease;
 }
 
-.Sidebar > ul > a > li:hover {
+.barra > .barra__menu > a > .barra__item:hover {
   color: white;
 }
-
-.Sidebar > ul > a > li > i {
+.barra > .barra__menu > a > .barra__item > i {
   width: 56px;
   height: 56px;
   display: flex; /* Habilita el uso de flexbox */
@@ -86,7 +85,7 @@ body {
   cursor: pointer;
 }
 
-.Sidebar > ul {
+.barra > .barra__menu {
   align-items: center;
   display: flex;
   position: relative;
@@ -99,47 +98,47 @@ body {
   scroll-behavior: smooth;
 }
 
-.Sidebar > ul::-webkit-scrollbar {
+.barra > .barra__menu::-webkit-scrollbar {
   width: 8px; /* Ancho del scrollbar */
   height: 8px; /* Alto del scrollbar */
 }
 
 /* Estilo para el pulgar (la parte que se desplaza) */
-.Sidebar > ul::-webkit-scrollbar-thumb {
+.barra > .barra__menu::-webkit-scrollbar-thumb {
   background: #e9cb94; /* Color de fondo del pulgar */
   border-radius: 10px; /* Bordes redondeados */
 }
 
 /* Estilo para el track (la parte sobre la que se desplaza el pulgar) */
-.Sidebar > ul::-webkit-scrollbar-track {
+.barra > .barra__menu::-webkit-scrollbar-track {
   background: #f1f1f1; /* Color de fondo del track */
   border-radius: 10px; /* Bordes redondeados */
 }
 
 /* Cambiar el estilo del pulgar al pasar el cursor */
-.Sidebar > ul::-webkit-scrollbar-thumb:hover {
+.barra > .barra__menu::-webkit-scrollbar-thumb:hover {
   background: #e6b252; /* Color de fondo del pulgar al pasar el cursor */
 }
 
-.Sidebar > ul > a > li > span {
+.barra > .barra__menu > a > .barra__item > span {
   display: none;
 }
 
-.Sidebar > ul > a {
+.barra > .barra__menu > a {
   text-decoration: none;
   color: #6a778e;
 }
 
 @media (max-width: 768px) {
-  .Sidebar > ul {
+  .barra > .barra__menu {
     flex-direction: row;
     align-items: center;
   }
-  .Sidebar {
+  .barra {
     grid-row: 1;
     grid-column: 2;
   }
-  .Content {
+  .main-content {
     grid-row: 2;
     grid-column: 1 / span 2;
   }
