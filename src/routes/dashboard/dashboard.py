@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+from flask_login import login_required
 
 dashboard = Blueprint(
     "dashboard", __name__, url_prefix="/dashboard", template_folder="templates"
@@ -6,6 +7,7 @@ dashboard = Blueprint(
 
 
 @dashboard.route("/")
+@login_required
 def index():
     galletaVentasMes = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210]
 

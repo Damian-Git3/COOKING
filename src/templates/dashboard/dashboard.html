@@ -1,25 +1,26 @@
-{% extends "layout/layout.html" %}
+{% extends 'inicio.html' %}
+
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="col-12">
         <div class="row border">
-            <div class="col-6">
+            <div class="col-6 text-center">
                 <kbd>GALLETAS VENDIDAS POR MES</kbd>
                 <canvas id="G1"  height="400" width="600"></canvas>
             </div>
-            <div class="col-6">
+            <div class="col-6 text-center">
                 <kbd>VENTAS POR MES</kbd>
                 <canvas id="G2"  height="400" width="600"></canvas>
             </div>
         </div>
         <div class="row border">
-            <div class="col-6">
+            <div class="col-6 text-center">
                 <kbd>PRODUCTO MAS VENDIDO</kbd>
                 <canvas id="G3" height="400" width="600"></canvas>
             </div>
-            <div class="col-6">
+            <div class="col-6 text-center">
                 <kbd>VENTAS POR MES</kbd>
                 <canvas id="G4"  height="400" width="600"   ></canvas>
             </div>
@@ -31,6 +32,7 @@
 
 {% block jscode %}
 <script>
+    console.log('Hola desde el dashboard');
     const G1 = document.getElementById('G1');
     const G2 = document.getElementById('G2');
     const G3 = document.getElementById('G3');
