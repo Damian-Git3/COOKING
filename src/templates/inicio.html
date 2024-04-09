@@ -58,19 +58,18 @@
 
         {% endif %} {%if current_user.has_rol('vendedor') %}
 
-        <a href="{{url_for('venta.punto_venta')}}">
-          <li>
-            <i class="fa-solid fa-cash-register"></i>
-            <span class="tooltip">Punto de venta</span>
-          </li>
-        </a>
-        
-        <a href="{{url_for('venta.solicitud_produccion')}}">
-          <li>
-            <i class="fa-solid fa-list-check"></i>
-            <span class="tooltip">Solicitud de Producción</span>
-          </li>
-        </a>
+          <a href="{{url_for('venta.punto_venta')}}"
+            ><li>
+              <i class="fa-solid fa-cash-register"></i>
+              <span class="tooltip">Punto de venta</span>
+            </li></a
+          >
+          <a href="{{url_for('venta.solicitud_produccion')}}"
+            ><li>
+              <i class="fa-solid fa-paper-plane"></i>
+              <span class="tooltip">Solicitud de Producción</span>
+            </li></a
+          >
 
         <a href="{{url_for('venta.compras')}}">
           <li>
@@ -97,8 +96,8 @@
 
           <a href="{{url_for('cocina.cocinar')}}"
             ><li>
-              <i class="fa-solid fa-kitchen-set"></i>
-              <span class="tooltip">Cocinar</span>
+              <i class="fa-solid fa-fire-burner"></i>
+              <span class="tooltip">Producción</span>
             </li></a
           >
 
@@ -115,6 +114,12 @@
             ><li>
               <i class="fa-solid fa-dumpster-fire"></i>
               <span class="tooltip">Mermas</span>
+            </li></a
+          >
+          <a href="{{url_for('main.dashboard')}}"
+            ><li>
+              <i class="fa-solid fa-gear"></i>
+              <span class="tooltip">Configuración</span>
             </li></a
           >
 
