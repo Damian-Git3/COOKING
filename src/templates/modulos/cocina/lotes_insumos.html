@@ -1,0 +1,42 @@
+{% extends 'inicio.html' %} {% block title %}Almacen{% endblock %} {% block
+styles %} {% endblock %} {% block content %}
+<div style="width: 100%; text-align: center">
+  <h1>Almacén</h1>
+</div>
+{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
+messages %}
+<div class="alert alert-success" style="width: 90%">{{ message }}</div>
+{% endfor %} {% endif %} {% endwith %} {% if admin or vendedor %}
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a href="{{url_for('main.galletas')}}">
+      <button
+        class="nav-link active"
+        id="nav-lote1-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-lote1"
+        type="button"
+        role="tab"
+        aria-controls="nav-lote1"
+        aria-selected="true"
+      >
+        Lotes de Galletas
+      </button>
+    </a>
+    <a href="{{url_for('main.galletas')}}">
+      <button
+        class="nav-link"
+        id="nav-lote2-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-lote2"
+        type="button"
+        role="tab"
+        aria-controls="nav-profile"
+        aria-selected="false"
+      >
+        Lotes de Insumos
+      </button>
+    </a>
+  </div>
+</nav>
+{% endif %} {% endblock %}

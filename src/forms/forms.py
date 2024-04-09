@@ -1,6 +1,6 @@
 from wtforms import Form
 from wtforms import StringField, TextAreaField,IntegerField, SelectField, RadioField, BooleanField, PasswordField, DateField
-from wtforms import EmailField
+from wtforms import EmailField, HiddenField
 from wtforms import validators
 from datetime import date
 
@@ -39,3 +39,19 @@ class ModificarSolicitudProduccionForm(Form):
     ])
     fecha_solicitud = DateField("Fecha de Solicitud", default=date.today(), format='%Y-%m-%d')
     mensaje = TextAreaField("Mensaje")
+    
+class BusquedaLoteGalletaForm(Form):
+    fecha_inicio = DateField('Fecha de Inicio', format='%Y-%m-%d', validators=[validators.DataRequired()])
+    fecha_fin = DateField('Fecha de Fin', format='%Y-%m-%d', validators=[validators.DataRequired()])
+    
+    # Assuming get_recetas() returns a list of tuples like [(id, name), ...]
+    receta = SelectField('Receta', choices=[], validators=[validators.DataRequired()])
+
+    
+class MermaGalletaForm(Form):
+    lot_id = HiddenField('Lot ID')
+    tipo_medida = SelectField('Tipo de Medida', choices=[('g', 'Gramos'), ('u', 'Unidades')], validators=[validators.DataRequired()])
+    cantidad = IntegerField('Cantidad', validators=[validators.DataRequired(), validators.NumberRange(min=1, message='La cantidad debe ser mayor a 0')])
+    
+class MermaInsumoForm(Form):
+    cantidad = IntegerField('Cantidad', validators=[validators.DataRequired(), validators.NumberRange(min=1, message='La cantidad debe ser mayor a 0')])

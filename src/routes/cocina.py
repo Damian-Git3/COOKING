@@ -17,10 +17,11 @@ def cocinar():
 def recetas():
     return render_template('modulos/cocina/recetas.html')
 
-@cocina.route('/insumos')
+@cocina.route('/lotes/insumos')
 @login_required
-def insumos():
-    return render_template('modulos/cocina/insumos.html')
+def lotes_insumos():
+    return render_template('modulos/cocina/recetas.html')
+
 
 @cocina.route("/aceptar-solicitud/<int:idSolicitud>")
 @login_required

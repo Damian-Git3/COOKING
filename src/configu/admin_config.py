@@ -79,8 +79,8 @@ def setup_admin(app, db):
     admin.add_view(RolView(Rol, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
     admin.add_view(ModelView(Insumo, db.session,
-                   menu_icon_type='fa-solid', menu_icon_value='fa-truck-field'))
+                   menu_icon_type='fa-solid', menu_icon_value='fa-carrot'))
     admin.add_view(ModelView(Proveedor, db.session,
-                   menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
+                   menu_icon_type='fa-solid', menu_icon_value='fa-handshake'))
     admin.add_view(RecetaView(Receta, db.session,
-                   menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
+                   menu_icon_type='fa-solid', menu_icon_value='fa-clipboard'))
