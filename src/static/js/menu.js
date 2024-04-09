@@ -12,5 +12,5 @@ const Toast = Swal.mixin({
   });
   Toast.fire({
     icon: "success",
-    title: ("Bienvenido " + localStorage.getItem("admin"))
+    title: (localStorage.getItem("mensaje"))
   });

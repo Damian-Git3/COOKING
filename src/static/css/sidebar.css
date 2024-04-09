@@ -70,6 +70,7 @@ body {
   justify-content: center;
   align-items: center;
   color: #6a778e;
+  transition: all 1s ease;
 }
 
 .Sidebar > ul > a > li:hover {
@@ -95,6 +96,7 @@ body {
   overflow: auto;
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
 }
 
 .Sidebar > ul::-webkit-scrollbar {
