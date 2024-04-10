@@ -33,4 +33,10 @@ def menu():
             mensaje += "permisos de cocinero."
     else:
         mensaje += "no tienes rol asignado."
+        
     return render_template('inicio.html', mensaje=mensaje)
+
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('modulos/general/dashboard.html')
