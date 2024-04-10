@@ -3,9 +3,9 @@ from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
 from configu.config import DevelopmentConfig
-from configu.admin_config import setup_admin
 from database.models import db, Usuario
 from sassutils.wsgi import SassMiddleware
+from configu.admin_config import setup_admin
 
 if __name__ == "__main__":
     app = Flask(__name__)
@@ -53,9 +53,8 @@ if __name__ == "__main__":
     from routes.venta import venta
     app.register_blueprint(venta)
 
-
     setup_admin(app, db)
-
+    
     def has_no_empty_params(rule):
         defaults = rule.defaults if rule.defaults is not None else ()
         arguments = rule.arguments if rule.arguments is not None else ()

@@ -61,11 +61,6 @@
     {% endblock %} {% block head %} {% endblock %} {% block head_tail %} {%
     endblock %}
 
-    <link
-      href="{{ url_for('static', filename='css/sidebar-admin.scss.css') }}"
-      rel="stylesheet"
-      type="text/css"
-    />
   </head>
 
   <body>
@@ -81,6 +76,7 @@
       </div>
       <span class="HoverTip"></span>
       <div class="barra">
+        <div class="HoverBox"></div>
         <div class="barra__menu">
           <div class="barra__item">
             <a class="barra__link" href="{{ url_for('main.menu') }}">
@@ -134,7 +130,7 @@
         src="{{ admin_static.url(filename='admin/js/helpers.js', v='1.0.0') }}"
         type="text/javascript"
       ></script>
-      <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
+      <script src="{{ url_for('static', filename='js/sidebar-admin.js')}}"></script>
       {% if admin_view.extra_js %} {% for js_url in admin_view.extra_js %}
       <script src="{{ js_url }}" type="text/javascript"></script>
       {% endfor %} {% endif %} {% endblock %} {% block tail %} {% endblock %}
