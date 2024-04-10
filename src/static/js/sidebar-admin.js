@@ -1,6 +1,6 @@
-var button_s = document.querySelectorAll(".Sidebar>ul>a>li");
-var ScrollBox_s = document.querySelectorAll(".Sidebar>ul")[0];
-var icon = document.querySelectorAll(".Sidebar>ul>a>li>i");
+var button_s = document.querySelectorAll(".barra>.barra__menu>.barra__item>.barra__link");
+var ScrollBox_s = document.querySelectorAll(".barra>.barra__menu")[0];
+var icon = document.querySelectorAll(".barra>.barra__menu>.barra__item>.barra__link>i");
 var HoverBox_s = document.getElementsByClassName("HoverBox")[0];
 var HoverTip_s = document.getElementsByClassName("HoverTip")[0];
 
@@ -60,8 +60,8 @@ function handleMouseover(index) {
 
   var viewWidth = window.innerWidth;
 
-  var actualHeight = button_s[index].offsetTop;
-  var actualLength = button_s[index].offsetLeft;
+  var actualHeight = button_s[index].offsetTop+9;
+  var actualLength = button_s[index].offsetLeft+9;
 
   var side = viewWidth <= 768 ? false : true;
 
@@ -106,7 +106,7 @@ function setupMouseoverListeners() {
 }
 
 function adjustScrollXPosition(index) {
-  ScrollBox_s.style.overflowX = "scroll";
+  ScrollBox_s.style.overflowX = "auto";
   ScrollBox_s.style.overflowY = "hidden";
   var hoverpositionHorizontal = button_s[index].offsetLeft;
 
@@ -119,7 +119,7 @@ function adjustScrollXPosition(index) {
 
 function adjustScrollYPosition(index) {
   ScrollBox_s.style.overflowX = "hidden";
-  ScrollBox_s.style.overflowY = "scroll";
+  ScrollBox_s.style.overflowY = "auto";
   var hoverposition = button_s[index].offsetTop;
   var buttonHeight = button_s[index].offsetHeight;
   var alturatotal = ScrollBox_s.scrollHeight - buttonHeight;

@@ -37,7 +37,6 @@ messages %}
   </div>
 </nav>
 
-
 <script>
   var recetas_imagenes = {{ recetas_imagenes| tojson | safe }};
 </script>
@@ -120,7 +119,23 @@ messages %}
     <br />
     <form name="solicitud" id="solicitud" method="POST">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
+          <div
+            id="receta-imagen"
+            style="
+              height: 200px;
+              width: auto;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              border-radius: 10px;
+            "
+          >
+            <img src="" id="imagen" style="height: auto; width: 100%" alt="" />
+          </div>
+        </div>
+        <div class="col-md-8">
           <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
           <div class="row control-group">
             <div class="form-group col-xs-12 float-label-form-group controls">
@@ -131,19 +146,6 @@ messages %}
             <div class="form-group col-xs-12 float-label-form-group controls">
               {{render_field(form.tandas, class="form-control")}}
             </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div id="receta-imagen" style="
-              height: 200px;
-              width: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              overflow: hidden;
-              border-radius: 10px;
-            ">
-            <img src="" id="imagen" style="height: auto; width: 100%" alt="" />
           </div>
         </div>
 
