@@ -36,7 +36,3 @@ def menu():
         
     return render_template('inicio.html', mensaje=mensaje)
 
-@main.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('modulos/general/dashboard.html')
