@@ -222,6 +222,7 @@ class SolicitudProduccion(db.Model):
     idUsuarioProduccion = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     
     receta = db.relationship('Receta', backref=db.backref('solicitudes_produccion', lazy='dynamic'))
+    
     usuarioSolicitud = db.relationship('Usuario', foreign_keys=[idUsuarioSolicitud], backref=db.backref('solicitudes_produccion_vendedor', lazy='dynamic'))
     usuarioProduccion = db.relationship('Usuario', foreign_keys=[idUsuarioProduccion], backref=db.backref('solicitudes_produccion_cocinero', lazy='dynamic'))
 

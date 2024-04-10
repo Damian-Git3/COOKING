@@ -7,6 +7,7 @@ from database.models import db, Usuario
 from sassutils.wsgi import SassMiddleware
 from configu.admin_config import setup_admin
 
+
 if __name__ == "__main__":
     app = Flask(__name__)
     app.config.from_object(DevelopmentConfig)
@@ -49,6 +50,9 @@ if __name__ == "__main__":
 
     from routes.cocina import cocina
     app.register_blueprint(cocina)
+
+    from routes.dashboard.dashboard import dashboard as dashboard_blueprint
+    app.register_blueprint(dashboard_blueprint)
     
     from routes.venta import venta
     app.register_blueprint(venta)
