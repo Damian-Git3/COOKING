@@ -2,7 +2,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
-from sqlalchemy import func
+from sqlalchemy import func, Enum
 
 db = SQLAlchemy()
 
@@ -17,8 +17,12 @@ class InsumosReceta(db.Model):
     idInsumo = db.Column(db.Integer, db.ForeignKey('insumos.id'), primary_key=True)
     cantidad = db.Column(db.Float, nullable=False)
     
-    receta = db.relationship('Receta', backref='recetas')
-    insumo = db.relationship('Insumo', backref='insumos', overlaps="insumos")
+    receta = db.relationship('Receta', backref='insumos')
+    insumo = db.relationship('Insumo', backref='recetas')
+    
+    def __str__(self):
+        return f"{self.insumo.nombre} en {self.receta.nombre}"
+    
     
 class Receta(db.Model):
     __tablename__ = 'recetas'
@@ -30,9 +34,11 @@ class Receta(db.Model):
     descripcion = db.Column(db.String(500))
     nombre = db.Column(db.String(50), nullable=False, unique=True)
     imagen = db.Column(db.String(2550), nullable=False)
-
     
-    insumos = db.relationship('Insumo', secondary='insumos_receta', backref=db.backref('insumo', lazy='dynamic'), overlaps="receta,recetas")
+    # Método para obtener solo el nombre
+    def __str__(self):
+        return self.nombre
+
     
     
 class Insumo(db.Model):
@@ -41,7 +47,7 @@ class Insumo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(45), nullable=False)
     descripcion = db.Column(db.String(45), nullable=False)
-    unidad_medida = db.Column(db.String(45), nullable=False)
+    unidad_medida = db.Column(Enum('Kilos','Litros'), nullable=False)
     cantidad_maxima = db.Column(db.Float, nullable=False)
     cantidad_minima = db.Column(db.Float, nullable=False)
     merma = db.Column(db.Float, nullable=False)

@@ -100,6 +100,33 @@ def setup_admin(app, db):
                 flash('Error al eliminar la receta y los registros relacionados: {}'.format(
                     str(e)), 'error')
                 return False
+    
+    class InsumoView(BaseModelConfiguration):
+        form_columns = ['nombre', 'descripcion', 'unidad_medida', 'cantidad_maxima', 'cantidad_minima', 'merma']
+        column_list = ['nombre', 'descripcion', 'unidad_medida', 'cantidad_maxima', 'cantidad_minima', 'merma']
+        
+        inline_models = ((
+            InsumosReceta,
+            {
+                'form_columns': ('cantidad', 'receta', 'idReceta', 'idInsumo'),
+                'form_label': 'Recetas Asociadas'
+            }
+        ),)
+
+        column_formatters = {
+            # Aquí puedes agregar formatters personalizados si es necesario
+        }
+
+        def delete_model(self, model):
+            try:
+                # Eliminar los registros relacionados en la tabla InsumosReceta
+                InsumosReceta.query.filter_by(idInsumo=model.id).delete()
+                # Llamar al método delete_model de la superclase para eliminar el insumo
+                return super(InsumoView, self).delete_model(model)
+            except Exception as e:
+                flash('Error al eliminar el insumo y los registros relacionados: {}'.format(
+                    str(e)), 'error')
+                return False
 
     # Clase de vista personalizada para Rol
     class RolView(BaseModelConfiguration):
@@ -120,7 +147,7 @@ def setup_admin(app, db):
                    menu_icon_type='fa-solid', menu_icon_value='fa-user'))
     admin.add_view(RolView(Rol, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
-    admin.add_view(AdminModelView(Insumo, db.session,
+    admin.add_view(InsumoView(Insumo, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-carrot'))
     admin.add_view(AdminModelView(Proveedor, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-handshake'))
