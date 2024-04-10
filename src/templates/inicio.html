@@ -3,10 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/sidebar.css')}}"
-    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css')}}" />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='libs/bootstrap5/css/bootstrap.min.css')}}"
@@ -20,11 +17,7 @@
       href="https://fonts.googleapis.com/css?family=Open+Sans"
       rel="stylesheet"
     />
-    <link
-      rel="icon"
-      type="image/png"
-      href="{{ url_for('static', filename='img/cookie_1.png')}}"
-    />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/cookie_1.png')}}" />
 
     <!-- <link
       rel="stylesheet"
@@ -67,7 +60,7 @@
           >
           <a href="{{url_for('venta.solicitud_produccion')}}"
             ><li>
-              <i class="fa-solid fa-paper-plane"></i>
+              <i class="fa-solid fa-list-check"></i>
               <span class="tooltip">Solicitud de Producción</span>
             </li></a
           >
@@ -81,6 +74,13 @@
 
           {% endif %} {% if current_user.has_rol('cocinero') %}
 
+          <a href="{{url_for('cocina.insumos')}}"
+            ><li>
+              <i class="fa-solid fa-egg"></i>
+              <span class="tooltip">Insumos</span>
+            </li></a
+          >
+
           <a href="{{url_for('cocina.recetas')}}"
             ><li>
               <i class="fa-solid fa-book"></i>
@@ -90,25 +90,24 @@
 
           <a href="{{url_for('cocina.cocinar')}}"
             ><li>
-              <i class="fa-solid fa-fire-burner"></i>
-              <span class="tooltip">Producción</span>
+              <i class="fa-solid fa-kitchen-set"></i>
+              <span class="tooltip">Cocinar</span>
             </li></a
           >
 
           {% endif %}
 
-          <a href="{{url_for('venta.lotes_galletas')}}"
+          <a href="{{url_for('main.inventario')}}"
             ><li>
-              <i class="fa-solid fa-cookie-bite"></i>
-              <span class="tooltip">Galletas</span>
+              <i class="fa-solid fa-boxes-stacked"></i>
+              <span class="tooltip">Inventario</span>
             </li></a
           >
 
-          <a href="{{url_for('cocina.lotes_insumos')}}"
+          <a href="{{url_for('main.mermas')}}"
             ><li>
-              <i class="fa-solid fa-boxes-stacked"></i>
-
-              <span class="tooltip">Lotes insumos</span>
+              <i class="fa-solid fa-dumpster-fire"></i>
+              <span class="tooltip">Mermas</span>
             </li></a
           >
 
@@ -116,12 +115,6 @@
             ><li>
               <i class="fa-solid fa-chart-line"></i>
               <span class="tooltip">Dashboard</span>
-            </li></a
-          >
-          <a href="{{url_for('main.dashboard')}}"
-            ><li>
-              <i class="fa-solid fa-gear"></i>
-              <span class="tooltip">Configuración</span>
             </li></a
           >
 
@@ -162,9 +155,6 @@
             Bievenido a CooKing
           </h1>
         </div>
-        <script>
-          localStorage.setItem("mensaje", "{{mensaje}}");
-        </script>
         <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
         {% endblock %}
       </div>
