@@ -5,11 +5,12 @@ from database.models import db
 
 cocina = Blueprint('cocina', __name__, url_prefix="/cocina")
 
-
 @cocina.route('/cocinar')
 @login_required
 def cocinar():
     solicitudesProduccion = SolicitudProduccion.query.all()
+    print(solicitudesProduccion)
+    
     return render_template('modulos/cocina/cocinar.html', solicitudesProduccion=solicitudesProduccion)
 
 @cocina.route('/recetas')
@@ -26,9 +27,6 @@ def lotes_insumos():
 @cocina.route("/aceptar-solicitud/<int:idSolicitud>")
 @login_required
 def aceptarSolicitud(idSolicitud):
-    print("--------------------")
-    print("Aceptando solicitud:", idSolicitud)
-
     solicitudProduccion = SolicitudProduccion.query.get(idSolicitud)
 
     if solicitudProduccion:
@@ -48,10 +46,25 @@ def aceptarSolicitud(idSolicitud):
             insumo = Insumo.query.get(insumoReceta.idInsumo)
             mensajeReceta += f"{insumo.nombre}: {insumoReceta.cantidad} {insumo.unidad_medida}\n"
 
-        print(mensajeReceta)
         flash(mensajeReceta, 'receta')
-        return redirect(url_for('cocina.solicitudesProduccion'))
+        
+        return redirect(url_for('cocina.cocinar'))
     else:
         flash("No se encontro la solicitud de producción con los datos proporcionados", 'info')
-        return redirect(url_for('cocina.solicitudesProduccion'))
+        return redirect(url_for('cocina.cocinar'))
 
+@cocina.route("/finalizar-produccion/<int:idSolicitud>")
+@login_required
+def finalizarProduccion(idSolicitud):
+    print("Finalizando producción")
+    
+    solicitudProduccion = SolicitudProduccion.query.get(idSolicitud)
+    insumosRecetaProduccion = InsumosReceta.query.filter_by(idReceta=solicitudProduccion.idReceta).all()
+    
+    print(insumosRecetaProduccion)
+
+    if solicitudProduccion:
+        return redirect(url_for('cocina.cocinar'))
+    else:
+        flash("No se encontro la solicitud de producción con los datos proporcionados", 'info')
+        return redirect(url_for('cocina.cocinar'))
