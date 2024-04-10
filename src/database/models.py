@@ -174,8 +174,11 @@ class LoteGalleta(db.Model):
     tipo_venta = db.Column(db.Integer, nullable=False)
     
     idProduccion = db.Column(db.Integer, db.ForeignKey('solicitudes_produccion.id'), nullable=False)
-    idReceta = db.Column(db.Integer, nullable=False)
+    idReceta = db.Column(db.Integer, db.ForeignKey('recetas.id'), nullable=False)
     idUsuarios = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    
+    receta = db.relationship('Receta',foreign_keys=[idReceta], backref=db.backref('lotes_receta', lazy='dynamic'))
+    usuario = db.relationship('Usuario',foreign_keys=[idUsuarios], backref=db.backref('lotes_usuario', lazy='dynamic'))
 
 class LoteInsumo(db.Model):
     __tablename__ = 'lotes_insumo'
