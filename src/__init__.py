@@ -59,7 +59,6 @@ if __name__ == "__main__":
     from routes.venta import venta
     app.register_blueprint(venta)
 
-
     setup_admin(app, db)
 
     def has_no_empty_params(rule):
