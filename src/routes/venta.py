@@ -114,7 +114,7 @@ def solicitud_produccion_post():
             idUsuarioProduccion=usuario_cocinero,
             fecha_solicitud=form.fecha_solicitud.data,
             tandas=form.tandas.data,
-            status=1
+            estatus=1
         )
         
         db.session.add(solicitud)

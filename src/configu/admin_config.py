@@ -20,7 +20,7 @@ class AdminModelView(ModelView):
         """
         if not current_user.is_authenticated:
             return False
-        if not current_user.has_rol('admin'):
+        if not current_user.has_role('admin'):
             return False
         return True
 
@@ -39,7 +39,7 @@ class AdminIndexView(AdminIndexView):
         """
         if not current_user.is_authenticated:
             return False
-        if not current_user.has_rol('admin'):
+        if not current_user.has_role('admin'):
             return False
         return True
 
@@ -75,7 +75,7 @@ def setup_admin(app, db):
                     f"La contraseña automatica para {Usuario.nombre} es 1234")
 
     class RecetaView(BaseModelConfiguration):
-        form_columns = ['nombre', 'descripcion', 'piezas', 'utilidad', 'peso_estimado', 'imagen']
+        form_columns = ['nombre', 'descripcion', 'piezas', 'utilidad', 'imagen']
         column_list = ['nombre', 'descripcion', 'piezas', 'utilidad', 'peso_estimado']
         
         inline_models = ((
@@ -145,8 +145,8 @@ def setup_admin(app, db):
     # Agregar módulos a Flask_Admin
     admin.add_view(UsuarioView(Usuario, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-user'))
-    admin.add_view(RolView(Rol, db.session,
-                   menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
+    #admin.add_view(RolView(Rol, db.session,
+                  # menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
     admin.add_view(InsumoView(Insumo, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-carrot'))
     admin.add_view(AdminModelView(Proveedor, db.session,

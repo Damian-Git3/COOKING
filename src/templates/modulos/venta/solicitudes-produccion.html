@@ -95,15 +95,15 @@ messages %}
           <td>{{ solicitud.tandas }}</td>
           <td>{{ solicitud.fecha_solicitud }}</td>
           <td>
-            {% if solicitud.status == 1 %}
+            {% if solicitud.estatus == 1 %}
             Solicitud realizada
-            {% elif solicitud.status == 2 %}
+            {% elif solicitud.estatus == 2 %}
             En preparación
-            {% elif solicitud.status == 3 %}
+            {% elif solicitud.estatus == 3 %}
             Listo para entrega
-            {% elif solicitud.status == 4 %}
+            {% elif solicitud.estatus == 4 %}
             Producción entregada
-            {% elif solicitud.status == 5 %}
+            {% elif solicitud.estatus == 5 %}
             Solicitud rechazada
             {% endif %}
           </td>
