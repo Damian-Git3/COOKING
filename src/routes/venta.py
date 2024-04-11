@@ -7,6 +7,7 @@ from flask import flash, jsonify
 from configu.config import DevelopmentConfig
 from database.models import db, Usuario, Rol, asignacion_rol_usuario, Insumo, Receta, SolicitudProduccion, Venta, DetalleVenta, Compra, Proveedor, LoteGalleta
 
+from routes.auth import requires_role
 from forms import forms
 from sqlalchemy.orm import joinedload
 from sqlalchemy import desc, extract,text
@@ -23,12 +24,12 @@ def compras():
 
 
 @venta.route('/punto_venta')
-@login_required
+@requires_role("vendedor")
 def punto_venta():
     return render_template('modulos/venta/punto-venta.html')
 
 @venta.route('/solicitud_produccion')
-@login_required
+@requires_role("vendedor")
 def solicitud_produccion():
     form = forms.SolicitudProduccionForm(request.form)
     
@@ -51,7 +52,7 @@ def solicitud_produccion():
     return render_template('modulos/venta/solicitudes-produccion.html', form=form, recetas_imagenes=recetas_imagenes, solicitudes=solicitudes)
 
 @venta.route('/solicitud_produccion/nuevo')
-@login_required
+@requires_role("vendedor")
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
     
@@ -75,7 +76,7 @@ def solicitud_produccion_nuevo():
     return render_template('modulos/venta/solicitudes-produccion.html', form=form, recetas_imagenes=recetas_imagenes, solicitudes=solicitudes, nuevo=True)
 
 @venta.route('/solicitud_produccion/nuevo', methods=['POST'])
-@login_required
+@requires_role("vendedor")
 def solicitud_produccion_post():
     form = forms.SolicitudProduccionForm(request.form)
     
@@ -131,7 +132,7 @@ def solicitud_produccion_post():
     return redirect(url_for('venta.solicitud_produccion'))
 
 @venta.route('/solicitud_produccion/edit/<int:id>', methods=['GET','POST'])
-@login_required
+@requires_role("vendedor")
 def edit_solicitud_produccion(id):
     form2 = forms.ModificarSolicitudProduccionForm(request.form)
     form = forms.SolicitudProduccionForm(request.form)
@@ -175,7 +176,7 @@ def edit_solicitud_produccion(id):
     return render_template('modulos/venta/solicitudes-produccion.html', form=form, form2=form2, recetas_imagenes=recetas_imagenes, solicitudes=solicitudes, editar=True,nombre_receta=nombre_receta,imagen_receta = imagen_receta, id_receta=id)
 
 @venta.route('/solicitud_produccion/delete', methods=['POST'])
-@login_required
+@requires_role("vendedor")
 def delete_solicitud_produccion():
     id = request.form.get('id')
     solicitud = SolicitudProduccion.query.get_or_404(id)
@@ -186,6 +187,7 @@ def delete_solicitud_produccion():
 
 
 @venta.route('/almacen/galletas', methods=['GET', 'POST'])
+@requires_role("vendedor")
 def lotes_galletas():
     form = forms.BusquedaLoteGalletaForm(request.form)
     
@@ -220,6 +222,7 @@ def lotes_galletas():
     return render_template('modulos/venta/galletas.html', form=form, lotes=lotes, lista = True)
 
 @venta.route('/merma/galletas', methods=['GET','POST'])
+@requires_role("vendedor")
 def merma_galletas():
     form = forms.MermaGalletaForm(request.form)
     if form.validate():

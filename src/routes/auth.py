@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
+from functools import wraps
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 import forms.forms as forms
 from database.models import Usuario
 from database.models import db
+from database.models import LogLogin
 
 auth = Blueprint('auth', __name__)
 
@@ -36,12 +38,21 @@ def login_post():
     
     if not user:
         flash('No se ha encontrado un usuario con esas credenciales. Por favor, verifica la información')
+        log_login = LogLogin(fecha=datetime.now(), exito=False)
+        db.session.add(log_login)
+        db.session.commit()
         return render_template('login.html')
     elif not check_password_hash(user.contrasenia, contrasenia):
         flash('Credenciales incorrectas. Por favor, inténtelo de nuevo.')
+        log_login = LogLogin(fecha=datetime.now(), exito=False, idUsuario=user.id)
+        db.session.add(log_login)
+        db.session.commit()
         return render_template('login.html')
     elif not user.estatus:
         flash('Usuario no activo. Por favor, consulta con tu administrador.')
+        log_login = LogLogin(fecha=datetime.now(), exito=False, idUsuario=user.id)
+        db.session.add(log_login)
+        db.session.commit()
         return render_template('login.html')
 
     user.last_login_at = user.current_login_at
@@ -49,6 +60,12 @@ def login_post():
 
     # Guarda los cambios en la base de datos
     db.session.commit()
+    
+    
+    log_login = LogLogin(fecha=datetime.now(), exito=True, idUsuario=user.id)
+    db.session.add(log_login)
+    db.session.commit()
+    
     login_user(user, remember=recordar)
     return redirect(url_for('main.menu'))
 
@@ -86,3 +103,19 @@ def signup_post():
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))
+
+
+def requires_role(role_name):
+    def decorator(f):
+        @login_required
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_authenticated:
+                return redirect(url_for('auth.login', next=request.url))
+            if current_user.has_role('admin'):
+                return f(*args, **kwargs)
+            if not current_user.has_role(role_name):
+                return redirect(url_for('main.menu'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
