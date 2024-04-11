@@ -91,7 +91,7 @@
     }),
       (a.prototype.loadImage = function () {
         let img = new Image();
-        img.src = "../static/img/cookie_1.png"; // Asegúrate de que esta ruta sea correcta
+        img.src = "/static/img/cookie_1.png"; // Asegúrate de que esta ruta sea correcta
         img.onload = () => {
           this.particleImage = img;
         };

@@ -1,42 +1,61 @@
-{% extends 'inicio.html' %}
-
-{% block title %}Solicitudes Producción{% endblock%}
-
-{% block styles %} {% endblock %}
-
-{%from "macros.html" import render_field%}
-
-{% block content %}
+{% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock%}
+{% block styles %} {% endblock %} {%from "macros.html" import render_field%} {%
+block content %}
 <div style="width: 100%; text-align: center">
   <h1>Solicitudes de producción</h1>
 </div>
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
+{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
+messages %}
 <div class="alert alert-success" style="width: 90%">{{ message }}</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
+{% endfor %} {% endif %} {% endwith %}
 
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
-    <a href="{{ url_for('venta.solicitud_produccion') }}" style="text-decoration: none; color: black"><button
-        class="nav-link {%if not nuevo %}active{%endif%}" id="nav-home-tab" data-bs-toggle="tab"
-        data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
-        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}">
+    <a
+      href="{{ url_for('venta.solicitud_produccion') }}"
+      style="text-decoration: none; color: black"
+      ><button
+        class="nav-link {%if not nuevo %}active{%endif%}"
+        id="nav-home-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-home"
+        type="button"
+        role="tab"
+        aria-controls="nav-home"
+        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}"
+      >
         Pendientes
-      </button></a>
-    <a href="{{ url_for('venta.solicitud_produccion_nuevo') }}" style="text-decoration: none; color: black">
-      <button class="nav-link {%if nuevo %}active{%endif%}" id="nav-profile-tab" data-bs-toggle="tab"
-        data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
-        aria-selected="{%if nuevo %}true{%else%}false{%endif%}">
+      </button></a
+    >
+    <a
+      href="{{ url_for('venta.solicitud_produccion_nuevo') }}"
+      style="text-decoration: none; color: black"
+    >
+      <button
+        class="nav-link {%if nuevo %}active{%endif%}"
+        id="nav-profile-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-profile"
+        type="button"
+        role="tab"
+        aria-controls="nav-profile"
+        aria-selected="{%if nuevo %}true{%else%}false{%endif%}"
+      >
         Nueva
       </button>
     </a>
 
     {% if editar %}
-    <button class="nav-link" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab"
-      aria-controls="nav-edit" aria-selected="false">
+    <button
+      class="nav-link"
+      id="nav-edit-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-edit"
+      type="button"
+      role="tab"
+      aria-controls="nav-edit"
+      aria-selected="false"
+    >
       Editar
     </button>
     {% endif %}
@@ -50,6 +69,7 @@
       <thead>
         <tr>
           <th></th>
+          <th></th>
           <th>Nombre de la Receta</th>
           <th>Número de Tandas</th>
           <th>Fecha de Solicitud</th>
@@ -61,18 +81,38 @@
       <tbody>
         {% for solicitud in solicitudes %}
         <tr>
-          <td class="list-buttons-column" style="display: flex; justify-content: space-around; border: none">
-            <a class="icon" href="/venta/solicitud_produccion/edit/{{ solicitud.id }}" title="Editar Registro"
-              style="text-decoration: none; color: black">
+          <td
+            class="list-buttons-column"
+            style="display: flex; justify-content: space-around; border: none"
+          >
+            <a
+              class="icon"
+              href="/venta/solicitud_produccion/edit/{{ solicitud.id }}"
+              title="Editar Registro"
+              style="text-decoration: none; color: black"
+            >
               <span class="fa fa-pencil glyphicon glyphicon-pencil"></span>
             </a>
 
-            <form id="deleteForm" method="POST" action="/venta/solicitud_produccion/delete">
-              <input id="id" name="id" required="" type="hidden" value="{{solicitud.id}}" />
+            <form
+              id="deleteForm"
+              method="POST"
+              action="/venta/solicitud_produccion/delete"
+            >
+              <input
+                id="id"
+                name="id"
+                required=""
+                type="hidden"
+                value="{{solicitud.id}}"
+              />
               <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
 
-              <button onclick="event.preventDefault(); confirmDelete();" title="Delete record"
-                style="border: none; background: none">
+              <button
+                onclick="event.preventDefault(); confirmDelete();"
+                title="Delete record"
+                style="border: none; background: none"
+              >
                 <span class="fa-solid fa-trash"></span>
               </button>
             </form>
@@ -94,21 +134,21 @@
               }
             </script>
           </td>
+          <td>
+            <img
+              src="{{ url_for('static', filename='img/cookies/' + solicitud.receta.imagen) }}"
+              style="max-width: 80px; max-height: 80px; border-radius: 10px"
+            />
+          </td>
           <td>{{ solicitud.receta.nombre }}</td>
           <td>{{ solicitud.tandas }}</td>
           <td>{{ solicitud.fecha_solicitud }}</td>
           <td>
-            {% if solicitud.status == 1 %}
-            Solicitud realizada
-            {% elif solicitud.status == 2 %}
-            En preparación
-            {% elif solicitud.status == 3 %}
-            Listo para entrega
-            {% elif solicitud.status == 4 %}
-            Producción entregada
-            {% elif solicitud.status == 5 %}
-            Solicitud rechazada
-            {% endif %}
+            {% if solicitud.estatus == 1 %} Solicitud realizada {% elif
+            solicitud.estatus == 2 %} En preparación {% elif solicitud.estatus
+            == 3 %} Listo para entrega {% elif solicitud.estatus == 4 %}
+            Producción entregada {% elif solicitud.estatus == 5 %} Solicitud
+            rechazada {% endif %}
           </td>
           <td>{{ solicitud.usuarioSolicitud.nombre }}</td>
           <td>{{ solicitud.usuarioProduccion.nombre }}</td>
