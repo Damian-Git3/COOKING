@@ -75,9 +75,14 @@ def setup_admin(app, db):
                     f"La contraseña automatica para {Usuario.nombre} es 1234")
 
     class RecetaView(BaseModelConfiguration):
-        form_columns = ['nombre', 'descripcion', 'piezas', 'utilidad', 'imagen']
+        form_columns = ['nombre', 'descripcion', 'piezas', 'utilidad', 'peso_estimado', 'imagen']
         column_list = ['nombre', 'descripcion', 'piezas', 'utilidad', 'peso_estimado']
-        
+        form_extra_fields = {
+            'imagen': ImageUploadField('Imagen',
+                                       base_path=os.path.join(os.path.dirname(__file__), "..", "static", "img", "cookies"),
+                               url_relative_path="img/cookies/")
+
+        }
         inline_models = ((
             InsumosReceta,
             {
@@ -86,10 +91,6 @@ def setup_admin(app, db):
             }
         ),)
 
-        column_formatters = {
-            'imagen': lambda v, c, m, p: Markup(f'<img src="{url_for("static", filename="img/cookies/" + m.imagen)}" style="max-width:300px; max-height:300px;">')
-        }
-
         def delete_model(self, model):
             try:
                 # Eliminar los registros relacionados en la tabla InsumosReceta
@@ -97,8 +98,7 @@ def setup_admin(app, db):
                 # Llamar al método delete_model de la superclase para eliminar la receta
                 return super(RecetaView, self).delete_model(model)
             except Exception as e:
-                flash('Error al eliminar la receta y los registros relacionados: {}'.format(
-                    str(e)), 'error')
+                flash('Error al eliminar la receta y los registros relacionados: {}'.format(str(e)), 'error')
                 return False
     
     class InsumoView(BaseModelConfiguration):

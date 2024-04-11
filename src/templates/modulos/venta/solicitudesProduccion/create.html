@@ -1,0 +1,103 @@
+{% extends 'inicio.html' %}
+
+{% block title %}Solicitudes Producción{% endblock%}
+
+{% block styles %} {% endblock %}
+
+{%from "macros.html" import render_field%}
+
+{% block content %}
+<div style="width: 100%; text-align: center">
+    <h1>Solicitudes de producción</h1>
+</div>
+{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
+messages %}
+<div class="alert alert-success" style="width: 90%">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a href="{{ url_for('venta.solicitud_produccion') }}" style="text-decoration: none; color: black"><button
+                class="nav-link {%if not nuevo %}active{%endif%}" id="nav-home-tab" data-bs-toggle="tab"
+                data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
+                aria-selected="{%if not nuevo %}true{%else%}false{%endif%}">
+                Pendientes
+            </button>
+        </a>
+        <a href="{{ url_for('venta.solicitud_produccion_nuevo') }}" style="text-decoration: none; color: black">
+            <button class="nav-link {%if nuevo %}active{%endif%}" id="nav-profile-tab" data-bs-toggle="tab"
+                data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
+                aria-selected="{%if nuevo %}true{%else%}false{%endif%}">
+                Nueva
+            </button>
+        </a>
+
+        {% if editar %}
+        <button class="nav-link" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button"
+            role="tab" aria-controls="nav-edit" aria-selected="false">
+            Editar
+        </button>
+        {% endif %}
+    </div>
+</nav>
+
+<div>
+    <form name="solicitud" id="solicitud" method="POST">
+        <div class="row">
+            <div class="col-md-6">
+                <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+                <div class="row control-group">
+                    <div class="form-group col-xs-12 float-label-form-group controls">
+                        {{render_field(form.receta, class="form-control", id="receta")}}
+                    </div>
+                </div>
+                <div class="row control-group">
+                    <div class="form-group col-xs-12 float-label-form-group controls">
+                        {{render_field(form.tandas, class="form-control")}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div id="receta-imagen" style="
+              height: 200px;
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              border-radius: 10px;
+            ">
+                    <img src="" id="imagen" style="height: auto; width: 100%" alt="" />
+                </div>
+            </div>
+
+            <script>
+                document
+                    .getElementById("receta")
+                    .addEventListener("change", function () {
+                        var id = this.value;
+                        var imagen = recetas_imagenes.find(function (receta) {
+                            return receta[0] == id;
+                        })[1];
+                        document.getElementById("imagen").src = imagen;
+                    });
+
+                document.getElementById("receta").dispatchEvent(new Event("change"));
+            </script>
+        </div>
+        <hr />
+        <input type="submit" class="btn btn-primary" value="Solicitar" />
+        <script>
+            cerrarNuevaSolicitud = function () {
+                document.getElementById("nav-home-tab").click();
+                document.getElementById("solicitud").reset();
+            };
+        </script>
+        <button type="button" class="btn btn-secondary" href="{{ url_for('venta.solicitud_produccion') }}">
+            Cancelar
+        </button>
+    </form>
+</div>
+{% endblock %}

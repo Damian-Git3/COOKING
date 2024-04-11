@@ -219,8 +219,6 @@ class SolicitudProduccion(db.Model):
     fecha_produccion = db.Column(db.Date)
     
     posicion = db.Column(db.Integer, default=1)
-    
-    status = db.Column(db.Integer, nullable=False)
     idReceta = db.Column(db.Integer, db.ForeignKey('recetas.id'), nullable=False)
 
     idUsuarioSolicitud = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)

@@ -10,10 +10,14 @@
 <div style="width: 100%; text-align: center">
   <h1>Solicitudes de producción</h1>
 </div>
-{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
-messages %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
 <div class="alert alert-success" style="width: 90%">{{ message }}</div>
-{% endfor %} {% endif %} {% endwith %}
+{% endfor %}
+{% endif %}
+{% endwith %}
+
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <a href="{{ url_for('venta.solicitud_produccion') }}" style="text-decoration: none; color: black"><button
@@ -27,7 +31,9 @@ messages %}
         data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
         aria-selected="{%if nuevo %}true{%else%}false{%endif%}">
         Nueva
-      </button></a>
+      </button>
+    </a>
+
     {% if editar %}
     <button class="nav-link" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab"
       aria-controls="nav-edit" aria-selected="false">
@@ -37,9 +43,6 @@ messages %}
   </div>
 </nav>
 
-<script>
-  var recetas_imagenes = {{ recetas_imagenes| tojson | safe }};
-</script>
 <div class="tab-content" id="nav-tabContent">
   <div class="tab-pane fade {%if not nuevo %}show active{% endif %}" id="nav-home" role="tabpanel"
     aria-labelledby="nav-home-tab">
@@ -95,15 +98,15 @@ messages %}
           <td>{{ solicitud.tandas }}</td>
           <td>{{ solicitud.fecha_solicitud }}</td>
           <td>
-            {% if solicitud.estatus == 1 %}
+            {% if solicitud.status == 1 %}
             Solicitud realizada
-            {% elif solicitud.estatus == 2 %}
+            {% elif solicitud.status == 2 %}
             En preparación
-            {% elif solicitud.estatus == 3 %}
+            {% elif solicitud.status == 3 %}
             Listo para entrega
-            {% elif solicitud.estatus == 4 %}
+            {% elif solicitud.status == 4 %}
             Producción entregada
-            {% elif solicitud.estatus == 5 %}
+            {% elif solicitud.status == 5 %}
             Solicitud rechazada
             {% endif %}
           </td>
@@ -114,128 +117,5 @@ messages %}
       </tbody>
     </table>
   </div>
-  <div class="tab-pane fade {%if nuevo %}show active{% endif %}" id="nav-profile" role="tabpanel"
-    aria-labelledby="nav-profile-tab">
-    <br />
-    <form name="solicitud" id="solicitud" method="POST">
-      <div class="row">
-        <div class="col-md-4">
-          <div
-            id="receta-imagen"
-            style="
-              height: 200px;
-              width: auto;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              overflow: hidden;
-              border-radius: 10px;
-            "
-          >
-            <img src="" id="imagen" style="height: auto; width: 100%" alt="" />
-          </div>
-        </div>
-        <div class="col-md-8">
-          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form.receta, class="form-control", id="receta")}}
-            </div>
-          </div>
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form.tandas, class="form-control")}}
-            </div>
-          </div>
-        </div>
-
-        <script>
-          document
-            .getElementById("receta")
-            .addEventListener("change", function () {
-              var id = this.value;
-              var imagen = recetas_imagenes.find(function (receta) {
-                return receta[0] == id;
-              })[1];
-              document.getElementById("imagen").src = imagen;
-            });
-
-          document.getElementById("receta").dispatchEvent(new Event("change"));
-        </script>
-      </div>
-      <hr />
-      <input type="submit" class="btn btn-primary" value="Solicitar" />
-      <script>
-        cerrarNuevaSolicitud = function () {
-          document.getElementById("nav-home-tab").click();
-          document.getElementById("solicitud").reset();
-        };
-      </script>
-      <button type="button" class="btn btn-secondary" onclick="cerrarNuevaSolicitud()">
-        Cancelar
-      </button>
-    </form>
-  </div>
-
-  {% if editar %}
-  <div class="tab-pane fade" id="nav-edit" role="tabpanel" aria-labelledby="nav-edit-tab">
-    <br />
-    <form name="solicitud-editar" id="solicitud-editar" method="POST">
-      <div class="row">
-        <div class="col-md-6">
-          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form2.tandas, class="form-control")}}
-            </div>
-          </div>
-
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form2.fecha_solicitud, class="form-control")}}
-            </div>
-          </div>
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form2.mensaje, class="form-control")}}
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <h3>Receta {{nombre_receta}}</h3>
-          <div id="receta-imagen-editar" style="
-              height: 200px;
-              width: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              overflow: hidden;
-              border-radius: 10px;
-            ">
-            <img src="" id="imagen-editar" style="height: auto; width: 100%" alt="" />
-          </div>
-        </div>
-
-        <script>
-          document.getElementById("imagen-editar").src = "{{imagen_receta}}";
-        </script>
-      </div>
-      <hr />
-      <input type="submit" class="btn btn-primary" value="Actualizar" />
-      <script>
-        cerrarNuevaSolicitud = function () {
-          document.getElementById("nav-home-tab").click();
-          document.getElementById("solicitud").reset();
-        };
-      </script>
-      <button type="button" class="btn btn-secondary" onclick="cerrarNuevaSolicitud()">
-        Cancelar
-      </button>
-    </form>
-  </div>
-  <script>
-    document.getElementById("nav-edit-tab").click();
-  </script>
-  {% endif %}
 </div>
 {% endblock %}
