@@ -11,22 +11,23 @@ from forms import forms
 from sqlalchemy.orm import joinedload
 from sqlalchemy import desc, extract, text
 from datetime import datetime, timedelta
+from routes.auth import requires_role
 
 venta = Blueprint('venta', __name__, url_prefix="/venta")
 
 
 @venta.route('/compras')
-@login_required
+@requires_role('vendedor')
 def compras():
     return render_template('modulos/venta/compras.html')
 
 @venta.route('/punto_venta')
-@login_required
+@requires_role('vendedor')
 def punto_venta():
     return render_template('modulos/venta/punto-venta.html')
 
 @venta.route('/solicitud_produccion')
-@login_required
+@requires_role('vendedor')
 def solicitud_produccion():
     solicitudes = SolicitudProduccion.query.options(
         # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
@@ -41,14 +42,14 @@ def solicitud_produccion():
 
 
 @venta.route('/solicitud_produccion/crear', methods=["GET", "POST"])
-@login_required
+@requires_role('vendedor')
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
-    form.receta.choices = [(0, 'Todas las recetas')] + \
-            [(receta.id, receta.nombre) for receta in Receta.query.all()]
+    form.receta.choices = [(receta.id, receta.nombre) for receta in Receta.query.all()]
+    images = [(receta.id, receta.imagen) for receta in Receta.query.all()]
     
     if request.method == "GET":
-        return render_template('modulos/venta/solicitudesProduccion/create.html', form=form, nuevo=True)
+        return render_template('modulos/venta/solicitudesProduccion/create.html', form=form, images=images, nuevo=True)
     else:
         if form.validate():
             usuario_cocinero=0
@@ -82,10 +83,10 @@ def solicitud_produccion_nuevo():
 
             return redirect(url_for('venta.solicitud_produccion'))
         else:
-            return render_template('modulos/venta/solicitudesProduccion/create.html', form=form)
+            return render_template('modulos/venta/solicitudesProduccion/create.html', form=form, images= images, nuevo=True)
 
 @venta.route('/solicitud_produccion/edit/<int:id>', methods=['GET', 'POST'])
-@login_required
+@requires_role('vendedor')
 def edit_solicitud_produccion(id):
     solicitud = SolicitudProduccion.query.get(id)
     
@@ -105,7 +106,7 @@ def edit_solicitud_produccion(id):
 
 
 @venta.route('/solicitud_produccion/delete', methods=['POST'])
-@login_required
+@requires_role('vendedor')
 def delete_solicitud_produccion():
     id = request.form.get('id')
     solicitud = SolicitudProduccion.query.get_or_404(id)
