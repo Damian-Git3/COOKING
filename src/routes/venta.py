@@ -70,20 +70,23 @@ def solicitud_produccion():
 @requires_role("vendedor")
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
-    form.receta.choices = [(receta.id, receta.nombre) for receta in Receta.query.all()]
-    images = [(receta.id, receta.imagen) for receta in Receta.query.all()]
+    form.receta.choices = [(receta.id, receta.nombre)
+                           for receta in Receta.query.all()]
+    recetas = [(receta.id, receta.imagen, receta.piezas)
+               for receta in Receta.query.all()]
 
     if request.method == "GET":
         return render_template(
             "modulos/venta/solicitudesProduccion/create.html",
             form=form,
-            images=images,
             nuevo=True,
+            recetas=recetas
         )
     else:
         if form.validate():
             usuario_cocinero = 0
             rol_cocinero = Rol.query.filter_by(nombre="cocinero").first()
+            
             if rol_cocinero is not None:
                 # Luego, filtra los usuarios que tienen el rol 'cocinero' y ordena por 'is_active'
                 usuario_cocinero = (
@@ -107,7 +110,6 @@ def solicitud_produccion_nuevo():
                 if usuario_cocinero is not None:
                     usuario_cocinero = usuario_cocinero.id
                 else:
-                    # Maneja el caso en que no se encuentre ningún usuario cocinero
                     usuario_cocinero = current_user.id
 
             solicitud = SolicitudProduccion(

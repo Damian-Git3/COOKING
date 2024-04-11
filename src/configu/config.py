@@ -8,6 +8,6 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     # encriptar esta madre
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://admin:admin@localhost:3306/cooking'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@localhost:3306/cooking'
 
 
