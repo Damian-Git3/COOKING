@@ -56,7 +56,8 @@
             </li></a
           >
 
-          {% endif %} {%if current_user.has_role('vendedor') %}
+          {% endif %} {%if current_user.has_role('vendedor') or
+          current_user.has_role('admin') %}
 
           <a href="{{url_for('venta.punto_venta')}}"
             ><li>
@@ -78,7 +79,15 @@
             </li></a
           >
 
-          {% endif %} {% if current_user.has_role('cocinero') %}
+          <a href="{{url_for('venta.lotes_galletas')}}"
+            ><li>
+              <i class="fa-solid fa-cookie-bite"></i>
+              <span class="tooltip">Galletas</span>
+            </li></a
+          >
+
+          {% endif %} {% if current_user.has_role('cocinero') or
+          current_user.has_role('admin') %}
 
           <a href="{{url_for('cocina.recetas')}}"
             ><li>
@@ -93,16 +102,6 @@
               <span class="tooltip">Producción</span>
             </li></a
           >
-
-          {% endif %}
-
-          <a href="{{url_for('venta.lotes_galletas')}}"
-            ><li>
-              <i class="fa-solid fa-cookie-bite"></i>
-              <span class="tooltip">Galletas</span>
-            </li></a
-          >
-
           <a href="{{url_for('cocina.lotes_insumos')}}"
             ><li>
               <i class="fa-solid fa-boxes-stacked"></i>
@@ -110,13 +109,16 @@
               <span class="tooltip">Lotes insumos</span>
             </li></a
           >
-
+          {% endif %} {% if current_user.has_role('admin') or
+          current_user.has_role('vendedor') or current_user.has_role('cocinero')
+          %}
           <a href="{{url_for('dashboard.index')}}"
             ><li>
               <i class="fa-solid fa-chart-line"></i>
               <span class="tooltip">Dashboard</span>
             </li></a
           >
+          {% endif %}
           <a href="{{url_for('main.configuracion')}}"
             ><li>
               <i class="fa-solid fa-gear"></i>
