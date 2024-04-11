@@ -35,7 +35,7 @@ class Receta(db.Model):
     descripcion = db.Column(db.String(500))
     nombre = db.Column(db.String(50), nullable=False, unique=True)
     imagen = db.Column(db.String(2550), nullable=False)
-
+    
     # Método para obtener solo el nombre
     def __str__(self):
         return self.nombre
@@ -51,7 +51,7 @@ class Insumo(db.Model):
     cantidad_maxima = db.Column(db.Float, nullable=False)
     cantidad_minima = db.Column(db.Float, nullable=False)
     merma = db.Column(db.Float, nullable=False)
-
+    
     def __str__(self):
         return self.nombre
 
@@ -122,7 +122,10 @@ class Proveedor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     empresa = db.Column(db.String(45), nullable=False)
     direccion = db.Column(db.String(45), nullable=False)
-    nombre_proveedor = db.Column(db.String(45), nullable=False)
+    nombre_contacto = db.Column(db.String(45), nullable=False)
+    contacto = db.Column(db.String(45), nullable=True)
+    estatus = db.Column(db.Boolean, nullable=False, default=True)
+
 
 
 class Compra(db.Model):
@@ -199,7 +202,7 @@ class LoteGalleta(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha_entrada = db.Column(db.Date)
     cantidad = db.Column(db.Integer, nullable=False)
-    merma = db.Column(db.Integer)
+    merma = db.Column(db.Float, nullable=False, default=0)
     tipo_venta = db.Column(db.Integer, nullable=False)
 
     idProduccion = db.Column(
@@ -228,6 +231,7 @@ class LoteInsumo(db.Model):
     cantidad = db.Column(db.Float, nullable=False)
     fecha_compra = db.Column(db.Date, nullable=False)
     precio_unidad = db.Column(db.Float, nullable=False)
+    merma = db.Column(db.Float, nullable=False, default=0)
 
     idInsumo = db.Column(db.Integer, db.ForeignKey("insumos.id"), primary_key=True)
     idCompra = db.Column(db.Integer, db.ForeignKey("compras.id"), primary_key=True)
@@ -240,7 +244,7 @@ class SolicitudProduccion(db.Model):
 
     fecha_produccion = db.Column(db.Date)
     mensaje = db.Column(db.String(50))
-    status = db.Column(db.Integer, nullable=False)
+    estatus = db.Column(db.Integer, nullable=False)
     tandas = db.Column(db.Integer)
     merma = db.Column(db.Integer)
     fecha_solicitud = db.Column(db.Date, nullable=False)
@@ -249,9 +253,9 @@ class SolicitudProduccion(db.Model):
     fecha_produccion = db.Column(db.Date)
 
     posicion = db.Column(db.Integer, default=1)
-
+    
     status = db.Column(db.Integer, nullable=False)
-    idReceta = db.Column(db.Integer, db.ForeignKey("recetas.id"), nullable=False)
+    idReceta = db.Column(db.Integer, db.ForeignKey('recetas.id'), nullable=False)
 
     idUsuarioSolicitud = db.Column(
         db.Integer, db.ForeignKey("usuarios.id"), nullable=False

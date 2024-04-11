@@ -28,17 +28,17 @@ from database.models import (
     LoteGalleta,
 )
 
-from routes.auth import requires_role
 from forms import forms
 from sqlalchemy.orm import joinedload
 from sqlalchemy import desc, extract, text
 from datetime import datetime, timedelta
+from routes.auth import requires_role
 
 venta = Blueprint("venta", __name__, url_prefix="/venta")
 
 
 @venta.route("/compras")
-@login_required
+@requires_role("vendedor")
 def compras():
     return render_template("modulos/venta/compras.html")
 
@@ -52,206 +52,106 @@ def punto_venta():
 @venta.route("/solicitud_produccion")
 @requires_role("vendedor")
 def solicitud_produccion():
-    form = forms.SolicitudProduccionForm(request.form)
-
-    # Obtiene todas las recetas de la base de datos
-    recetas = Receta.query.all()
-
-    # Crea una lista de tuplas con el ID y el nombre de cada receta
-    recetas_opciones = [(receta.id, receta.nombre) for receta in recetas]
-    recetas_imagenes = [(receta.id, receta.imagen) for receta in recetas]
-
-    # Asigna las opciones al campo receta del formulario
-    form.receta.choices = recetas_opciones
-
     solicitudes = SolicitudProduccion.query.options(
-        joinedload(
-            SolicitudProduccion.receta
-        ),  # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
-        joinedload(
-            SolicitudProduccion.usuarioSolicitud
-        ),  # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
-        joinedload(
-            SolicitudProduccion.usuarioProduccion
-        ),  # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
+        # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.receta),
+        # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioSolicitud),
+        # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
+        joinedload(SolicitudProduccion.usuarioProduccion),
     ).all()
 
     return render_template(
-        "modulos/venta/solicitudes-produccion.html",
-        form=form,
-        recetas_imagenes=recetas_imagenes,
-        solicitudes=solicitudes,
+        "modulos/venta/solicitudes-produccion.html", solicitudes=solicitudes
     )
 
 
-@venta.route("/solicitud_produccion/nuevo")
+@venta.route("/solicitud_produccion/crear", methods=["GET", "POST"])
 @requires_role("vendedor")
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
+    form.receta.choices = [(receta.id, receta.nombre) for receta in Receta.query.all()]
+    images = [(receta.id, receta.imagen) for receta in Receta.query.all()]
 
-    # Obtiene todas las recetas de la base de datos
-    recetas = Receta.query.all()
-
-    # Crea una lista de tuplas con el ID y el nombre de cada receta
-    recetas_opciones = [(receta.id, receta.nombre) for receta in recetas]
-    recetas_imagenes = [(receta.id, receta.imagen) for receta in recetas]
-
-    # Asigna las opciones al campo receta del formulario
-    form.receta.choices = recetas_opciones
-
-    solicitudes = SolicitudProduccion.query.options(
-        joinedload(
-            SolicitudProduccion.receta
-        ),  # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
-        joinedload(
-            SolicitudProduccion.usuarioSolicitud
-        ),  # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
-        joinedload(
-            SolicitudProduccion.usuarioProduccion
-        ),  # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
-    ).all()
-
-    return render_template(
-        "modulos/venta/solicitudes-produccion.html",
-        form=form,
-        recetas_imagenes=recetas_imagenes,
-        solicitudes=solicitudes,
-        nuevo=True,
-    )
-
-
-@venta.route("/solicitud_produccion/nuevo", methods=["POST"])
-@requires_role("vendedor")
-def solicitud_produccion_post():
-    form = forms.SolicitudProduccionForm(request.form)
-
-    # Obtiene todas las recetas de la base de datos
-    recetas = Receta.query.all()
-
-    # Crea una lista de tuplas con el ID y el nombre de cada receta
-    recetas_opciones = [(receta.id, receta.nombre) for receta in recetas]
-    recetas_imagenes = [(receta.id, receta.imagen) for receta in recetas]
-
-    # Asigna las opciones al campo receta del formulario
-    form.receta.choices = recetas_opciones
-
-    if form.validate():
-        rol_cocinero = Rol.query.filter_by(nombre="cocinero").first()
-
-        usuario_cocinero = 0
-        if rol_cocinero is not None:
-            # Luego, filtra los usuarios que tienen el rol 'cocinero' y ordena por 'is_active'
-            usuario_cocinero = (
-                Usuario.query.join(asignacion_rol_usuario)
-                .join(Rol)
-                .filter(Rol.id == rol_cocinero.id)
-                .order_by(desc("is_active"))
-                .first()
-            )
-
-            # Si no se encuentra un usuario cocinero con is_active, intenta obtener el usuario con el last_login_at más reciente
-            if usuario_cocinero is None:
+    if request.method == "GET":
+        return render_template(
+            "modulos/venta/solicitudesProduccion/create.html",
+            form=form,
+            images=images,
+            nuevo=True,
+        )
+    else:
+        if form.validate():
+            usuario_cocinero = 0
+            rol_cocinero = Rol.query.filter_by(nombre="cocinero").first()
+            if rol_cocinero is not None:
+                # Luego, filtra los usuarios que tienen el rol 'cocinero' y ordena por 'is_active'
                 usuario_cocinero = (
                     Usuario.query.join(asignacion_rol_usuario)
                     .join(Rol)
                     .filter(Rol.id == rol_cocinero.id)
-                    .order_by(desc("last_login_at"))
+                    .order_by(desc("is_active"))
                     .first()
                 )
 
-            if usuario_cocinero is not None:
-                usuario_cocinero = usuario_cocinero.id
-            else:
-                # Maneja el caso en que no se encuentre ningún usuario cocinero
-                usuario_cocinero = current_user.id
+                # Si no se encuentra un usuario cocinero con is_active, intenta obtener el usuario con el last_login_at más reciente
+                if usuario_cocinero is None:
+                    usuario_cocinero = (
+                        Usuario.query.join(asignacion_rol_usuario)
+                        .join(Rol)
+                        .filter(Rol.id == rol_cocinero.id)
+                        .order_by(desc("last_login_at"))
+                        .first()
+                    )
 
-        solicitud = SolicitudProduccion(
-            idReceta=form.receta.data,
-            idUsuarioSolicitud=current_user.id,
-            idUsuarioProduccion=usuario_cocinero,
-            fecha_solicitud=form.fecha_solicitud.data,
-            tandas=form.tandas.data,
-            status=1,
-        )
+                if usuario_cocinero is not None:
+                    usuario_cocinero = usuario_cocinero.id
+                else:
+                    # Maneja el caso en que no se encuentre ningún usuario cocinero
+                    usuario_cocinero = current_user.id
 
-        db.session.add(solicitud)
-        db.session.commit()
+            solicitud = SolicitudProduccion(
+                idReceta=form.receta.data,
+                idUsuarioSolicitud=current_user.id,
+                idUsuarioProduccion=usuario_cocinero,
+                tandas=form.tandas.data,
+                estatus=1,
+            )
 
-        flash("Solicitud de producción creada correctamente", "success")
+            db.session.add(solicitud)
+            db.session.commit()
 
-    solicitudes = SolicitudProduccion.query.options(
-        joinedload(
-            SolicitudProduccion.receta
-        ),  # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
-        joinedload(
-            SolicitudProduccion.usuarioSolicitud
-        ),  # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
-        joinedload(
-            SolicitudProduccion.usuarioProduccion
-        ),  # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
-    ).all()
+            flash("Solicitud de producción creada correctamente", "success")
 
-    return redirect(url_for("venta.solicitud_produccion"))
+            return redirect(url_for("venta.solicitud_produccion"))
+        else:
+            return render_template(
+                "modulos/venta/solicitudesProduccion/create.html",
+                form=form,
+                images=images,
+                nuevo=True,
+            )
 
 
 @venta.route("/solicitud_produccion/edit/<int:id>", methods=["GET", "POST"])
 @requires_role("vendedor")
 def edit_solicitud_produccion(id):
-    form2 = forms.ModificarSolicitudProduccionForm(request.form)
-    form = forms.SolicitudProduccionForm(request.form)
+    solicitud = SolicitudProduccion.query.get(id)
 
-    if request.method == "POST" and form2.validate():
+    form = forms.ModificarSolicitudProduccionForm(request.form)
 
+    if request.method == "POST" and form.validate():
         solicitud = SolicitudProduccion.query.get(id)
         solicitud.tandas = form.tandas.data
         solicitud.fecha_solicitud = form.fecha_solicitud.data
-        solicitud.mensaje = form2.mensaje.data
         db.session.commit()
+
         flash("Solicitud de producción modificada correctamente", "success")
+
         return redirect(url_for("venta.solicitud_produccion"))
 
-    # Obtiene todas las recetas de la base de datos
-    recetas = Receta.query.all()
-
-    # Crea una lista de tuplas con el ID y el nombre de cada receta
-    recetas_opciones = [(receta.id, receta.nombre) for receta in recetas]
-    recetas_imagenes = [(receta.id, receta.imagen) for receta in recetas]
-
-    # Asigna las opciones al campo receta del formulario
-    form.receta.choices = recetas_opciones
-
-    solicitudes = SolicitudProduccion.query.options(
-        joinedload(
-            SolicitudProduccion.receta
-        ),  # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
-        joinedload(
-            SolicitudProduccion.usuarioSolicitud
-        ),  # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
-        joinedload(
-            SolicitudProduccion.usuarioProduccion
-        ),  # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
-    ).all()
-
-    # Busca la solicitud de producción específica por su ID
-    solicitud_especifica = SolicitudProduccion.query.get(id)
-
-    # Si encontramos la solicitud, obtenemos el nombre de la receta
-    nombre_receta = None
-    imagen_receta = None
-    if solicitud_especifica:
-        nombre_receta = solicitud_especifica.receta.nombre
-        imagen_receta = solicitud_especifica.receta.imagen
-
     return render_template(
-        "modulos/venta/solicitudes-produccion.html",
-        form=form,
-        form2=form2,
-        recetas_imagenes=recetas_imagenes,
-        solicitudes=solicitudes,
-        editar=True,
-        nombre_receta=nombre_receta,
-        imagen_receta=imagen_receta,
-        id_receta=id,
+        "modulos/venta/solicitudesProduccion/edit.html", form=form, solicitud=solicitud
     )
 
 
@@ -267,7 +167,6 @@ def delete_solicitud_produccion():
 
 
 @venta.route("/almacen/galletas", methods=["GET", "POST"])
-@requires_role("vendedor")
 def lotes_galletas():
     form = forms.BusquedaLoteGalletaForm(request.form)
 
@@ -319,7 +218,6 @@ def lotes_galletas():
 
 
 @venta.route("/merma/galletas", methods=["GET", "POST"])
-@requires_role("vendedor")
 def merma_galletas():
     form = forms.MermaGalletaForm(request.form)
     if form.validate():

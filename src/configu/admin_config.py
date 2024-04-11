@@ -9,8 +9,11 @@ from wtforms.validators import DataRequired
 from markupsafe import Markup
 from flask_login import current_user
 from flask import redirect, url_for, request
+from wtforms.fields import BooleanField, DecimalField
+from wtforms.validators import NumberRange
 
 import os
+
 
 
 class AdminModelView(ModelView):
@@ -70,6 +73,9 @@ def setup_admin(app, db):
         form_columns = ["nombre", "correo", "estatus", "roles"]
         column_list = ["nombre", "correo", "estatus", "roles"]
         column_searchable_list = ("nombre", "correo")
+        form_columns = ["nombre", "correo", "estatus", "roles"]
+        column_list = ["nombre", "correo", "estatus", "roles"]
+        column_searchable_list = ("nombre", "correo")
 
         def on_model_change(self, form, Usuario, is_created):
             if is_created:
@@ -82,11 +88,58 @@ def setup_admin(app, db):
             "descripcion",
             "piezas",
             "utilidad",
-            "peso_estimado",
             "imagen",
+            "estatus",
         ]
-        column_list = ["nombre", "descripcion", "piezas", "utilidad", "peso_estimado"]
+        column_list = [
+            "nombre",
+            "descripcion",
+            "piezas",
+            "utilidad",
+            "peso_estimado",
+            "estatus",
+        ]
+        column_labels = {
+            "peso_estimado": "Peso promedio por Pieza"  # Cambia el nombre de la columna para especificar gramos
+        }
+        form_extra_fields = {
+            "imagen": ImageUploadField(
+                "Imagen",
+                base_path=os.path.join(
+                    os.path.dirname(__file__), "..", "static", "img", "cookies"
+                ),
+                url_relative_path="img/cookies/",
+            ),
+            "estatus": BooleanField("Activar Receta"),
+            "utilidad": DecimalField(
+                "Utilidad (%)",
+                validators=[
+                    NumberRange(
+                        min=0,
+                        message="La utilidad no puede ser menor a 0 porque genera perdidas",
+                    )
+                ],
+            ),
+        }
+        form_args = {
+            "utilidad": {
+                "description": "La utilidad es tomada como porcentaje, una utilidad del 100% genera un precio de venta del doble del costo de producción.",
+                "type": "number",
+                "step": "1",
+            }
+        }
 
+        def peso_estimado_formatter(view, context, model, name):
+            return f"{model.peso_estimado * 1000:.0f} gr"
+
+        def utilidad_formatter(view, context, model, name):
+            return f"{model.utilidad * 1:.2f}%"
+
+        # Asigna el formateador personalizado a la columna peso_estimado
+        column_formatters = {
+            "peso_estimado": peso_estimado_formatter,
+            "utilidad": utilidad_formatter
+        }
         inline_models = (
             (
                 InsumosReceta,
@@ -97,11 +150,15 @@ def setup_admin(app, db):
             ),
         )
 
-        column_formatters = {
-            "imagen": lambda v, c, m, p: Markup(
-                f'<img src="{url_for("static", filename="img/cookies/" + m.imagen)}" style="max-width:300px; max-height:300px;">'
-            )
-        }
+        def on_model_change(self, form, model, is_created):
+
+            total_cantidad = sum(insumo.cantidad for insumo in model.insumos)
+            model.peso_estimado = total_cantidad / model.piezas if model.piezas else 0
+            model.estatus = form.estatus.data
+
+        def on_model_delete(self, model):
+            model.estatus = 0
+            db.session.commit()
 
         def delete_model(self, model):
             try:
@@ -186,9 +243,8 @@ def setup_admin(app, db):
             Usuario, db.session, menu_icon_type="fa-solid", menu_icon_value="fa-user"
         )
     )
-    admin.add_view(
-        RolView(Rol, db.session, menu_icon_type="fa-solid", menu_icon_value="fa-ruler")
-    )
+    # admin.add_view(RolView(Rol, db.session,
+    # menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
     admin.add_view(
         InsumoView(
             Insumo, db.session, menu_icon_type="fa-solid", menu_icon_value="fa-carrot"
@@ -212,3 +268,4 @@ def setup_admin(app, db):
     )
 
     return admin
+

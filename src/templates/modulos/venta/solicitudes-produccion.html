@@ -8,6 +8,7 @@ block content %}
 messages %}
 <div class="alert alert-success" style="width: 90%">{{ message }}</div>
 {% endfor %} {% endif %} {% endwith %}
+
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <a
@@ -41,8 +42,9 @@ messages %}
         aria-selected="{%if nuevo %}true{%else%}false{%endif%}"
       >
         Nueva
-      </button></a
-    >
+      </button>
+    </a>
+
     {% if editar %}
     <button
       class="nav-link"
@@ -60,19 +62,13 @@ messages %}
   </div>
 </nav>
 
-<script>
-  var recetas_imagenes = {{ recetas_imagenes| tojson | safe }};
-</script>
-<div class="tab-content" id="nav-tabContent">
-  <div
-    class="tab-pane fade {%if not nuevo %}show active{% endif %}"
-    id="nav-home"
-    role="tabpanel"
-    aria-labelledby="nav-home-tab"
-  >
-    <table class="table table-bordered">
+<div class="tab-content">
+  <div class="tab-pane fade {%if not nuevo %}show active{% endif %}" id="nav-home" role="tabpanel"
+    aria-labelledby="nav-home-tab">
+    <table class="table table-bordered" id="tabla-principal">
       <thead>
         <tr>
+          <th></th>
           <th></th>
           <th>Nombre de la Receta</th>
           <th>Número de Tandas</th>
@@ -138,15 +134,21 @@ messages %}
               }
             </script>
           </td>
+          <td>
+            <img
+              src="{{ url_for('static', filename='img/cookies/' + solicitud.receta.imagen) }}"
+              style="max-width: 80px; max-height: 80px; border-radius: 10px"
+            />
+          </td>
           <td>{{ solicitud.receta.nombre }}</td>
           <td>{{ solicitud.tandas }}</td>
           <td>{{ solicitud.fecha_solicitud }}</td>
           <td>
-            {% if solicitud.status == 1 %} Solicitud realizada {% elif
-            solicitud.status == 2 %} En preparación {% elif solicitud.status ==
-            3 %} Listo para entrega {% elif solicitud.status == 4 %} Producción
-            entregada {% elif solicitud.status == 5 %} Solicitud rechazada {%
-            endif %}
+            {% if solicitud.estatus == 1 %} Solicitud realizada {% elif
+            solicitud.estatus == 2 %} En preparación {% elif solicitud.estatus
+            == 3 %} Listo para entrega {% elif solicitud.estatus == 4 %}
+            Producción entregada {% elif solicitud.estatus == 5 %} Solicitud
+            rechazada {% endif %}
           </td>
           <td>{{ solicitud.usuarioSolicitud.nombre }}</td>
           <td>{{ solicitud.usuarioProduccion.nombre }}</td>
@@ -155,153 +157,27 @@ messages %}
       </tbody>
     </table>
   </div>
-  <div
-    class="tab-pane fade {%if nuevo %}show active{% endif %}"
-    id="nav-profile"
-    role="tabpanel"
-    aria-labelledby="nav-profile-tab"
-  >
-    <br />
-    <form name="solicitud" id="solicitud" method="POST">
-      <div class="row">
-        <div class="col-md-4">
-          <div
-            id="receta-imagen"
-            style="
-              height: 200px;
-              width: auto;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              overflow: hidden;
-              border-radius: 10px;
-            "
-          >
-            <img src="" id="imagen" style="height: auto; width: 100%" alt="" />
-          </div>
-        </div>
-        <div class="col-md-8">
-          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form.receta, class="form-control", id="receta")}}
-            </div>
-          </div>
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form.tandas, class="form-control")}}
-            </div>
-          </div>
-        </div>
-
-        <script>
-          document
-            .getElementById("receta")
-            .addEventListener("change", function () {
-              var id = this.value;
-              var imagen = recetas_imagenes.find(function (receta) {
-                return receta[0] == id;
-              })[1];
-              document.getElementById("imagen").src = imagen;
-            });
-
-          document.getElementById("receta").dispatchEvent(new Event("change"));
-        </script>
-      </div>
-      <hr />
-      <input type="submit" class="btn btn-primary" value="Solicitar" />
-      <script>
-        cerrarNuevaSolicitud = function () {
-          document.getElementById("nav-home-tab").click();
-          document.getElementById("solicitud").reset();
-        };
-      </script>
-      <button
-        type="button"
-        class="btn btn-secondary"
-        onclick="cerrarNuevaSolicitud()"
-      >
-        Cancelar
-      </button>
-    </form>
-  </div>
-
-  {% if editar %}
-  <div
-    class="tab-pane fade"
-    id="nav-edit"
-    role="tabpanel"
-    aria-labelledby="nav-edit-tab"
-  >
-    <br />
-    <form name="solicitud-editar" id="solicitud-editar" method="POST">
-      <div class="row">
-        <div class="col-md-6">
-          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form2.tandas, class="form-control")}}
-            </div>
-          </div>
-
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form2.fecha_solicitud, class="form-control")}}
-            </div>
-          </div>
-          <div class="row control-group">
-            <div class="form-group col-xs-12 float-label-form-group controls">
-              {{render_field(form2.mensaje, class="form-control")}}
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <h3>Receta {{nombre_receta}}</h3>
-          <div
-            id="receta-imagen-editar"
-            style="
-              height: 200px;
-              width: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              overflow: hidden;
-              border-radius: 10px;
-            "
-          >
-            <img
-              src=""
-              id="imagen-editar"
-              style="height: auto; width: 100%"
-              alt=""
-            />
-          </div>
-        </div>
-
-        <script>
-          document.getElementById("imagen-editar").src = "{{imagen_receta}}";
-        </script>
-      </div>
-      <hr />
-      <input type="submit" class="btn btn-primary" value="Actualizar" />
-      <script>
-        cerrarNuevaSolicitud = function () {
-          document.getElementById("nav-home-tab").click();
-          document.getElementById("solicitud").reset();
-        };
-      </script>
-      <button
-        type="button"
-        class="btn btn-secondary"
-        onclick="cerrarNuevaSolicitud()"
-      >
-        Cancelar
-      </button>
-    </form>
-  </div>
-  <script>
-    document.getElementById("nav-edit-tab").click();
-  </script>
-  {% endif %}
 </div>
+
+<script>
+  var data = [
+    [
+      "Tiger Nixon",
+      "System Architect",
+      "Edinburgh",
+      "5421",
+      "2011/04/25",
+      "$3,120"
+    ],
+    [
+      "Garrett Winters",
+      "Director",
+      "Edinburgh",
+      "8422",
+      "2011/07/25",
+      "$5,300"
+    ]
+  ]
+
+</script>
 {% endblock %}

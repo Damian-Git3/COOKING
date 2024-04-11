@@ -18,7 +18,7 @@
     <div class="c-body">
       <div class="top">
         <ul class="progress-line">
-          {% if solicitudProduccion.status >= 1 %}
+          {% if solicitudProduccion.estatus >= 1 %}
           <li class="green">{% else %}</li>
 
           <li>
@@ -29,7 +29,7 @@
             </div>
           </li>
 
-          {% if solicitudProduccion.status >= 2 %}
+          {% if solicitudProduccion.estatus >= 2 %}
           <li class="green">{% else %}</li>
 
           <li>
@@ -40,7 +40,7 @@
             </div>
           </li>
 
-          {% if solicitudProduccion.status >= 3 %}
+          {% if solicitudProduccion.estatus >= 3 %}
           <li class="green">{% else %}</li>
 
           <li>
@@ -51,7 +51,7 @@
             </div>
           </li>
 
-          {% if solicitudProduccion.status >= 4 %}
+          {% if solicitudProduccion.estatus >= 4 %}
           <li class="green">{% else %}</li>
 
           <li>
@@ -131,7 +131,7 @@
     </div>
 
     <div class="botones-solicitud">
-      {% if solicitudProduccion.status == 1 %}
+      {% if solicitudProduccion.estatus == 1 %}
       <form
         action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
         id="formAceptarSolicitud{{solicitudProduccion.id}}"
@@ -144,7 +144,7 @@
           Aceptar
         </button>
       </form>
-      {% endif %} {% if solicitudProduccion.status == 2 %}
+      {% endif %} {% if solicitudProduccion.estatus == 2 %}
       <form
         action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
         id="formFinalizarProduccion{{solicitudProduccion.id}}"
@@ -157,7 +157,7 @@
           Finalizar producción
         </button>
       </form>
-      {% endif %} {% if solicitudProduccion.status == 1 %}
+      {% endif %} {% if solicitudProduccion.estatus == 1 %}
       <form
         action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
         id="formAceptarSolicitud{{solicitudProduccion.id}}"
@@ -170,7 +170,7 @@
           Posponer
         </button>
       </form>
-      {% endif %} {% if solicitudProduccion.status == 1 %}
+      {% endif %} {% if solicitudProduccion.estatus == 1 %}
       <form
         action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
         id="formAceptarSolicitud{{solicitudProduccion.id}}"

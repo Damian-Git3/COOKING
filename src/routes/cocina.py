@@ -35,7 +35,7 @@ def aceptarSolicitud(idSolicitud):
     solicitudProduccion = SolicitudProduccion.query.get(idSolicitud)
 
     if solicitudProduccion:
-        solicitudProduccion.status = 2
+        solicitudProduccion.estatus = 2
         solicitudProduccion.idUsuarioProduccion = current_user.id
         db.session.commit()
 

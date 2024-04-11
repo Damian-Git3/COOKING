@@ -30,7 +30,7 @@
     />
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     {% block styles %}{% endblock %}
   </head>
   <body>
@@ -49,35 +49,35 @@
           <div class="HoverBox"></div>
           {%if current_user.has_role('admin') %}
 
-          <a href="/admin"
-            ><li class="Active">
-              <i class="fa-solid fa-crown"></i>
-              <span class="tooltip">Administración Avanzada</span>
-            </li></a
-          >
+        <a href="/admin">
+          <li class="Active">
+            <i class="fa-solid fa-crown"></i>
+            <span class="tooltip">Administración Avanzada</span>
+          </li>
+        </a>
 
           {% endif %} {%if current_user.has_role('vendedor') or
           current_user.has_role('admin') %}
 
-          <a href="{{url_for('venta.punto_venta')}}"
-            ><li>
-              <i class="fa-solid fa-cash-register"></i>
-              <span class="tooltip">Punto de venta</span>
-            </li></a
-          >
-          <a href="{{url_for('venta.solicitud_produccion')}}"
-            ><li>
-              <i class="fa-solid fa-paper-plane"></i>
-              <span class="tooltip">Solicitud de Producción</span>
-            </li></a
-          >
+        <a href="{{url_for('venta.punto_venta')}}">
+          <li>
+            <i class="fa-solid fa-cash-register"></i>
+            <span class="tooltip">Punto de venta</span>
+          </li>
+        </a>
+        <a href="{{url_for('venta.solicitud_produccion')}}">
+          <li>
+            <i class="fa-solid fa-paper-plane"></i>
+            <span class="tooltip">Solicitud de Producción</span>
+          </li>
+        </a>
 
-          <a href="{{url_for('venta.compras')}}"
-            ><li>
-              <i class="fa-solid fa-basket-shopping"></i>
-              <span class="tooltip">Compras</span>
-            </li></a
-          >
+        <a href="{{url_for('venta.compras')}}">
+          <li>
+            <i class="fa-solid fa-basket-shopping"></i>
+            <span class="tooltip">Compras</span>
+          </li>
+        </a>
 
           <a href="{{url_for('venta.lotes_galletas')}}"
             ><li>
@@ -89,12 +89,12 @@
           {% endif %} {% if current_user.has_role('cocinero') or
           current_user.has_role('admin') %}
 
-          <a href="{{url_for('cocina.recetas')}}"
-            ><li>
-              <i class="fa-solid fa-book"></i>
-              <span class="tooltip">Recetas</span>
-            </li></a
-          >
+        <a href="{{url_for('cocina.recetas')}}">
+          <li>
+            <i class="fa-solid fa-book"></i>
+            <span class="tooltip">Recetas</span>
+          </li>
+        </a>
 
           <a href="{{url_for('cocina.cocinar')}}"
             ><li>
@@ -126,18 +126,17 @@
             </li></a
           >
 
-          <a href="{{url_for('auth.logout')}}"
-            ><li>
-              <i class="fa-solid fa-right-from-bracket"></i>
-              <span class="tooltip">Cerrar sesión</span>
-            </li></a
-          >
-        </ul>
-      </div>
-      <div class="Content">
-        {% block content %}
-        <div
-          style="
+        <a href="{{url_for('auth.logout')}}">
+          <li>
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span class="tooltip">Cerrar sesión</span>
+          </li>
+        </a>
+      </ul>
+    </div>
+    <div class="Content">
+      {% block content %}
+      <div style="
             display: flex;
             height: 100%;
             width: 100%;
@@ -146,10 +145,8 @@
             background-image: url(../static/img/cookie_17.png);
             background-size: cover;
             overflow: hidden;
-          "
-        >
-          <h1
-            style="
+          ">
+        <h1 style="
               padding: 150px 200px;
               margin: 0 50px;
               background: #00000095;
@@ -166,6 +163,7 @@
         <script>
           localStorage.setItem("mensaje", "{{mensaje}}");
         </script>
+
         <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
         {% endblock %}
       </div>
