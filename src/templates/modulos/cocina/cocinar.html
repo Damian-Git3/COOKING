@@ -1,261 +1,290 @@
-{% extends 'inicio.html' %}
-
-{% block title %}Solicitudes Producción{% endblock %}
-
-{% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/cocina.scss.css') }}">
-{% endblock %}
-
-{% block content %}
+{% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock
+%} {% block styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/cocina.scss.css') }}"
+/>
+{% endblock %} {% block content %}
 <h1 class="titulo-cocina">Solicitudes producción</h1>
 <div class="contenedor-solicitudes" id="contenedor">
-    {% for solicitudProduccion in solicitudesProduccion %}
-    <div class="order-card">
-        <h2 class="title">{{ solicitudProduccion.receta.nombre }}</h2>
-        <div class="centrar-contenido">
-            <img src="{{ url_for('static', filename='img/cookies/' ~ solicitudProduccion.receta.imagen) }}">
-        </div>
-        <div class="c-body">
-            <div class="top">
-                <ul class="progress-line">
-                    {% if solicitudProduccion.estatus >= 1 %}
-                    <li class="green">
-                        {% else %}
-                    <li>
-                        {% endif %}
-                        <span>Solicitud realizada</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-check"></i>
-                        </div>
-                    </li>
+  {% for solicitudProduccion in solicitudesProduccion %}
+  <div class="order-card">
+    <h2 class="title">{{ solicitudProduccion.receta.nombre }}</h2>
+    <div class="centrar-contenido">
+      <img
+        src="{{ url_for('static', filename='img/cookies/' ~ solicitudProduccion.receta.imagen) }}"
+      />
+    </div>
+    <div class="c-body">
+      <div class="top">
+        <ul class="progress-line">
+          {% if solicitudProduccion.estatus >= 1 %}
+          <li class="green">{% else %}</li>
 
-                    {% if solicitudProduccion.estatus >= 2 %}
-                    <li class="green">
-                        {% else %}
-                    <li>
-                        {% endif %}
-                        <span>En preparación</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-fire-burner"></i>
-                        </div>
-                    </li>
-
-                    {% if solicitudProduccion.estatus >= 3 %}
-                    <li class="green">
-                        {% else %}
-                    <li>
-                        {% endif %}
-                        <span>Listo para entrega</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-share"></i>
-                        </div>
-                    </li>
-
-                    {% if solicitudProduccion.estatus >= 4 %}
-                    <li class="green">
-                        {% else %}
-                    <li>
-                        {% endif %}
-                        <span>Producción entregada</span>
-                        <div class="icon">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
-                    </li>
-                </ul>
-
-                <div class="contenedor-usuarios-detalles">
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-circle-user"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Solicitud</div>
-                            <div class="contenido-detalle">{{ solicitudProduccion.usuarioSolicitud.nombre }}</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-kitchen-set"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Cocinero</div>
-                            <div class="contenido-detalle">
-                                {% if solicitudProduccion.usuarioProduccion is not none %}
-                                {{ solicitudProduccion.usuarioProduccion.nombre }}
-                                {% else %}
-                                No asignado
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-calendar-days"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Fecha</div>
-                            <div class="contenido-detalle">
-                                {{ solicitudProduccion.fecha_solicitud.strftime('%d de %B del %Y') }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-regular fa-clock"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Hora</div>
-                            <div class="contenido-detalle">{{ solicitudProduccion.fecha_solicitud.strftime('%H:%M:%S')
-                                }}</div>
-                        </div>
-                    </div>
-
-                    <div class="c-media b-border contenedor-detalles">
-                        <div class="icono">
-                            <i class="fa-solid fa-hashtag"></i>
-                        </div>
-                        <div class="details">
-                            <div class="titulo-detalle">Tandas</div>
-                            <div class="contenido-detalle">{{ solicitudProduccion.tandas }}</div>
-                        </div>
-                    </div>
-                </div>
+          <li>
+            {% endif %}
+            <span>Solicitud realizada</span>
+            <div class="icon">
+              <i class="fa-solid fa-check"></i>
             </div>
+          </li>
+
+          {% if solicitudProduccion.estatus >= 2 %}
+          <li class="green">{% else %}</li>
+
+          <li>
+            {% endif %}
+            <span>En preparación</span>
+            <div class="icon">
+              <i class="fa-solid fa-fire-burner"></i>
+            </div>
+          </li>
+
+          {% if solicitudProduccion.estatus >= 3 %}
+          <li class="green">{% else %}</li>
+
+          <li>
+            {% endif %}
+            <span>Listo para entrega</span>
+            <div class="icon">
+              <i class="fa-solid fa-share"></i>
+            </div>
+          </li>
+
+          {% if solicitudProduccion.estatus >= 4 %}
+          <li class="green">{% else %}</li>
+
+          <li>
+            {% endif %}
+            <span>Producción entregada</span>
+            <div class="icon">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+          </li>
+        </ul>
+
+        <div class="contenedor-usuarios-detalles">
+          <div class="c-media b-border contenedor-detalles">
+            <div class="icono">
+              <i class="fa-solid fa-circle-user"></i>
+            </div>
+            <div class="details">
+              <div class="titulo-detalle">Solicitud</div>
+              <div class="contenido-detalle">
+                {{ solicitudProduccion.usuarioSolicitud.nombre }}
+              </div>
+            </div>
+          </div>
+
+          <div class="c-media b-border contenedor-detalles">
+            <div class="icono">
+              <i class="fa-solid fa-kitchen-set"></i>
+            </div>
+            <div class="details">
+              <div class="titulo-detalle">Cocinero</div>
+              <div class="contenido-detalle">
+                {% if solicitudProduccion.usuarioProduccion is not none %} {{
+                solicitudProduccion.usuarioProduccion.nombre }} {% else %} No
+                asignado {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="c-media b-border contenedor-detalles">
+            <div class="icono">
+              <i class="fa-solid fa-calendar-days"></i>
+            </div>
+            <div class="details">
+              <div class="titulo-detalle">Fecha</div>
+              <div class="contenido-detalle">
+                {{ solicitudProduccion.fecha_solicitud.strftime('%d de %B del
+                %Y') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="c-media b-border contenedor-detalles">
+            <div class="icono">
+              <i class="fa-regular fa-clock"></i>
+            </div>
+            <div class="details">
+              <div class="titulo-detalle">Hora</div>
+              <div class="contenido-detalle">
+                {{ solicitudProduccion.fecha_solicitud.strftime('%H:%M:%S') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="c-media b-border contenedor-detalles">
+            <div class="icono">
+              <i class="fa-solid fa-hashtag"></i>
+            </div>
+            <div class="details">
+              <div class="titulo-detalle">Tandas</div>
+              <div class="contenido-detalle">
+                {{ solicitudProduccion.tandas }}
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div class="botones-solicitud">
-            {% if solicitudProduccion.estatus == 1 %}
-            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
-                id="formAceptarSolicitud{{solicitudProduccion.id}}">
-                <button type="button" class="boton btn-aceptar"
-                    onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
-                    Aceptar
-                </button>
-            </form>
-            {% endif %}
-
-            {% if solicitudProduccion.estatus == 2 %}
-            <form action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
-                id="formFinalizarProduccion{{solicitudProduccion.id}}">
-                <button type="button" class="boton btn-aceptar"
-                    onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')">
-                    Finalizar producción
-                </button>
-            </form>
-            {% endif %}
-
-            {% if solicitudProduccion.estatus == 1 %}
-            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
-                id="formAceptarSolicitud{{solicitudProduccion.id}}">
-                <button type="button" class="boton btn-posponer"
-                    onclick="posponerSolicitud('{{ solicitudProduccion.id }}')">
-                    Posponer
-                </button>
-            </form>
-            {% endif %}
-
-            {% if solicitudProduccion.estatus == 1 %}
-            <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
-                id="formAceptarSolicitud{{solicitudProduccion.id}}">
-                <button type="button" class="boton btn-cancelar"
-                    onclick="cancelarSolicitud('{{ solicitudProduccion.id }}')">
-                    Cancelar
-                </button>
-            </form>
-            {% endif %}
-        </div>
+      </div>
     </div>
-    {% else %}
-    <div class="solicitudes-vacias">
-        <h2>No se encontraron solicitudes de producción.</h2>
+
+    <div class="botones-solicitud">
+      {% if solicitudProduccion.estatus == 1 %}
+      <form
+        action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+        id="formAceptarSolicitud{{solicitudProduccion.id}}"
+      >
+        <button
+          type="button"
+          class="boton btn-aceptar"
+          onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')"
+        >
+          Aceptar
+        </button>
+      </form>
+      {% endif %} {% if solicitudProduccion.estatus == 2 %}
+      <form
+        action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
+        id="formFinalizarProduccion{{solicitudProduccion.id}}"
+      >
+        <button
+          type="button"
+          class="boton btn-aceptar"
+          onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')"
+        >
+          Finalizar producción
+        </button>
+      </form>
+      {% endif %} {% if solicitudProduccion.estatus == 1 %}
+      <form
+        action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+        id="formAceptarSolicitud{{solicitudProduccion.id}}"
+      >
+        <button
+          type="button"
+          class="boton btn-posponer"
+          onclick="posponerSolicitud('{{ solicitudProduccion.id }}')"
+        >
+          Posponer
+        </button>
+      </form>
+      {% endif %} {% if solicitudProduccion.estatus == 1 %}
+      <form
+        action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+        id="formAceptarSolicitud{{solicitudProduccion.id}}"
+      >
+        <button
+          type="button"
+          class="boton btn-cancelar"
+          onclick="cancelarSolicitud('{{ solicitudProduccion.id }}')"
+        >
+          Cancelar
+        </button>
+      </form>
+      {% endif %}
     </div>
-    {% endfor %}
+  </div>
+  {% else %}
+  <div class="solicitudes-vacias">
+    <h2>No se encontraron solicitudes de producción.</h2>
+  </div>
+  {% endfor %}
 </div>
 
 <script>
-    $(document).ready(function () {
-        $("#contenedor").sortable({
-            start: function (event, div) {
-                div.item.data('start-index', div.item.index());
-            },
-            update: function (event, div) {
-                var startIndex = div.item.data('start-index');
-                var endIndex = div.item.index();
-                console.log("El elemento se movió de la posición " + (startIndex + 1) + " a la posición " + (endIndex + 1));
-            }
-        });
-        $("#contenedor").disableSelection();
+  $(document).ready(function () {
+    $("#contenedor").sortable({
+      start: function (event, div) {
+        div.item.data("start-index", div.item.index());
+      },
+      update: function (event, div) {
+        var startIndex = div.item.data("start-index");
+        var endIndex = div.item.index();
+        console.log(
+          "El elemento se movió de la posición " +
+            (startIndex + 1) +
+            " a la posición " +
+            (endIndex + 1)
+        );
+      },
     });
+    $("#contenedor").disableSelection();
+  });
 </script>
 
 <script>
-    function aceptarSolicitud(id) {
-        Swal.fire({
-            title: '¿Estás seguro de aceptar la solicitud?',
-            showCancelButton: true,
-            confirmButtonText: 'Sí',
-            cancelButtonText: 'Cancelar',
-            icon: 'question'
-        }).then((result) => {
-            let formAceptarSolicitud = document.getElementById('formAceptarSolicitud' + id);
-            formAceptarSolicitud.submit();
-        });
-    }
+  function aceptarSolicitud(id) {
+    Swal.fire({
+      title: "¿Estás seguro de aceptar la solicitud?",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "Cancelar",
+      icon: "question",
+    }).then((result) => {
+      let formAceptarSolicitud = document.getElementById(
+        "formAceptarSolicitud" + id
+      );
+      formAceptarSolicitud.submit();
+    });
+  }
 
-    function finalizarSolicitud(id) {
-        Swal.fire({
-            title: '¿Estás seguro de finalizar la producción?',
-            showCancelButton: true,
-            confirmButtonText: 'Sí',
-            cancelButtonText: 'Cancelar',
-            icon: 'question'
-        }).then((result) => {
-            let formFinalizarProduccion = document.getElementById('formFinalizarProduccion' + id);
-            formFinalizarProduccion.submit();
-        });
-    }
+  function finalizarSolicitud(id) {
+    Swal.fire({
+      title: "¿Estás seguro de finalizar la producción?",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "Cancelar",
+      icon: "question",
+    }).then((result) => {
+      let formFinalizarProduccion = document.getElementById(
+        "formFinalizarProduccion" + id
+      );
+      formFinalizarProduccion.submit();
+    });
+  }
 
-    function posponerSolicitud(id) {
-        Swal.fire({
-            title: '¿Estás seguro de posponer la solicitud?',
-            showCancelButton: true,
-            confirmButtonText: 'Sí',
-            cancelButtonText: 'Cancelar',
-            icon: 'question'
-        }).then((result) => {
-            let formFinalizarProduccion = document.getElementById('formFinalizarProduccion' + id);
-            formFinalizarProduccion.submit();
-        });
-    }
+  function posponerSolicitud(id) {
+    Swal.fire({
+      title: "¿Estás seguro de posponer la solicitud?",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "Cancelar",
+      icon: "question",
+    }).then((result) => {
+      let formFinalizarProduccion = document.getElementById(
+        "formFinalizarProduccion" + id
+      );
+      formFinalizarProduccion.submit();
+    });
+  }
 
-    function cancelarSolicitud(id) {
-        Swal.fire({
-            title: '¿Estás seguro de cancelar la solicitud?',
-            showCancelButton: true,
-            confirmButtonText: 'Sí',
-            cancelButtonText: 'Cancelar',
-            icon: 'question'
-        }).then((result) => {
-            let formFinalizarProduccion = document.getElementById('formFinalizarProduccion' + id);
-            formFinalizarProduccion.submit();
-        });
-    }
+  function cancelarSolicitud(id) {
+    Swal.fire({
+      title: "¿Estás seguro de cancelar la solicitud?",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "Cancelar",
+      icon: "question",
+    }).then((result) => {
+      let formFinalizarProduccion = document.getElementById(
+        "formFinalizarProduccion" + id
+      );
+      formFinalizarProduccion.submit();
+    });
+  }
 </script>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
+{% with messages = get_flashed_messages(with_categories=true) %} {% if messages
+%}
 <script>
-    {% for category, message in messages %}
-    {% if category == 'receta' %}
-    Swal.fire(`{{ message }}`);
-    {% else %}
-    console.log("Mensaje diferente: {{ message }}");
-    {% endif %}
-    {% endfor %}
+  {% for category, message in messages %}
+  {% if category == 'receta' %}
+  Swal.fire(`{{ message }}`);
+  {% else %}
+  console.log("Mensaje diferente: {{ message }}");
+  {% endif %}
+  {% endfor %}
 </script>
-{% endif %}
-{% endwith %}
-{% endblock %}
+{% endif %} {% endwith %} {% endblock %}
