@@ -53,7 +53,7 @@
       <div class="Sidebar">
         <ul>
           <div class="HoverBox"></div>
-          {%if current_user.has_rol('admin') %}
+          {%if current_user.has_role('admin') %}
 
           <a href="/admin"
             ><li class="Active">
@@ -62,7 +62,7 @@
             </li></a
           >
 
-          {% endif %} {%if current_user.has_rol('vendedor') %}
+          {% endif %} {%if current_user.has_role('vendedor') %}
 
           <a href="{{url_for('venta.punto_venta')}}"
             ><li>
@@ -84,7 +84,7 @@
             </li></a
           >
 
-          {% endif %} {% if current_user.has_rol('cocinero') %}
+          {% endif %} {% if current_user.has_role('cocinero') %}
 
           <a href="{{url_for('cocina.recetas')}}"
             ><li>

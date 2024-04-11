@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for
 from flask_wtf.csrf import CSRFProtect
+from flask_cors import CORS
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
 from configu.config import DevelopmentConfig
@@ -11,6 +12,7 @@ from configu.admin_config import setup_admin
 if __name__ == "__main__":
     app = Flask(__name__)
     app.config.from_object(DevelopmentConfig)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:*"}})
 
     app.wsgi_app = SassMiddleware(app.wsgi_app, {
         '__main__': {

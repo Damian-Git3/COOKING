@@ -100,7 +100,7 @@ class Usuario(UserMixin, db.Model):
         return str(self.id)
     
     #metodo para acelerar la validacion de roles
-    def has_rol(self, role):
+    def has_role(self, role):
         return bool(Rol.query.join(asignacion_rol_usuario).join(Usuario).filter(Rol.nombre == role, Usuario.id == self.id).first())
     
     def get_roles(self):
@@ -168,7 +168,7 @@ class LogLogin(db.Model):
     fecha = db.Column(db.DateTime, nullable=False)
     exito = db.Column(db.Boolean, nullable=False)
     
-    idUsuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=True)
 
 class LoteGalleta(db.Model):
     __tablename__ = 'lotes_galletas'

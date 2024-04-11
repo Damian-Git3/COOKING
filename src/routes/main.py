@@ -11,9 +11,9 @@ def index():
 @login_required
 def menu():
     usuario = current_user.nombre
-    admin = current_user.has_rol('admin')
-    vendedor = current_user.has_rol('vendedor')
-    cocinero = current_user.has_rol('cocinero')
+    admin = current_user.has_role('admin')
+    vendedor = current_user.has_role('vendedor')
+    cocinero = current_user.has_role('cocinero')
     mensaje = f"Bienvenido {usuario} "
     if admin or vendedor or cocinero: 
         mensaje += " tienes "
