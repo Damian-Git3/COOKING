@@ -1,12 +1,6 @@
-{% extends 'inicio.html' %}
-
-{% block title %}Solicitudes Producción{% endblock%}
-
-{% block styles %} {% endblock %}
-
-{%from "macros.html" import render_field%}
-
-{% block content %}
+{% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock%}
+{% block styles %} {% endblock %} {%from "macros.html" import render_field%} {%
+block content %}
 <div style="width: 100%; text-align: center">
   <h1>Solicitudes de producción</h1>
 </div>
@@ -16,21 +10,50 @@ messages %}
 {% endfor %} {% endif %} {% endwith %}
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
-    <a href="{{ url_for('venta.solicitud_produccion') }}" style="text-decoration: none; color: black"><button
-        class="nav-link {%if not nuevo %}active{%endif%}" id="nav-home-tab" data-bs-toggle="tab"
-        data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
-        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}">
+    <a
+      href="{{ url_for('venta.solicitud_produccion') }}"
+      style="text-decoration: none; color: black"
+      ><button
+        class="nav-link {%if not nuevo %}active{%endif%}"
+        id="nav-home-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-home"
+        type="button"
+        role="tab"
+        aria-controls="nav-home"
+        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}"
+      >
         Pendientes
-      </button></a>
-    <a href="{{ url_for('venta.solicitud_produccion_nuevo') }}" style="text-decoration: none; color: black">
-      <button class="nav-link {%if nuevo %}active{%endif%}" id="nav-profile-tab" data-bs-toggle="tab"
-        data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
-        aria-selected="{%if nuevo %}true{%else%}false{%endif%}">
+      </button></a
+    >
+    <a
+      href="{{ url_for('venta.solicitud_produccion_nuevo') }}"
+      style="text-decoration: none; color: black"
+    >
+      <button
+        class="nav-link {%if nuevo %}active{%endif%}"
+        id="nav-profile-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-profile"
+        type="button"
+        role="tab"
+        aria-controls="nav-profile"
+        aria-selected="{%if nuevo %}true{%else%}false{%endif%}"
+      >
         Nueva
-      </button></a>
+      </button></a
+    >
     {% if editar %}
-    <button class="nav-link" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab"
-      aria-controls="nav-edit" aria-selected="false">
+    <button
+      class="nav-link"
+      id="nav-edit-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-edit"
+      type="button"
+      role="tab"
+      aria-controls="nav-edit"
+      aria-selected="false"
+    >
       Editar
     </button>
     {% endif %}
@@ -41,8 +64,12 @@ messages %}
   var recetas_imagenes = {{ recetas_imagenes| tojson | safe }};
 </script>
 <div class="tab-content" id="nav-tabContent">
-  <div class="tab-pane fade {%if not nuevo %}show active{% endif %}" id="nav-home" role="tabpanel"
-    aria-labelledby="nav-home-tab">
+  <div
+    class="tab-pane fade {%if not nuevo %}show active{% endif %}"
+    id="nav-home"
+    role="tabpanel"
+    aria-labelledby="nav-home-tab"
+  >
     <table class="table table-bordered">
       <thead>
         <tr>
@@ -58,18 +85,38 @@ messages %}
       <tbody>
         {% for solicitud in solicitudes %}
         <tr>
-          <td class="list-buttons-column" style="display: flex; justify-content: space-around; border: none">
-            <a class="icon" href="/venta/solicitud_produccion/edit/{{ solicitud.id }}" title="Editar Registro"
-              style="text-decoration: none; color: black">
+          <td
+            class="list-buttons-column"
+            style="display: flex; justify-content: space-around; border: none"
+          >
+            <a
+              class="icon"
+              href="/venta/solicitud_produccion/edit/{{ solicitud.id }}"
+              title="Editar Registro"
+              style="text-decoration: none; color: black"
+            >
               <span class="fa fa-pencil glyphicon glyphicon-pencil"></span>
             </a>
 
-            <form id="deleteForm" method="POST" action="/venta/solicitud_produccion/delete">
-              <input id="id" name="id" required="" type="hidden" value="{{solicitud.id}}" />
+            <form
+              id="deleteForm"
+              method="POST"
+              action="/venta/solicitud_produccion/delete"
+            >
+              <input
+                id="id"
+                name="id"
+                required=""
+                type="hidden"
+                value="{{solicitud.id}}"
+              />
               <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
 
-              <button onclick="event.preventDefault(); confirmDelete();" title="Delete record"
-                style="border: none; background: none">
+              <button
+                onclick="event.preventDefault(); confirmDelete();"
+                title="Delete record"
+                style="border: none; background: none"
+              >
                 <span class="fa-solid fa-trash"></span>
               </button>
             </form>
@@ -95,17 +142,11 @@ messages %}
           <td>{{ solicitud.tandas }}</td>
           <td>{{ solicitud.fecha_solicitud }}</td>
           <td>
-            {% if solicitud.status == 1 %}
-            Solicitud realizada
-            {% elif solicitud.status == 2 %}
-            En preparación
-            {% elif solicitud.status == 3 %}
-            Listo para entrega
-            {% elif solicitud.status == 4 %}
-            Producción entregada
-            {% elif solicitud.status == 5 %}
-            Solicitud rechazada
-            {% endif %}
+            {% if solicitud.status == 1 %} Solicitud realizada {% elif
+            solicitud.status == 2 %} En preparación {% elif solicitud.status ==
+            3 %} Listo para entrega {% elif solicitud.status == 4 %} Producción
+            entregada {% elif solicitud.status == 5 %} Solicitud rechazada {%
+            endif %}
           </td>
           <td>{{ solicitud.usuarioSolicitud.nombre }}</td>
           <td>{{ solicitud.usuarioProduccion.nombre }}</td>
@@ -114,8 +155,12 @@ messages %}
       </tbody>
     </table>
   </div>
-  <div class="tab-pane fade {%if nuevo %}show active{% endif %}" id="nav-profile" role="tabpanel"
-    aria-labelledby="nav-profile-tab">
+  <div
+    class="tab-pane fade {%if nuevo %}show active{% endif %}"
+    id="nav-profile"
+    role="tabpanel"
+    aria-labelledby="nav-profile-tab"
+  >
     <br />
     <form name="solicitud" id="solicitud" method="POST">
       <div class="row">
@@ -171,14 +216,23 @@ messages %}
           document.getElementById("solicitud").reset();
         };
       </script>
-      <button type="button" class="btn btn-secondary" onclick="cerrarNuevaSolicitud()">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="cerrarNuevaSolicitud()"
+      >
         Cancelar
       </button>
     </form>
   </div>
 
   {% if editar %}
-  <div class="tab-pane fade" id="nav-edit" role="tabpanel" aria-labelledby="nav-edit-tab">
+  <div
+    class="tab-pane fade"
+    id="nav-edit"
+    role="tabpanel"
+    aria-labelledby="nav-edit-tab"
+  >
     <br />
     <form name="solicitud-editar" id="solicitud-editar" method="POST">
       <div class="row">
@@ -203,7 +257,9 @@ messages %}
         </div>
         <div class="col-md-6">
           <h3>Receta {{nombre_receta}}</h3>
-          <div id="receta-imagen-editar" style="
+          <div
+            id="receta-imagen-editar"
+            style="
               height: 200px;
               width: 100%;
               display: flex;
@@ -211,8 +267,14 @@ messages %}
               justify-content: center;
               overflow: hidden;
               border-radius: 10px;
-            ">
-            <img src="" id="imagen-editar" style="height: auto; width: 100%" alt="" />
+            "
+          >
+            <img
+              src=""
+              id="imagen-editar"
+              style="height: auto; width: 100%"
+              alt=""
+            />
           </div>
         </div>
 
@@ -228,7 +290,11 @@ messages %}
           document.getElementById("solicitud").reset();
         };
       </script>
-      <button type="button" class="btn btn-secondary" onclick="cerrarNuevaSolicitud()">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        onclick="cerrarNuevaSolicitud()"
+      >
         Cancelar
       </button>
     </form>
