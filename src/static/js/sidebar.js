@@ -106,7 +106,7 @@ function setupMouseoverListeners() {
 }
 
 function adjustScrollXPosition(index) {
-  ScrollBox_s.style.overflowX = "scroll";
+  ScrollBox_s.style.overflowX = "auto";
   ScrollBox_s.style.overflowY = "hidden";
   var hoverpositionHorizontal = button_s[index].offsetLeft;
 
@@ -119,7 +119,7 @@ function adjustScrollXPosition(index) {
 
 function adjustScrollYPosition(index) {
   ScrollBox_s.style.overflowX = "hidden";
-  ScrollBox_s.style.overflowY = "scroll";
+  ScrollBox_s.style.overflowY = "auto";
   var hoverposition = button_s[index].offsetTop;
   var buttonHeight = button_s[index].offsetHeight;
   var alturatotal = ScrollBox_s.scrollHeight - buttonHeight;

@@ -7,17 +7,59 @@ from flask_babel import Babel
 from flask import flash, url_for
 from wtforms.validators import DataRequired
 from markupsafe import Markup
+from flask_login import current_user
+from flask import redirect, url_for, request
 
 import os
 
+class AdminModelView(ModelView):
+    def is_accessible(self):
+        """
+        Verifica si el usuario actual tiene el rol de "admin".
+        Si no es así, redirige al usuario a la página de inicio de sesión.
+        """
+        if not current_user.is_authenticated:
+            return False
+        if not current_user.has_rol('admin'):
+            return False
+        return True
+
+    def inaccessible_callback(self, name, **kwargs):
+        """
+        Redirige al usuario a la página de inicio de sesión si intenta acceder a una vista
+        a la que no tiene acceso.
+        """
+        return redirect(url_for('auth.login', next=request.url))
+    
+class AdminIndexView(AdminIndexView):
+    def is_accessible(self):
+        """
+        Verifica si el usuario actual tiene el rol de "admin".
+        Si no es así, redirige al usuario a la página de inicio de sesión.
+        """
+        if not current_user.is_authenticated:
+            return False
+        if not current_user.has_rol('admin'):
+            return False
+        return True
+
+    def inaccessible_callback(self, name, **kwargs):
+        """
+        Redirige al usuario a la página de inicio de sesión si intenta acceder a una vista
+        a la que no tiene acceso.
+        """
+        return redirect(url_for('auth.login', next=request.url))
+
+
 def setup_admin(app, db):
-    admin = Admin(app,  template_mode='bootstrap4', index_view=AdminIndexView(
+    
+    admin = Admin(app, index_view=AdminIndexView(
         menu_icon_type='fa-solid',
         menu_icon_value='fa-home'
-    ))
+    ), template_mode='bootstrap4')
 
     # Clase base para modelos configuration
-    class BaseModelConfiguration(ModelView):
+    class BaseModelConfiguration(AdminModelView):
         page_size = 10
 
     # Clase de vista personalizada para Usuario
@@ -58,6 +100,33 @@ def setup_admin(app, db):
                 flash('Error al eliminar la receta y los registros relacionados: {}'.format(
                     str(e)), 'error')
                 return False
+    
+    class InsumoView(BaseModelConfiguration):
+        form_columns = ['nombre', 'descripcion', 'unidad_medida', 'cantidad_maxima', 'cantidad_minima', 'merma']
+        column_list = ['nombre', 'descripcion', 'unidad_medida', 'cantidad_maxima', 'cantidad_minima', 'merma']
+        
+        inline_models = ((
+            InsumosReceta,
+            {
+                'form_columns': ('cantidad', 'receta', 'idReceta', 'idInsumo'),
+                'form_label': 'Recetas Asociadas'
+            }
+        ),)
+
+        column_formatters = {
+            # Aquí puedes agregar formatters personalizados si es necesario
+        }
+
+        def delete_model(self, model):
+            try:
+                # Eliminar los registros relacionados en la tabla InsumosReceta
+                InsumosReceta.query.filter_by(idInsumo=model.id).delete()
+                # Llamar al método delete_model de la superclase para eliminar el insumo
+                return super(InsumoView, self).delete_model(model)
+            except Exception as e:
+                flash('Error al eliminar el insumo y los registros relacionados: {}'.format(
+                    str(e)), 'error')
+                return False
 
     # Clase de vista personalizada para Rol
     class RolView(BaseModelConfiguration):
@@ -78,9 +147,11 @@ def setup_admin(app, db):
                    menu_icon_type='fa-solid', menu_icon_value='fa-user'))
     admin.add_view(RolView(Rol, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
-    admin.add_view(ModelView(Insumo, db.session,
+    admin.add_view(InsumoView(Insumo, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-carrot'))
-    admin.add_view(ModelView(Proveedor, db.session,
+    admin.add_view(AdminModelView(Proveedor, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-handshake'))
     admin.add_view(RecetaView(Receta, db.session,
                    menu_icon_type='fa-solid', menu_icon_value='fa-clipboard'))
+
+    return admin

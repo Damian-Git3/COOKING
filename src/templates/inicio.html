@@ -17,10 +17,7 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='libs/fontawesome/css/all.css')}}"
     />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='libs/fontawesome/js/all.js')}}"
-    />
+    <script src="{{ url_for('static', filename='libs/fontawesome/js/all.js')}}"></script>
 
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans"
@@ -32,11 +29,8 @@
       href="{{ url_for('static', filename='img/cookie_1.png')}}"
     />
 
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='libs/sweetalert2/src/sweetalert2.scss')}}"
-    />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     {% block styles %}{% endblock %}
   </head>
   <body>
@@ -117,13 +111,13 @@
             </li></a
           >
 
-          <a href="{{url_for('main.dashboard')}}"
+          <a href="{{url_for('dashboard.index')}}"
             ><li>
               <i class="fa-solid fa-chart-line"></i>
               <span class="tooltip">Dashboard</span>
             </li></a
           >
-          <a href="{{url_for('main.dashboard')}}"
+          <a href="{{url_for('main.configuracion')}}"
             ><li>
               <i class="fa-solid fa-gear"></i>
               <span class="tooltip">Configuración</span>
@@ -175,5 +169,9 @@
       </div>
     </div>
     <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
+
+    {% block jscode %}
+  
+    {% endblock %}
   </body>
 </html>

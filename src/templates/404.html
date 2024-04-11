@@ -4,8 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cooking - Página no encontrada</title>
-  <link rel="stylesheet" href="../static/css/404.css" />
+  <title>404</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/404.css')}}" />
+  <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='img/cookie_1.png')}}"
+    />
 </head>
 
 <body>
@@ -17,7 +22,11 @@
   
   <div class="error-container">
     <div class="cookie">
-      <img src="../static/img/cookie_19.png" alt="" />
+      <img
+            src="{{ url_for('static', filename='img/cookie_19.png')}}"
+            alt="Logo de la empresa"
+            class="que busca compa"
+        />
     </div>
     <div class="error">
       <div class="error__title">
@@ -38,7 +47,7 @@
   </div>
 
   <script src="https://unpkg.com/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
-  <script src="../static/js/404.js"></script>
+  <script src="{{ url_for('static', filename='js/404.js')}}"></script>
 </body>
 
 </html>
