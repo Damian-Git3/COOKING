@@ -13,15 +13,8 @@
     />
     <title>CooKing - {% block title %}{% endblock %}</title>
     <script src="{{ url_for('static', filename='libs/bootstrap5/js/bootstrap.bundle.js')}}"></script>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='libs/fontawesome/css/all.css')}}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='libs/fontawesome/js/all.js')}}"
-    />
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/fontawesome/css/all.css')}}" />
+    <script src="{{ url_for('static', filename='libs/fontawesome/js/all.js')}}" ></script>   
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans"
       rel="stylesheet"
@@ -32,28 +25,28 @@
       href="{{ url_for('static', filename='img/cookie_1.png')}}"
     />
 
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='libs/sweetalert2/src/sweetalert2.scss')}}"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    {% block styles %}{% endblock %}
-  </head>
-  <body>
-    <div class="Menu">
-      <div class="logo-container">
-        <a href="{{url_for('main.menu')}}"
-          ><img
-            src="{{ url_for('static', filename='img/logo.png')}}"
-            alt="Logo de la empresa"
-            class="company-logo"
-        /></a>
-      </div>
-      <span class="HoverTip"></span>
-      <div class="Sidebar">
-        <ul>
-          <div class="HoverBox"></div>
-          {%if current_user.has_rol('admin') %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='libs/sweetalert2/src/sweetalert2.scss')}}" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+  <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jqueryui.js') }}"></script>
+
+  {% block styles %}{% endblock %}
+</head>
+
+<body>
+  <div class="Menu">
+    <div class="logo-container">
+      <a href="{{url_for('main.menu')}}"><img src="{{ url_for('static', filename='img/logo.png')}}"
+          alt="Logo de la empresa" class="company-logo" /></a>
+    </div>
+    <span class="HoverTip"></span>
+    <div class="Sidebar">
+      <ul>
+        <div class="HoverBox"></div>
+        {%if current_user.has_rol('admin') %}
 
           <a href="/admin"
             ><li class="Active">
@@ -124,6 +117,7 @@
             </li></a
           >
           <a href="{{url_for('main.dashboard')}}"
+
             ><li>
               <i class="fa-solid fa-gear"></i>
               <span class="tooltip">Configuración</span>
@@ -174,6 +168,9 @@
         {% endblock %}
       </div>
     </div>
+    {% block jscode %}
+    
+    {% endblock %}
     <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
   </body>
 </html>
