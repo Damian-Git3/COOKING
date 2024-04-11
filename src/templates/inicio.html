@@ -37,6 +37,7 @@
       href="{{ url_for('static', filename='libs/sweetalert2/src/sweetalert2.scss')}}"
     />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     {% block styles %}{% endblock %}
   </head>
   <body>
@@ -172,6 +173,7 @@
         <script>
           localStorage.setItem("mensaje", "{{mensaje}}");
         </script>
+
         <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
         {% endblock %}
       </div>
