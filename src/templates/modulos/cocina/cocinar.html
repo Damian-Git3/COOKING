@@ -1,19 +1,19 @@
-{% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock
-%} {% block styles %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/cocina.scss.css') }}"
-/>
-{% endblock %} {% block content %}
+{% extends 'inicio.html' %}
+
+{% block title %}Solicitudes Producción{% endblock%}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cocina.scss.css') }}" />
+{% endblock %}
+
+{% block content %}
 <h1 class="titulo-cocina">Solicitudes producción</h1>
 <div class="contenedor-solicitudes" id="contenedor">
   {% for solicitudProduccion in solicitudesProduccion %}
   <div class="order-card">
     <h2 class="title">{{ solicitudProduccion.receta.nombre }}</h2>
     <div class="centrar-contenido">
-      <img
-        src="{{ url_for('static', filename='img/cookies/' ~ solicitudProduccion.receta.imagen) }}"
-      />
+      <img src="{{ url_for('static', filename='img/cookies/' ~ solicitudProduccion.receta.imagen) }}" />
     </div>
     <div class="c-body">
       <div class="top">
@@ -83,9 +83,9 @@
             <div class="details">
               <div class="titulo-detalle">Cocinero</div>
               <div class="contenido-detalle">
-                {% if solicitudProduccion.usuarioProduccion is not none %} {{
-                solicitudProduccion.usuarioProduccion.nombre }} {% else %} No
-                asignado {% endif %}
+                {% if solicitudProduccion.usuarioProduccion is not none %}
+                {{ solicitudProduccion.usuarioProduccion.nombre }}
+                {% else %} No asignado {% endif %}
               </div>
             </div>
           </div>
@@ -97,8 +97,7 @@
             <div class="details">
               <div class="titulo-detalle">Fecha</div>
               <div class="contenido-detalle">
-                {{ solicitudProduccion.fecha_solicitud.strftime('%d de %B del
-                %Y') }}
+                {{ solicitudProduccion.fecha_solicitud.strftime('%d de %B del %Y') }}
               </div>
             </div>
           </div>
@@ -132,54 +131,30 @@
 
     <div class="botones-solicitud">
       {% if solicitudProduccion.estatus == 1 %}
-      <form
-        action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
-        id="formAceptarSolicitud{{solicitudProduccion.id}}"
-      >
-        <button
-          type="button"
-          class="boton btn-aceptar"
-          onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')"
-        >
+      <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+        id="formAceptarSolicitud{{solicitudProduccion.id}}">
+        <button type="button" class="boton btn-aceptar" onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
           Aceptar
         </button>
       </form>
       {% endif %} {% if solicitudProduccion.estatus == 2 %}
-      <form
-        action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
-        id="formFinalizarProduccion{{solicitudProduccion.id}}"
-      >
-        <button
-          type="button"
-          class="boton btn-aceptar"
-          onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')"
-        >
+      <form action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
+        id="formFinalizarProduccion{{solicitudProduccion.id}}">
+        <button type="button" class="boton btn-aceptar" onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')">
           Finalizar producción
         </button>
       </form>
       {% endif %} {% if solicitudProduccion.estatus == 1 %}
-      <form
-        action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
-        id="formAceptarSolicitud{{solicitudProduccion.id}}"
-      >
-        <button
-          type="button"
-          class="boton btn-posponer"
-          onclick="posponerSolicitud('{{ solicitudProduccion.id }}')"
-        >
+      <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+        id="formAceptarSolicitud{{solicitudProduccion.id}}">
+        <button type="button" class="boton btn-posponer" onclick="posponerSolicitud('{{ solicitudProduccion.id }}')">
           Posponer
         </button>
       </form>
       {% endif %} {% if solicitudProduccion.estatus == 1 %}
-      <form
-        action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
-        id="formAceptarSolicitud{{solicitudProduccion.id}}"
-      >
-        <button
-          type="button"
-          class="boton btn-cancelar"
-          onclick="cancelarSolicitud('{{ solicitudProduccion.id }}')"
-        >
+      <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+        id="formAceptarSolicitud{{solicitudProduccion.id}}">
+        <button type="button" class="boton btn-cancelar" onclick="cancelarSolicitud('{{ solicitudProduccion.id }}')">
           Cancelar
         </button>
       </form>
@@ -204,9 +179,9 @@
         var endIndex = div.item.index();
         console.log(
           "El elemento se movió de la posición " +
-            (startIndex + 1) +
-            " a la posición " +
-            (endIndex + 1)
+          (startIndex + 1) +
+          " a la posición " +
+          (endIndex + 1)
         );
       },
     });
@@ -275,16 +250,4 @@
     });
   }
 </script>
-
-{% with messages = get_flashed_messages(with_categories=true) %} {% if messages
-%}
-<script>
-  {% for category, message in messages %}
-  {% if category == 'receta' %}
-  Swal.fire(`{{ message }}`);
-  {% else %}
-  console.log("Mensaje diferente: {{ message }}");
-  {% endif %}
-  {% endfor %}
-</script>
-{% endif %} {% endwith %} {% endblock %}
+{% endblock %}

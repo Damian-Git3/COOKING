@@ -26,11 +26,13 @@ from database.models import (
     Compra,
     Proveedor,
     LoteGalleta,
+    InsumosReceta,
+    LoteInsumo
 )
 
 from forms import forms
 from sqlalchemy.orm import joinedload
-from sqlalchemy import desc, extract, text
+from sqlalchemy import desc, extract, text, asc
 from datetime import datetime, timedelta
 from routes.auth import requires_role
 
@@ -53,11 +55,8 @@ def punto_venta():
 @requires_role("vendedor")
 def solicitud_produccion():
     solicitudes = SolicitudProduccion.query.options(
-        # Asume que 'receta' es el nombre de la relación en SolicitudProduccion
         joinedload(SolicitudProduccion.receta),
-        # Asume que 'usuarioSolicitud' es el nombre de la relación en SolicitudProduccion
         joinedload(SolicitudProduccion.usuarioSolicitud),
-        # Asume que 'usuarioProduccion' es el nombre de la relación en SolicitudProduccion
         joinedload(SolicitudProduccion.usuarioProduccion),
     ).all()
 
@@ -70,10 +69,8 @@ def solicitud_produccion():
 @requires_role("vendedor")
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
-    form.receta.choices = [(receta.id, receta.nombre)
-                           for receta in Receta.query.all()]
-    recetas = [(receta.id, receta.imagen, receta.piezas)
-               for receta in Receta.query.all()]
+    form.receta.choices = [(receta.id, receta.nombre) for receta in Receta.query.all()]
+    recetas = [(receta.id, receta.imagen, receta.piezas) for receta in Receta.query.all()]
 
     if request.method == "GET":
         return render_template(
@@ -84,53 +81,112 @@ def solicitud_produccion_nuevo():
         )
     else:
         if form.validate():
-            usuario_cocinero = 0
-            rol_cocinero = Rol.query.filter_by(nombre="cocinero").first()
+            insumosReceta = InsumosReceta.query.filter_by(idReceta=form.receta.data).all()
             
-            if rol_cocinero is not None:
-                # Luego, filtra los usuarios que tienen el rol 'cocinero' y ordena por 'is_active'
-                usuario_cocinero = (
-                    Usuario.query.join(asignacion_rol_usuario)
-                    .join(Rol)
-                    .filter(Rol.id == rol_cocinero.id)
-                    .order_by(desc("is_active"))
-                    .first()
-                )
-
-                # Si no se encuentra un usuario cocinero con is_active, intenta obtener el usuario con el last_login_at más reciente
-                if usuario_cocinero is None:
+            if len(insumosReceta) > 0:
+                recetaSePuedeProcesar = True
+                mensajeInsumosCantidadesFaltantes = ""
+                
+                for insumoReceta in insumosReceta:
+                    lotesInsumosCumplenCantidad = True
+                    
+                    cantidadNecesaria = insumoReceta.cantidad * form.tandas.data
+                    
+                    print("----------------------")
+                    print(f"Insumo: {insumoReceta.insumo.nombre}")
+                    print(f"Insumo cantidad en receta: {insumoReceta.cantidad}")
+                    print(f"Tandas: {form.tandas.data}")
+                    print(f"Cantidad necesaria: {cantidadNecesaria}")
+                    
+                    lotesInsumosReceta = LoteInsumo.query.filter_by(idInsumo=insumoReceta.idInsumo).order_by(asc(LoteInsumo.fecha_caducidad)).all()
+                    
+                    print(f"Cantidad de lotes insumos para este insumo: {len(lotesInsumosReceta)}")
+                    
+                    if(len(lotesInsumosReceta) > 0):
+                        recetaSePuedeProcesar = False
+                        
+                        for loteInsumo in lotesInsumosReceta:
+                            print("----------------------")
+                            print(f"Lote insumo: {loteInsumo.cantidad}")
+                            
+                            if loteInsumo.cantidad <= cantidadNecesaria:
+                                pass
+                            else:
+                                pass
+                    else:
+                        if(insumoReceta.insumo.unidad_medida == "Kilos"):
+                            if (cantidadNecesaria >= 1):
+                                unidadMedida = "kg"
+                            else:
+                                unidadMedida = "g"
+                                cantidadNecesaria*1000
+                        elif(insumoReceta.insumo.unidad_medida == "Litros"):
+                            if (cantidadNecesaria >= 1):
+                                unidadMedida = "l"
+                            else:
+                                unidadMedida = "ml"
+                                cantidadNecesaria*1000
+                        
+                        mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadNecesaria} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
+                        print(mensajeInsumosCantidadesFaltantes)
+                
+                #Termina FOR DE INSUMOS
+                usuario_cocinero = 0
+                rol_cocinero = Rol.query.filter_by(nombre="cocinero").first()
+                
+                if rol_cocinero is not None:
+                    # Luego, filtra los usuarios que tienen el rol 'cocinero' y ordena por 'is_active'
                     usuario_cocinero = (
                         Usuario.query.join(asignacion_rol_usuario)
                         .join(Rol)
                         .filter(Rol.id == rol_cocinero.id)
-                        .order_by(desc("last_login_at"))
+                        .order_by(desc("is_active"))
                         .first()
                     )
 
-                if usuario_cocinero is not None:
-                    usuario_cocinero = usuario_cocinero.id
-                else:
-                    usuario_cocinero = current_user.id
+                    # Si no se encuentra un usuario cocinero con is_active, intenta obtener el usuario con el last_login_at más reciente
+                    if usuario_cocinero is None:
+                        usuario_cocinero = (
+                            Usuario.query.join(asignacion_rol_usuario)
+                            .join(Rol)
+                            .filter(Rol.id == rol_cocinero.id)
+                            .order_by(desc("last_login_at"))
+                            .first()
+                        )
 
-            solicitud = SolicitudProduccion(
-                idReceta=form.receta.data,
-                idUsuarioSolicitud=current_user.id,
-                idUsuarioProduccion=usuario_cocinero,
-                tandas=form.tandas.data,
-                estatus=1,
+                    if usuario_cocinero is not None:
+                        usuario_cocinero = usuario_cocinero.id
+                    else:
+                        usuario_cocinero = current_user.id
+
+                solicitud = SolicitudProduccion(
+                    idReceta=form.receta.data,
+                    idUsuarioSolicitud=current_user.id,
+                    idUsuarioProduccion=usuario_cocinero,
+                    tandas=form.tandas.data,
+                    estatus=1,
+                )
+
+                #db.session.add(solicitud)
+                #db.session.commit()
+
+                flash("Solicitud de producción creada correctamente", "success")
+
+                return redirect(url_for("venta.solicitud_produccion"))
+            else:
+                flash("Esta receta no cuenta con insumos agregados, consultalo con un administrador", "error")
+                
+                return render_template(
+                "modulos/venta/solicitudesProduccion/create.html",
+                form=form,
+                recetas=recetas,
+                nuevo=True,
             )
-
-            db.session.add(solicitud)
-            db.session.commit()
-
-            flash("Solicitud de producción creada correctamente", "success")
-
-            return redirect(url_for("venta.solicitud_produccion"))
         else:
             return render_template(
                 "modulos/venta/solicitudesProduccion/create.html",
                 form=form,
-                images=images,
+                recetas=recetas,
                 nuevo=True,
             )
 
@@ -162,10 +218,17 @@ def edit_solicitud_produccion(id):
 def delete_solicitud_produccion():
     id = request.form.get("id")
     solicitud = SolicitudProduccion.query.get_or_404(id)
-    db.session.delete(solicitud)
-    db.session.commit()
-    flash("Solicitud de producción eliminada correctamente", "success")
-    return redirect(url_for("venta.solicitud_produccion"))
+    
+    if (solicitud.estatus == 1):
+        db.session.delete(solicitud)
+        db.session.commit()
+        flash("Solicitud de producción eliminada correctamente", "success")
+        
+        return redirect(url_for("venta.solicitud_produccion"))
+    else:
+        flash("La solicitud se encuentra en un status diferente a realizada, solicita al cocinero que descienda los status para poder eliminarla", "error")
+        
+        return redirect(url_for("venta.solicitud_produccion"))
 
 
 @venta.route("/almacen/galletas", methods=["GET", "POST"])

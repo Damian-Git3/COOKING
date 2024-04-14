@@ -1,13 +1,13 @@
 {% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock%}
-{% block styles %} {% endblock %} {%from "macros.html" import render_field%} {%
-block content %}
+
+{% block styles %} {% endblock %}
+
+{%from "macros.html" import render_field%}
+
+{% block content %}
 <div style="width: 100%; text-align: center">
   <h1>Solicitudes de producción</h1>
 </div>
-{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
-messages %}
-<div class="alert alert-success" style="width: 90%">{{ message }}</div>
-{% endfor %} {% endif %} {% endwith %}
 
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -58,7 +58,7 @@ messages %}
         </div>
 
         <div class="mt-3">
-          <p>Las galletas totales seran: <span id="piezasTotales">Esperando tandas...</span></p>
+          <p>Las galletas a pedir serán: <span id="piezasTotales">Esperando tandas...</span></p>
         </div>
 
       </div>
@@ -111,7 +111,7 @@ messages %}
     const tandas = parseFloat(inputTandas.value);
 
     if (!isNaN(tandas) && Number.isInteger(tandas)) {
-      piezasTotales.innerHTML = tandas * recetaSeleccionada[2];
+      piezasTotales.innerHTML = tandas * recetaSeleccionada[2] + " piezas";
     } else {
       piezasTotales.innerHTML = "Esperando tandas...";
 
@@ -122,4 +122,5 @@ messages %}
     }
   }
 </script>
+
 {% endblock %}
