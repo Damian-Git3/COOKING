@@ -113,7 +113,7 @@ def setup_admin(app, db):
     @app.errorhandler(RecetaImagenValidationError)
     def handle_custom_validation_error(error):
         return redirect("/admin/receta/edit")
-    
+
     class RecetaView(BaseModelConfiguration):
         can_delete = False
         form_columns = [
@@ -140,9 +140,9 @@ def setup_admin(app, db):
                 base_path=os.path.join(
                     os.path.dirname(__file__), "..", "static", "img", "cookies"
                 ),
-                url_relative_path="img/cookies/"
+                url_relative_path="img/cookies/",
             ),
-            "estatus": BooleanField("Activar Receta")
+            "estatus": BooleanField("Activar Receta"),
         }
 
         def peso_estimado_formatter(view, context, model, name):
@@ -164,11 +164,11 @@ def setup_admin(app, db):
 
         def on_model_change(self, form, model, is_created):
             if not model.imagen:
-                    db.session.rollback()
-                    flash("Debe agregar una foto para la receta.", "error")
-                    raise RecetaImagenValidationError(
-                        "No se puede crear la receta sin una imagen."
-                    )
+                db.session.rollback()
+                flash("Debe agregar una foto para la receta.", "error")
+                raise RecetaImagenValidationError(
+                    "No se puede crear la receta sin una imagen."
+                )
 
             total_cantidad = sum(insumo.cantidad for insumo in model.insumos)
             model.peso_estimado = total_cantidad / model.piezas if model.piezas else 0
@@ -188,8 +188,7 @@ def setup_admin(app, db):
             "cantidad_maxima",
             "cantidad_minima",
             "merma",
-            "estatus"
-            
+            "estatus",
         ]
         column_list = [
             "nombre",
@@ -198,7 +197,7 @@ def setup_admin(app, db):
             "cantidad_maxima",
             "cantidad_minima",
             "merma",
-            "estatus"
+            "estatus",
         ]
 
         inline_models = (
@@ -232,8 +231,6 @@ def setup_admin(app, db):
         can_create = True
         can_delete = False
         form_excluded_columns = ["compras"]
-
-    
 
     babel = Babel(app)
 
@@ -273,7 +270,5 @@ def setup_admin(app, db):
             endpoint="receta",
         )
     )
-
-    
 
     return admin
