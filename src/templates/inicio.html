@@ -17,7 +17,10 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='libs/fontawesome/css/all.css')}}"
     />
-    <script src="{{ url_for('static', filename='libs/fontawesome/js/all.js')}}"></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='libs/fontawesome/js/all.js')}}"
+    />
 
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans"
@@ -29,7 +32,15 @@
       href="{{ url_for('static', filename='img/cookie_1.png')}}"
     />
 
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='libs/sweetalert2/src/sweetalert2.scss')}}"
+    />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
+
+    <script src="{{ url_for('static', filename='js/jquery.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/jqueryui.js')}}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     {% block styles %}{% endblock %}
@@ -50,94 +61,88 @@
           <div class="HoverBox"></div>
           {%if current_user.has_role('admin') %}
 
-        <a href="/admin">
-          <li class="Active">
-            <i class="fa-solid fa-crown"></i>
-            <span class="tooltip">Administración Avanzada</span>
-          </li>
-        </a>
+          <a href="/admin">
+            <li class="Active">
+              <i class="fa-solid fa-crown"></i>
+              <span class="tooltip">Administración Avanzada</span>
+            </li>
+          </a>
 
           {% endif %} {%if current_user.has_role('vendedor') or
           current_user.has_role('admin') %}
 
-        <a href="{{url_for('venta.punto_venta')}}">
-          <li>
-            <i class="fa-solid fa-cash-register"></i>
-            <span class="tooltip">Punto de venta</span>
-          </li>
-        </a>
-        <a href="{{url_for('venta.solicitud_produccion')}}">
-          <li>
-            <i class="fa-solid fa-paper-plane"></i>
-            <span class="tooltip">Solicitud de Producción</span>
-          </li>
-        </a>
+          <a href="{{url_for('venta.punto_venta')}}">
+            <li>
+              <i class="fa-solid fa-cash-register"></i>
+              <span class="tooltip">Punto de venta</span>
+            </li>
+          </a>
+          <a href="{{url_for('venta.solicitud_produccion')}}">
+            <li>
+              <i class="fa-solid fa-paper-plane"></i>
+              <span class="tooltip">Solicitud de Producción</span>
+            </li>
+          </a>
 
-        <a href="{{url_for('venta.compras')}}">
-          <li>
-            <i class="fa-solid fa-basket-shopping"></i>
-            <span class="tooltip">Compras</span>
-          </li>
-        </a>
+          <a href="{{url_for('venta.compras')}}">
+            <li>
+              <i class="fa-solid fa-basket-shopping"></i>
+              <span class="tooltip">Compras</span>
+            </li>
+          </a>
 
-          <a href="{{url_for('venta.lotes_galletas')}}"
-            ><li>
+          <a href="{{url_for('venta.lotes_galletas')}}">
+            <li>
               <i class="fa-solid fa-cookie-bite"></i>
               <span class="tooltip">Galletas</span>
-            </li></a
-          >
+            </li>
+          </a>
 
           {% endif %} {% if current_user.has_role('cocinero') or
           current_user.has_role('admin') %}
 
-        <a href="{{url_for('cocina.recetas')}}">
-          <li>
-            <i class="fa-solid fa-book"></i>
-            <span class="tooltip">Recetas</span>
-          </li>
-        </a>
-
-          <a href="{{url_for('cocina.cocinar')}}"
-            ><li>
+          <a href="{{url_for('cocina.cocinar')}}">
+            <li>
               <i class="fa-solid fa-fire-burner"></i>
               <span class="tooltip">Producción</span>
-            </li></a
-          >
-          <a href="{{url_for('cocina.lotes_insumos')}}"
-            ><li>
+            </li>
+          </a>
+          <a href="{{url_for('cocina.lotes_insumos')}}">
+            <li>
               <i class="fa-solid fa-boxes-stacked"></i>
 
               <span class="tooltip">Lotes insumos</span>
-            </li></a
-          >
+            </li>
+          </a>
           {% endif %} {% if current_user.has_role('admin') or
           current_user.has_role('vendedor') or current_user.has_role('cocinero')
           %}
-          <a href="{{url_for('dashboard.index')}}"
-            ><li>
+          <a href="{{url_for('dashboard.index')}}">
+            <li>
               <i class="fa-solid fa-chart-line"></i>
               <span class="tooltip">Dashboard</span>
-            </li></a
-          >
+            </li>
+          </a>
           {% endif %}
-          <a href="{{url_for('main.configuracion')}}"
-            ><li>
+          <a href="{{url_for('main.configuracion')}}">
+            <li>
               <i class="fa-solid fa-gear"></i>
               <span class="tooltip">Configuración</span>
-            </li></a
-          >
+            </li>
+          </a>
 
-        <a href="{{url_for('auth.logout')}}">
-          <li>
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span class="tooltip">Cerrar sesión</span>
-          </li>
-        </a>
-      </ul>
-    </div>
-    <div class="Content">
-      {% block content %}
-      <div style="
+          <a href="{{url_for('auth.logout')}}">
+            <li>
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span class="tooltip">Cerrar sesión</span>
+            </li>
+          </a>
+        </ul>
+      </div>
+      <div class="Content">
+        {% block content %}
+        <div
+          style="
             display: flex;
             height: 100%;
             width: 100%;
@@ -146,8 +151,10 @@
             background-image: url(../static/img/cookie_17.png);
             background-size: cover;
             overflow: hidden;
-          ">
-        <h1 style="
+          "
+        >
+          <h1
+            style="
               padding: 150px 200px;
               margin: 0 50px;
               background: #00000095;
@@ -166,11 +173,48 @@
         </script>
 
         <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
+        <script>
+          Toast.fire({
+            icon: "success",
+            title: localStorage.getItem("mensaje"),
+          });
+        </script>
         {% endblock %}
       </div>
     </div>
     <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% for
+    category, message in messages %}
+    <script>
+      console.log("{{ message }}");
+    </script>
+    {% if category == 'success' %}
+    <script>
+      Toast.fire({
+        icon: "success",
+        title: "{{ message }}",
+      });
+    </script>
 
-    {% block jscode %} {% endblock %}
+    {% elif category == 'error' %}
+    <script>
+      Toast.fire({
+        icon: "error",
+        title: "{{ message }}",
+      });
+    </script>
+
+    {% elif category == 'receta' %}
+    <script>
+      Swal.fire(`{{ message }}`);
+    </script>
+
+    {% else %}
+
+    <script>
+      console.log("Mensaje diferente: {{ message }}");
+    </script>
+
+    {% endif %} {% endfor %} {% endwith %} {% block jscode %} {% endblock %}
   </body>
 </html>

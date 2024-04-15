@@ -14,8 +14,10 @@ asignacion_rol_usuario = db.Table(
 
 class InsumosReceta(db.Model):
     __tablename__ = "insumos_receta"
-    idReceta = db.Column(db.Integer, db.ForeignKey("recetas.id"), primary_key=True)
-    idInsumo = db.Column(db.Integer, db.ForeignKey("insumos.id"), primary_key=True)
+    idReceta = db.Column(db.Integer, db.ForeignKey(
+        "recetas.id"), primary_key=True)
+    idInsumo = db.Column(db.Integer, db.ForeignKey(
+        "insumos.id"), primary_key=True)
     cantidad = db.Column(db.Float, nullable=False)
 
     receta = db.relationship("Receta", backref="insumos")
@@ -32,14 +34,21 @@ class Receta(db.Model):
     peso_estimado = db.Column(db.Float, nullable=False)
     utilidad = db.Column(db.Float)
     piezas = db.Column(db.Integer, nullable=False)
-    descripcion = db.Column(db.String(500))
+    descripcion = db.Column(db.String(800))
     nombre = db.Column(db.String(50), nullable=False, unique=True)
-    imagen = db.Column(db.String(2550), nullable=False)
+    imagen = db.Column(db.String(2550))
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
     # Método para obtener solo el nombre
     def __str__(self):
         return self.nombre
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'nombre': self.nombre,
+            'imagen': self.imagen
+        }
 
 
 class Insumo(db.Model):
@@ -170,7 +179,8 @@ class DetalleVenta(db.Model):
     precio = db.Column(db.Float, nullable=False)
     cantidad = db.Column(db.Integer)
 
-    idVenta = db.Column(db.Integer, db.ForeignKey("ventas.id"), primary_key=True)
+    idVenta = db.Column(db.Integer, db.ForeignKey(
+        "ventas.id"), primary_key=True)
     idStock = db.Column(
         db.Integer, db.ForeignKey("lotes_galletas.id"), primary_key=True
     )
@@ -184,7 +194,8 @@ class LogAccion(db.Model):
     modulo = db.Column(db.String(45), nullable=False)
     detalles = db.Column(db.String(200), nullable=False)
 
-    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey(
+        "usuarios.id"), nullable=False)
 
 
 class LogLogin(db.Model):
@@ -194,7 +205,8 @@ class LogLogin(db.Model):
     fecha = db.Column(db.DateTime, nullable=False)
     exito = db.Column(db.Boolean, nullable=False)
 
-    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=True)
+    idUsuario = db.Column(db.Integer, db.ForeignKey(
+        "usuarios.id"), nullable=True)
 
 
 class LoteGalleta(db.Model):
@@ -209,8 +221,10 @@ class LoteGalleta(db.Model):
     idProduccion = db.Column(
         db.Integer, db.ForeignKey("solicitudes_produccion.id"), nullable=False
     )
-    idReceta = db.Column(db.Integer, db.ForeignKey("recetas.id"), nullable=False)
-    idUsuarios = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
+    idReceta = db.Column(db.Integer, db.ForeignKey(
+        "recetas.id"), nullable=False)
+    idUsuarios = db.Column(db.Integer, db.ForeignKey(
+        "usuarios.id"), nullable=False)
 
     receta = db.relationship(
         "Receta",
@@ -234,8 +248,10 @@ class LoteInsumo(db.Model):
     precio_unidad = db.Column(db.Float, nullable=False)
     merma = db.Column(db.Float, nullable=False, default=0)
 
-    idInsumo = db.Column(db.Integer, db.ForeignKey("insumos.id"), primary_key=True)
-    idCompra = db.Column(db.Integer, db.ForeignKey("compras.id"), primary_key=True)
+    idInsumo = db.Column(db.Integer, db.ForeignKey(
+        "insumos.id"), primary_key=True)
+    idCompra = db.Column(db.Integer, db.ForeignKey(
+        "compras.id"), primary_key=True)
 
 
 class SolicitudProduccion(db.Model):
@@ -254,7 +270,8 @@ class SolicitudProduccion(db.Model):
     fecha_produccion = db.Column(db.Date)
 
     posicion = db.Column(db.Integer, default=1)
-    idReceta = db.Column(db.Integer, db.ForeignKey("recetas.id"), nullable=False)
+    idReceta = db.Column(db.Integer, db.ForeignKey(
+        "recetas.id"), nullable=False)
 
     idUsuarioSolicitud = db.Column(
         db.Integer, db.ForeignKey("usuarios.id"), nullable=False
@@ -281,7 +298,8 @@ class SolicitudProduccion(db.Model):
     @staticmethod
     def get_next_position():
         # Obtiene la siguiente posición disponible
-        max_position = db.session.query(func.max(SolicitudProduccion.posicion)).scalar()
+        max_position = db.session.query(
+            func.max(SolicitudProduccion.posicion)).scalar()
         return (max_position or 0) + 1
 
     def __init__(self, *args, **kwargs):
@@ -300,4 +318,5 @@ class TransaccionCaja(db.Model):
     monto_ingreso = db.Column(db.Float)
     fecha_transaccion = db.Column(db.Date)
 
-    idCorteCaja = db.Column(db.Integer, db.ForeignKey("cortes_caja.id"), nullable=False)
+    idCorteCaja = db.Column(db.Integer, db.ForeignKey(
+        "cortes_caja.id"), nullable=False)
