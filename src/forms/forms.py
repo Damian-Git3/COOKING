@@ -2,9 +2,21 @@
 
 from datetime import date
 
-from wtforms import (BooleanField, DateField, FieldList, FloatField, Form,
-                     FormField, HiddenField, IntegerField, PasswordField,
-                     SelectField, StringField, TextAreaField, validators)
+from wtforms import (
+    BooleanField,
+    DateField,
+    FieldList,
+    FloatField,
+    Form,
+    FormField,
+    HiddenField,
+    IntegerField,
+    PasswordField,
+    SelectField,
+    StringField,
+    TextAreaField,
+    validators,
+)
 
 
 class SignupForm(Form):
