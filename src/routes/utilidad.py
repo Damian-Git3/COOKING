@@ -1,10 +1,11 @@
-#Run pip install flask-blueprint
-import re
-from flask import Blueprint
+""" Rutas de la sección de utilidad """
 
-utilidad = Blueprint('utilidad',__name__, url_prefix='/utilidad')
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 
-@utilidad.route('/')
-def utilidad:
-    
-    return render_template('utilidad/utilidad.html')
+utilidad = Blueprint("utilidad", __name__, url_prefix="/utilidad")
+
+
+@utilidad.route("/")
+def inicio():
+    """Ruta para la página de inicio de la sección de utilidad"""
+    return render_template("utilidad/utilidad.html")
