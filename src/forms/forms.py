@@ -1,5 +1,5 @@
-from wtforms import Form
-from wtforms import StringField, TextAreaField,IntegerField, SelectField, RadioField, BooleanField, PasswordField, DateField
+from wtforms import Form, FormField, FieldList
+from wtforms import StringField, TextAreaField,IntegerField, SelectField, RadioField, BooleanField, PasswordField, DateField, FloatField
 from wtforms import EmailField, HiddenField
 from wtforms import validators
 from datetime import date
@@ -50,8 +50,26 @@ class BusquedaLoteGalletaForm(Form):
     
 class MermaGalletaForm(Form):
     lot_id = HiddenField('Lot ID')
-    tipo_medida = SelectField('Tipo de Medida', choices=[('g', 'Gramos'), ('u', 'Unidades')], validators=[validators.DataRequired()])
-    cantidad = IntegerField('Cantidad', validators=[validators.DataRequired(), validators.NumberRange(min=1, message='La cantidad debe ser mayor a 0')])
+    tipo_medida = SelectField('Tipo de Medida', choices=[('g', 'Gramos'), ('p', 'Piezas')], validators=[validators.DataRequired()])
+    cantidad = IntegerField('Cantidad', validators=[validators.DataRequired(), validators.NumberRange(min=1,   message='La cantidad debe ser mayor a 0')])
     
 class MermaInsumoForm(Form):
+    lot_id = HiddenField('Lot ID')
     cantidad = IntegerField('Cantidad', validators=[validators.DataRequired(), validators.NumberRange(min=1, message='La cantidad debe ser mayor a 0')])
+    
+class BusquedaCompra(Form):
+    fecha_inicio = DateField('Fecha de Inicio', format='%Y-%m-%d', validators=[validators.DataRequired()])
+    fecha_fin = DateField('Fecha de Fin', format='%Y-%m-%d', validators=[validators.DataRequired()])
+    
+    insumo = SelectField('Insumo', choices=[], validators=[validators.DataRequired()])
+    
+class LoteInsumoForm(Form):
+    insumos = SelectField('Insumo', choices=[], validators=[validators.DataRequired()])
+    cantidad = IntegerField('Cantidad', validators=[validators.DataRequired()])
+    fecha_caducidad = DateField('Fecha de Caducidad', format='%Y-%m-%d', validators=[validators.DataRequired()])
+    costo_lote = FloatField('Costo del Lote', validators=[validators.DataRequired()])
+
+class NuevaCompraForm(Form):
+    proveedores = SelectField('Proveedor', choices=[], validators=[validators.DataRequired()])
+    caja = BooleanField('¿Retirar dinero de la caja?', default=True)
+    lotes_insumos = FieldList(FormField(LoteInsumoForm), min_entries=1)

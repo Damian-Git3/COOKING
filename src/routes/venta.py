@@ -8,6 +8,7 @@ from flask import (
     url_for,
 )
 from flask_login import login_required, current_user
+import math
 
 from flask_wtf.csrf import CSRFProtect
 from flask import g
@@ -26,6 +27,7 @@ from database.models import (
     Compra,
     Proveedor,
     LoteGalleta,
+    LoteInsumo,
 )
 
 from forms import forms
@@ -185,20 +187,32 @@ def lotes_galletas():
             .join(Receta, LoteGalleta.idReceta == Receta.id)
             .join(Usuario, LoteGalleta.idUsuarios == Usuario.id)
         )
-        print(fecha_inicio, fecha_fin, receta)
-        if receta == 0:
-            lotes = base_query.filter(
-                LoteGalleta.fecha_entrada >= fecha_inicio,
-                LoteGalleta.fecha_entrada <= fecha_fin,
-                LoteGalleta.cantidad > 0,
-            ).all()
+
+        if receta == "0":
+            lotes = (
+                db.session.query(LoteGalleta, Receta.nombre, Usuario.nombre)
+                .join(Receta, LoteGalleta.idReceta == Receta.id)
+                .join(Usuario, LoteGalleta.idUsuarios == Usuario.id)
+                .filter(
+                    LoteGalleta.cantidad > 0,
+                    LoteGalleta.fecha_entrada >= fecha_inicio,
+                    LoteGalleta.fecha_entrada <= fecha_fin,
+                )
+                .all()
+            )
         else:
-            lotes = base_query.filter(
-                LoteGalleta.fecha_entrada >= fecha_inicio,
-                LoteGalleta.fecha_entrada <= fecha_fin,
-                LoteGalleta.idReceta == receta,
-                LoteGalleta.cantidad > 0,
-            ).all()
+            lotes = (
+                db.session.query(LoteGalleta, Receta.nombre, Usuario.nombre)
+                .join(Receta, LoteGalleta.idReceta == Receta.id)
+                .join(Usuario, LoteGalleta.idUsuarios == Usuario.id)
+                .filter(
+                    LoteGalleta.cantidad > 0,
+                    LoteGalleta.fecha_entrada >= fecha_inicio,
+                    LoteGalleta.fecha_entrada <= fecha_fin,
+                    LoteGalleta.idReceta == receta,
+                )
+                .all()
+            )
 
         return render_template(
             "modulos/venta/galletas.html", form=form, lotes=lotes, lista=True
@@ -217,11 +231,151 @@ def lotes_galletas():
     )
 
 
-@venta.route("/merma/galletas", methods=["GET", "POST"])
-def merma_galletas():
+@venta.route("/merma/galletas/<int:id>", methods=["GET", "POST"])
+def merma_galletas(id):
     form = forms.MermaGalletaForm(request.form)
-    if form.validate():
+    form.lot_id.data = id
+
+    lote = LoteGalleta.query.get(id)
+
+    cantidad_maxima = lote.cantidad
+
+    receta = Receta.query.get(lote.idReceta)
+    peso_pieza = receta.peso_estimado
+
+    if request.method == "POST" and form.validate():
         tipo_medida = form.tipo_medida.data
         cantidad = form.cantidad.data
 
-    return redirect(url_for("venta.lotes_galletas"))
+        id = form.lot_id.data
+
+        if tipo_medida == "g":
+            cantidad = cantidad / 1000
+            cantidad = math.ceil(cantidad / peso_pieza)
+        if cantidad > lote.cantidad:
+            flash(
+                "La cantidad de piezas a merma no puede ser mayor a la cantidad de piezas en el lote",
+                "error",
+            )
+            return render_template(
+                "modulos/venta/galletas.html",
+                form=form,
+                cantidad_maxima=cantidad_maxima,
+                peso_pieza=peso_pieza,
+                imagen=receta.imagen,
+            )
+
+        lote.cantidad -= cantidad
+        lote.merma += cantidad
+        db.session.commit()
+        flash("Merma registrada correctamente", "success")
+        return redirect(url_for("venta.lotes_galletas"))
+
+    return render_template(
+        "modulos/venta/galletas.html",
+        form=form,
+        cantidad_maxima=cantidad_maxima,
+        peso_pieza=peso_pieza,
+        imagen=receta.imagen,
+    )
+
+
+@venta.route("/compras/ver", methods=["GET"])
+@requires_role("vendedor")
+def compras_ver():
+    form = forms.BusquedaCompra(request.args)
+    form.insumo.choices = [(0, "Todos los insumos")] + [
+        (insumo.id, insumo.nombre) for insumo in Insumo.query.all()
+    ]
+    compras = (
+        db.session.query(Compra)
+        .join(Usuario, Compra.idUsuario == Usuario.id)
+        .join(Proveedor, Compra.idProveedores == Proveedor.id)
+        .with_entities(Compra, Usuario.nombre, Proveedor.empresa)
+        .all()
+    )
+    for compra, usuario, proveedor in compras:
+
+        lotes = (
+            db.session.query(LoteInsumo, Insumo)
+            .join(Insumo, LoteInsumo.idInsumo == Insumo.id)
+            .filter(LoteInsumo.idCompra == compra.id)
+            .all()
+        )
+
+        compra.insumos = ", ".join([lote.insumo.nombre for lote in lotes])
+        compra.caja = True if compra.idTransaccionCaja else False
+
+    return render_template("modulos/venta/compras/ver.html", compras=compras, form=form)
+
+
+@venta.route("/compras/nueva", methods=["GET", "POST"])
+@requires_role("vendedor")
+def compras_crear():
+    form = forms.NuevaCompraForm(request.form)
+    form.proveedores.choices = [
+        (proveedor.id, proveedor.empresa) for proveedor in Proveedor.query.all()
+    ]
+    
+    insumos_choices = [(insumo.id, insumo.nombre) for insumo in Insumo.query.all()]
+
+    for lote_insumo_form in form.lotes_insumos:
+        lote_insumo_form.insumos.choices = insumos_choices
+    
+    if request.method == "POST" and form.validate():
+        
+        compra = Compra(
+            idUsuario=current_user.id,
+            idProveedores=form.proveedores.data,
+            fecha_compra=datetime.now(),
+            pago_proveedor= sum([lote.costo_lote.data for lote in form.lotes_insumos])
+        )
+        if form.caja.data:
+            compra.idTransaccionCaja = form.caja.data
+
+        db.session.add(compra)
+        db.session.commit()
+
+        for lote_insumo_form in form.lotes_insumos:
+            lote_insumo = LoteInsumo(
+                idCompra=compra.id,  
+                idInsumo=lote_insumo_form.insumos.data,  
+                cantidad=lote_insumo_form.cantidad.data,
+                fecha_caducidad=lote_insumo_form.fecha_caducidad.data,
+                precio_unidad = lote_insumo_form.costo_lote.data / lote_insumo_form.cantidad.data,
+            )
+            db.session.add(lote_insumo)
+
+        db.session.commit()
+
+        flash("Compra registrada correctamente", "success")
+        return redirect(url_for("venta.compras_ver"))
+
+    return render_template("modulos/venta/compras/crear.html", form=form)
+
+
+@venta.route("/compras/editar/<int:id>", methods=["GET", "POST"])
+@requires_role("vendedor")
+def compras_editar(id):
+    form = forms.NuevaCompraForm(request.form)
+    form.proveedores.choices = [
+        (proveedor.id, proveedor.empresa) for proveedor in Proveedor.query.all()
+    ]
+
+    if request.method == "POST" and form.validate():
+        compra = Compra(
+            idUsuario=current_user.id,
+            idProveedores=form.proveedores.data,
+            fecha_compra=datetime.now(),
+            pago_proveedor=99.99,
+        )
+        if form.caja.data:
+            compra.idTransaccionCaja = form.caja.data
+
+        db.session.add(compra)
+        db.session.commit()
+
+        flash("Compra registrada correctamente", "success")
+        return redirect(url_for("venta.compras_ver"))
+
+    return render_template("modulos/venta/compras/crear.html", form=form)

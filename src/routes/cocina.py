@@ -20,7 +20,7 @@ def cocinar():
 @cocina.route("/recetas")
 @login_required
 def recetas():
-    return render_template("modulos/cocina/recetas.html")
+    return redirect(url_for('admin.receta'))
 
 
 @cocina.route("/lotes/insumos")

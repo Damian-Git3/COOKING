@@ -70,11 +70,9 @@ if __name__ == "__main__":
     def site_map():
         links = []
         for rule in app.url_map.iter_rules():
-            # Filter out rules we can't navigate to in a browser
-            # and rules that require parameters
-            if "GET" in rule.methods and has_no_empty_params(rule):
-                url = url_for(rule.endpoint, **(rule.defaults or {}))
-                links.append((url, rule.endpoint))
-        print(links)
+            links.append(rule)
+            print(rule)
+            
+        return str(links)
 
     app.run(port=4000)
