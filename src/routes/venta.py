@@ -452,4 +452,3 @@ def compras_crear():
     return render_template(
         "modulos/venta/compras/crear.html", form=form, insumos=insumos_choices
     )
-

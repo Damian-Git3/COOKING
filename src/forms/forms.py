@@ -126,7 +126,9 @@ class MermaInsumoForm(Form):
         "Cantidad",
         validators=[
             validators.DataRequired(message="Este campo no puede estar vacío."),
-            validators.NumberRange(min=0.001, message="La cantidad debe ser mayor a 0.001"),
+            validators.NumberRange(
+                min=0.001, message="La cantidad debe ser mayor a 0.001"
+            ),
         ],
     )
 
@@ -154,7 +156,8 @@ class BusquedaCompra(Form):
             validators.DataRequired(message="Este campo no puede estar vacío.")
         ],
     )
-    
+
+
 class BusquedaLoteInsumoForm(Form):
     fecha_inicio = DateField(
         "Fecha de Inicio",
