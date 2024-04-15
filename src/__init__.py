@@ -14,29 +14,31 @@ if __name__ == "__main__":
     app.config.from_object(DevelopmentConfig)
     CORS(app, resources={r"/*": {"origins": "http://localhost:*"}})
 
-    app.wsgi_app = SassMiddleware(app.wsgi_app, {
-        '__main__': {
-            'sass_path': 'static/sass',
-            'css_path': 'static/css',
-            'wsgi_path': '/static/css',
-            'strip_extension': False
-        }
-    })
+    app.wsgi_app = SassMiddleware(
+        app.wsgi_app,
+        {
+            "__main__": {
+                "sass_path": "static/sass",
+                "css_path": "static/css",
+                "wsgi_path": "/static/css",
+                "strip_extension": False,
+            }
+        },
+    )
 
     csrf = CSRFProtect()
     csrf.init_app(app)
     db.init_app(app)
 
     login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Por favor inicie sesión para acceder a esta página.'
+    login_manager.login_view = "auth.login"
+    login_manager.login_message = "Por favor inicie sesión para acceder a esta página."
     login_manager.init_app(app)
 
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template("404.html"), 404
-    
-    
+
     with app.app_context():
         db.create_all()
 
@@ -45,22 +47,27 @@ if __name__ == "__main__":
         return Usuario.query.filter_by(id=int(user_id)).first()
 
     from routes.auth import auth as auth_blueprint
+
     app.register_blueprint(auth_blueprint)
 
     from routes.main import main as main_blueprint
+
     app.register_blueprint(main_blueprint)
 
     from routes.cocina import cocina
+
     app.register_blueprint(cocina)
 
     from routes.dashboard import dashboard as dashboard_blueprint
+
     app.register_blueprint(dashboard_blueprint)
-    
+
     from routes.venta import venta
+
     app.register_blueprint(venta)
 
     setup_admin(app, db)
-    
+
     def has_no_empty_params(rule):
         defaults = rule.defaults if rule.defaults is not None else ()
         arguments = rule.arguments if rule.arguments is not None else ()
