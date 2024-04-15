@@ -10,7 +10,8 @@ from wtforms import (
     BooleanField,
     PasswordField,
     DateField,
-    FloatField,
+    FloatField
+    )
 from wtforms import EmailField, HiddenField, DecimalField
 from wtforms import validators
 from datetime import date

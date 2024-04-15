@@ -2,5 +2,20 @@
   "editor.formatOnSave": true,
   "python.formatting.provider": "black",
   "python.formatting.blackPath": "${workspaceFolder}/env/bin/black",
-  "python.formatting.blackArgs": ["--quiet"]
+  "python.formatting.blackArgs": ["--quiet"],
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "COOKING",
+      "database": "cooking",
+      "username": "root"
+    }
+  ]
 }
