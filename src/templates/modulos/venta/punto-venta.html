@@ -1,5 +1,5 @@
 {% extends 'inicio.html' %} {% block title %}Almacen{% endblock %} {% block
-styles %} {% endblock %} {%from "macros.html" import render_field%} {% block
+styles %} {% endblock %} {%from "_macros.html" import render_field%} {% block
 content %}
 <div style="width: 100%; text-align: center">
   <h1>Punto de venta</h1>
@@ -12,46 +12,60 @@ messages %}
   class="punto-venta"
   style="width: 100%; height: 100%; margin: 0; padding: 6px"
 >
-<div class="punto-venta" style="width: 100%; height: 100%; margin: 0; padding: 6px">
+  <div
+    class="punto-venta"
+    style="width: 100%; height: 100%; margin: 0; padding: 6px"
+  >
     <!-- Sección de la derecha con la nota de compra en forma de tabla -->
-    <div class="nota-compra" style="width: 50%; float: right;">
-       <table class="table">
-         <thead>
-           <tr>
-             <th>Galleta</th>
-             <th>Cantidad</th>
-             <th>Acciones</th>
-           </tr>
-         </thead>
-         <tbody>
-           <!-- Aquí se agregarán las filas de la nota de compra -->
-         </tbody>
-       </table>
-       <button class="btn btn-danger" style="margin-top: 10px;">Borrar todo</button>
-       <button class="btn btn-success" style="margin-top: 10px;">Confirmar compra</button>
+    <div class="nota-compra" style="width: 50%; float: right">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Galleta</th>
+            <th>Cantidad</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Aquí se agregarán las filas de la nota de compra -->
+        </tbody>
+      </table>
+      <button class="btn btn-danger" style="margin-top: 10px">
+        Borrar todo
+      </button>
+      <button class="btn btn-success" style="margin-top: 10px">
+        Confirmar compra
+      </button>
     </div>
-   
+
     <!-- Sección de la izquierda con barra de búsqueda y grid de tarjetas -->
-    <div class="seccion-izquierda" style="width: 50%; float: left; height: 100%; overflow-y: scroll;">
-       <div class="busqueda">
-         <input type="text" class="form-control" placeholder="Buscar galleta">
-         <button class="btn btn-primary">Buscar</button>
-       </div>
-       <div class="grid">
-         <!-- Aquí se cargarán las tarjetas de galleta -->
-         <!-- Ejemplo de tarjeta -->
-         <div class="card" style="width: 18rem;">
-           <img src="ruta/a/imagen/galleta.jpg" class="card-img-top" alt="Imagen de galleta">
-           <div class="card-body">
-             <h5 class="card-title">Nombre de la Galleta</h5>
-             <p class="card-text">Cantidad disponible: 10</p>
-             <input type="number" class="form-control" placeholder="Cantidad">
-             <button class="btn btn-primary">Agregar</button>
-           </div>
-         </div>
-       </div>
+    <div
+      class="seccion-izquierda"
+      style="width: 50%; float: left; height: 100%; overflow-y: scroll"
+    >
+      <div class="busqueda">
+        <input type="text" class="form-control" placeholder="Buscar galleta" />
+        <button class="btn btn-primary">Buscar</button>
+      </div>
+      <div class="grid">
+        <!-- Aquí se cargarán las tarjetas de galleta -->
+        <!-- Ejemplo de tarjeta -->
+        <div class="card" style="width: 18rem">
+          <img
+            src="ruta/a/imagen/galleta.jpg"
+            class="card-img-top"
+            alt="Imagen de galleta"
+          />
+          <div class="card-body">
+            <h5 class="card-title">Nombre de la Galleta</h5>
+            <p class="card-text">Cantidad disponible: 10</p>
+            <input type="number" class="form-control" placeholder="Cantidad" />
+            <button class="btn btn-primary">Agregar</button>
+          </div>
+        </div>
+      </div>
     </div>
-   </div>
+  </div>
   <!-- seccion de la derecha con la nota de compra en forma de tabla -->
   <!-- cada columna es una seleccion de galleta que tiene un boton para eliminarla -->
   <!-- arriba de la tabla hay un boton para borrar todo su contenido -->

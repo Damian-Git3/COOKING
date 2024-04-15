@@ -2,12 +2,10 @@ from flask import Blueprint, flash, redirect, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
-
 from database.models import Usuario, db
 from forms import usuario
 
 configuracion = Blueprint("configuracion", __name__, url_prefix="/configuracion")
-
 
 @configuracion.route("/usuario", methods=["POST"])
 @login_required
