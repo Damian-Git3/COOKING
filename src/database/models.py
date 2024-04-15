@@ -1,7 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
 from datetime import datetime
-from sqlalchemy import func, Enum
+
+from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Enum, func
 
 db = SQLAlchemy()
 

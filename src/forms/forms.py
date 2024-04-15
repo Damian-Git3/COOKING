@@ -1,17 +1,11 @@
-''' Este archivo contiene las clases de los formularios que se utilizan en la aplicación. '''
+""" Este archivo contiene las clases de los formularios que se utilizan en la aplicación. """
+
 from datetime import date
-from wtforms import FieldList, FloatField, Form, FormField
-from wtforms import (
-    StringField,
-    TextAreaField,
-    IntegerField,
-    SelectField,
-    BooleanField,
-    PasswordField,
-    DateField,
-)
-from wtforms import HiddenField
-from wtforms import validators
+
+from wtforms import (BooleanField, DateField, FieldList, FloatField, Form,
+                     FormField, HiddenField, IntegerField, PasswordField,
+                     SelectField, StringField, TextAreaField, validators)
+
 
 class SignupForm(Form):
     nombre = StringField(

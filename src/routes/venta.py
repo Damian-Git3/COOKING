@@ -1,40 +1,19 @@
-from flask import (
-    Blueprint,
-    Flask,
-    request,
-    render_template,
-    Response,
-    redirect,
-    url_for,
-)
-from flask_login import login_required, current_user
 import math
-
-from flask_wtf.csrf import CSRFProtect
-from flask import g
-from flask import flash, jsonify
-from configu.config import DevelopmentConfig
-from database.models import (
-    db,
-    Usuario,
-    Rol,
-    asignacion_rol_usuario,
-    Insumo,
-    Receta,
-    SolicitudProduccion,
-    Venta,
-    DetalleVenta,
-    Compra,
-    Proveedor,
-    LoteGalleta,
-    InsumosReceta,
-    LoteInsumo,
-)
-
-from forms import forms
-from sqlalchemy.orm import joinedload
-from sqlalchemy import desc, extract, text, asc
 from datetime import datetime, timedelta
+
+from flask import (Blueprint, Flask, Response, flash, g, jsonify, redirect,
+                   render_template, request, url_for)
+from flask_login import current_user, login_required
+from flask_wtf.csrf import CSRFProtect
+from sqlalchemy import asc, desc, extract, text
+from sqlalchemy.orm import joinedload
+
+from configu.config import DevelopmentConfig
+from database.models import (Compra, DetalleVenta, Insumo, InsumosReceta,
+                             LoteGalleta, LoteInsumo, Proveedor, Receta, Rol,
+                             SolicitudProduccion, Usuario, Venta,
+                             asignacion_rol_usuario, db)
+from forms import forms
 from routes.auth import requires_role
 
 venta = Blueprint("venta", __name__, url_prefix="/venta")

@@ -1,11 +1,12 @@
 from flask import Flask, render_template
-from flask_wtf.csrf import CSRFProtect
 from flask_cors import CORS
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from sassutils.wsgi import SassMiddleware
-from configu.config import DevelopmentConfig
-from database.models import db, Usuario
+
 from configu.admin_config import setup_admin
+from configu.config import DevelopmentConfig
+from database.models import Usuario, db
 
 if __name__ == "__main__":
     app = Flask(__name__)

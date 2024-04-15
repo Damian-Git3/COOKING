@@ -1,8 +1,9 @@
 from flask import Blueprint, flash, redirect, request, url_for
-from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash
+from flask_login import current_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
-from database.models import db, Usuario
+from werkzeug.security import generate_password_hash
+
+from database.models import Usuario, db
 from forms import usuario
 
 configuracion = Blueprint("configuracion", __name__, url_prefix="/configuracion")

@@ -1,15 +1,7 @@
 """"""
 
-from wtforms import (
-    Form,
-    StringField,
-    IntegerField,
-    FloatField,
-    DateField,
-    SelectField,
-    SubmitField,
-    validators,
-)
+from wtforms import (DateField, FloatField, Form, IntegerField, SelectField,
+                     StringField, SubmitField, validators)
 
 
 class CompraForm(Form):

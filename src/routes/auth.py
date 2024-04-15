@@ -1,13 +1,12 @@
 from datetime import datetime
 from functools import wraps
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required, current_user
-from database.models import Usuario
-from database.models import db
-from database.models import LogLogin
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
 
 import forms.forms as forms
+from database.models import LogLogin, Usuario, db
 
 auth = Blueprint("auth", __name__)
 
@@ -40,8 +39,8 @@ def login_post():
 
     if not user:
         flash(
-            "No se ha encontrado un usuario con esas credenciales" +
-            "Por favor, verifica la información"
+            "No se ha encontrado un usuario con esas credenciales"
+            + "Por favor, verifica la información"
         )
         log_login = LogLogin(fecha=datetime.now(), exito=False)
         db.session.add(log_login)

@@ -1,18 +1,20 @@
-''' Configuración de Flask-Admin '''
+""" Configuración de Flask-Admin """
+
 import os
 
-from flask import flash, redirect, url_for, request
+from flask import flash, redirect, request, url_for
 from flask_admin import Admin, AdminIndexView
-from flask_admin.form import ImageUploadField
 from flask_admin.contrib.sqla import ModelView
-from werkzeug.security import generate_password_hash
+from flask_admin.form import ImageUploadField
 from flask_babel import Babel
 from flask_login import current_user
+from werkzeug.security import generate_password_hash
+from wtforms import TextAreaField
 from wtforms.fields import BooleanField, DecimalField
 from wtforms.validators import NumberRange
-from wtforms import TextAreaField
 
-from database.models import Usuario, Insumo, Proveedor, Receta, InsumosReceta
+from database.models import Insumo, InsumosReceta, Proveedor, Receta, Usuario
+
 
 class AdminModelView(ModelView):
     def is_accessible(self):
@@ -132,8 +134,8 @@ def setup_admin(app, db):
         }
         form_args = {
             "utilidad": {
-                "description": 'La utilidad es tomada como porcentaje' +
-                                'una utilidad del 100% genera un precio de venta del doble del costo de producción.',
+                "description": "La utilidad es tomada como porcentaje"
+                + "una utilidad del 100% genera un precio de venta del doble del costo de producción.",
                 "type": "number",
                 "step": "1",
             }
