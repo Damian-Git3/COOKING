@@ -1,15 +1,12 @@
 from flask import Blueprint, render_template, request
 from flask_login import current_user, login_required
-
 from forms import usuario
 
 main = Blueprint("main", __name__)
 
-
 @main.route("/")
 def index():
     return render_template("index.html")
-
 
 @main.route("/inicio")
 @login_required
@@ -39,7 +36,6 @@ def menu():
         mensaje += "no tienes rol asignado."
 
     return render_template("inicio.html", mensaje=mensaje)
-
 
 @main.route("/configuracion")
 @login_required

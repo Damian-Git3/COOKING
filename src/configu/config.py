@@ -5,7 +5,6 @@ from sqlalchemy import create_engine
 
 load_dotenv()
 
-
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
     SESSION_COOKIE_SECURE = False

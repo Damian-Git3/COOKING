@@ -28,7 +28,6 @@ def login():
         return redirect(url_for("main.menu"))
     return render_template("login.html")
 
-
 @auth.route("/login", methods=["POST"])
 def login_post():
     usuario = request.form.get("usuario")
@@ -77,7 +76,6 @@ def login_post():
 def signup():
     form = forms.SignupForm(request.form)
     return render_template("signup_temporal.html", form=form)
-
 
 @auth.route("/signup", methods=["POST"])
 def signup_post():
