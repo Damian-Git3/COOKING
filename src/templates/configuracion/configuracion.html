@@ -1,0 +1,63 @@
+{% extends 'inicio.html' %} {% block title %}Conguración{% endblock %} {% block
+styles %} {% endblock %} {% block content %}
+<div class="container">
+
+  <div class="row">
+    <div class="col-12 h1 text-uppercase text-center">
+      <kbd>Configuración</kbd>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <form action="{{ url_for('configuracion.guardar_informacion_usuario') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input
+            type="text"
+            class="form-control"
+            id="nombre"
+            name="nombre"
+            value=""
+          />
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            name="email"
+            value=""
+          />
+        </div>
+        <div class="mb-3">
+          <label for="contrasenia" class="form-label">Contraseña</label>
+          <input
+            type="contrasenia"
+            class="form-control"
+            id="contrasenia"
+            name="contrasenia"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="password2" class="form-label">Repetir Contraseña</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password2"
+            name="password2"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %} 
+
+{% block jscode %} 
+
+{% endblock %}

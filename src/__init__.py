@@ -2,12 +2,10 @@ from flask import Flask, render_template, url_for
 from flask_wtf.csrf import CSRFProtect
 from flask_cors import CORS
 from flask_login import LoginManager
-from werkzeug.security import generate_password_hash
 from configu.config import DevelopmentConfig
 from database.models import db, Usuario
 from sassutils.wsgi import SassMiddleware
 from configu.admin_config import setup_admin
-
 
 if __name__ == "__main__":
     app = Flask(__name__)
@@ -35,8 +33,7 @@ if __name__ == "__main__":
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template("404.html"), 404
-    
-    
+
     with app.app_context():
         db.create_all()
 
@@ -53,14 +50,17 @@ if __name__ == "__main__":
     from routes.cocina import cocina
     app.register_blueprint(cocina)
 
-    from routes.dashboard import dashboard as dashboard_blueprint
-    app.register_blueprint(dashboard_blueprint)
-    
+    from routes.dashboard import dashboard
+    app.register_blueprint(dashboard)
+
     from routes.venta import venta
     app.register_blueprint(venta)
 
+    from routes.configuracion import configuracion
+    app.register_blueprint(configuracion)
+
     setup_admin(app, db)
-    
+
     def has_no_empty_params(rule):
         defaults = rule.defaults if rule.defaults is not None else ()
         arguments = rule.arguments if rule.arguments is not None else ()

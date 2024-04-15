@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template 
 from flask_login import login_required, current_user
-
 main = Blueprint('main', __name__)
 
 @main.route('/')
@@ -36,7 +35,7 @@ def menu():
         
     return render_template('inicio.html', mensaje=mensaje)
 
-@main.route('/config')
+@main.route('/configuracion')
 @login_required
 def configuracion():
-    return render_template('modulos/config.html')
+    return render_template("configuracion/configuracion.html")

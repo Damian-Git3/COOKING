@@ -35,7 +35,8 @@ class Receta(db.Model):
     descripcion = db.Column(db.String(500))
     nombre = db.Column(db.String(50), nullable=False, unique=True)
     imagen = db.Column(db.String(2550), nullable=False)
-    
+    estatus = db.Column(db.Boolean, nullable=False, default=True)
+
     # Método para obtener solo el nombre
     def __str__(self):
         return self.nombre
@@ -51,7 +52,8 @@ class Insumo(db.Model):
     cantidad_maxima = db.Column(db.Float, nullable=False)
     cantidad_minima = db.Column(db.Float, nullable=False)
     merma = db.Column(db.Float, nullable=False)
-    
+    estatus = db.Column(db.Boolean, nullable=False, default=True)
+
     def __str__(self):
         return self.nombre
 
@@ -125,7 +127,6 @@ class Proveedor(db.Model):
     nombre_contacto = db.Column(db.String(45), nullable=False)
     contacto = db.Column(db.String(45), nullable=True)
     estatus = db.Column(db.Boolean, nullable=False, default=True)
-
 
 
 class Compra(db.Model):
@@ -253,9 +254,7 @@ class SolicitudProduccion(db.Model):
     fecha_produccion = db.Column(db.Date)
 
     posicion = db.Column(db.Integer, default=1)
-    
-    status = db.Column(db.Integer, nullable=False)
-    idReceta = db.Column(db.Integer, db.ForeignKey('recetas.id'), nullable=False)
+    idReceta = db.Column(db.Integer, db.ForeignKey("recetas.id"), nullable=False)
 
     idUsuarioSolicitud = db.Column(
         db.Integer, db.ForeignKey("usuarios.id"), nullable=False
