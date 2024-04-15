@@ -62,7 +62,9 @@ messages %}
     </div>
     {% endif %}
     <br />
-
+    <script>
+      var insumosOptions = {{ insumos|tojson }};
+    </script>
     {% for lote_insumo_form in form.lotes_insumos %}
     <div class="lotes-insumo-container">
       <div
@@ -122,7 +124,8 @@ messages %}
       function addLoteForm() {
         var contenedor = document.querySelector(".lotes-insumo-container");
         // Contar cuántos formularios ya existen
-        var numFormularios = contenedor.querySelectorAll(".lote-insumo-form").length;
+        var numFormularios =
+          contenedor.querySelectorAll(".lote-insumo-form").length;
 
         var newLoteForm = document.createElement("div");
         newLoteForm.className = "lote-insumo-form";
@@ -172,7 +175,7 @@ messages %}
                     <div class="form-group col-xs-12 float-label-form-group controls">
                         
             <label for="lotes_insumos-${numFormularios}-costo_lote">Costo del Lote</label>
-            <input class="form-control" id="lotes_insumos-${numFormularios}-costo_lote" name="lotes_insumos-${numFormularios}-costo_lote" required="" type="text" value="">
+            <input class="form-control" id="lotes_insumos-${numFormularios}-costo_lote" name="lotes_insumos-${numFormularios}-costo_lote" required="" type="number" value="">
 
 
                     </div>
@@ -187,10 +190,35 @@ messages %}
 
         // Agregar el nuevo elemento al contenedor
         contenedor.appendChild(newLoteForm);
+
+        var newLoteForm = document.querySelector(
+          ".lote-insumo-form:last-child"
+        );
+        var selectInsumos = newLoteForm.querySelector(
+          'select[name*="insumos"]'
+        );
+
+        // Limpia las opciones existentes
+        selectInsumos.innerHTML = "";
+
+        // Establece las nuevas opciones basadas en la lista de JavaScript
+        insumosOptions.forEach(function (insumo) {
+          var option = document.createElement("option");
+          option.value = insumo[0]; // Asume que el primer elemento es el ID
+          option.textContent = insumo[1]; // Asume que el segundo elemento es el nombre
+          selectInsumos.appendChild(option);
+        });
+
+        var deleteButtons = document.querySelectorAll(".delete-lote-button");
+        deleteButtons.forEach(function (button) {
+          button.addEventListener("click", deleteLoteForm);
+        });
       }
+
       function deleteLoteForm(event) {
         var loteForm = event.target.closest(".lote-insumo-form");
         loteForm.remove();
+        console.log("Lote eliminado");
       }
 
       document
@@ -198,9 +226,36 @@ messages %}
         .addEventListener("click", addLoteForm);
     </script>
     <hr />
-    <button type="submit" class="btn btn-secondary ml-2">Cancelar</button>
+
     <button type="submit" class="btn btn-success ml-2">Registrar compra</button>
+
+    <a href="{{ url_for('venta.compras_ver') }}"
+      ><button type="button" class="btn btn-secondary ml-2">Cancelar</button></a
+    >
   </form>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var form = document.querySelector("form"); // Asegúrate de seleccionar el formulario correcto
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault(); // Previene el envío del formulario por defecto
+
+        Swal.fire({
+          title: "Confirmar compra",
+          text: "Verifica que los datos de los lotes y el proveedor sean correctos, una vez registrado no se podrán modificar.",
+          showCancelButton: true,
+          confirmButtonText: "Si",
+        }).then((result) => {
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+            form.submit();
+          } else if (result.isDenied) {
+            Swal.fire("Se canceló el envío", "", "info");
+          }
+        });
+      });
+    });
+  </script>
 </div>
 
 {% endblock %}
