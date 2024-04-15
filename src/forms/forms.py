@@ -1,22 +1,20 @@
 """ Este archivo contiene las clases de los formularios que se utilizan en la aplicación. """
 
-from datetime import date
-
+from wtforms import Form, FormField, FieldList
 from wtforms import (
-    BooleanField,
-    DateField,
-    FieldList,
-    FloatField,
-    Form,
-    FormField,
-    HiddenField,
-    IntegerField,
-    PasswordField,
-    SelectField,
     StringField,
     TextAreaField,
-    validators,
+    IntegerField,
+    SelectField,
+    RadioField,
+    BooleanField,
+    PasswordField,
+    DateField,
+    FloatField,
 )
+from wtforms import EmailField, HiddenField, DecimalField
+from wtforms import validators
+from datetime import date
 
 
 class SignupForm(Form):
@@ -82,27 +80,43 @@ class ModificarSolicitudProduccionForm(Form):
 
 class BusquedaLoteGalletaForm(Form):
     fecha_inicio = DateField(
-        "Fecha de Inicio", format="%Y-%m-%d", validators=[validators.DataRequired()]
+        "Fecha de Inicio",
+        format="%Y-%m-%d",
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
     )
     fecha_fin = DateField(
-        "Fecha de Fin", format="%Y-%m-%d", validators=[validators.DataRequired()]
+        "Fecha de Fin",
+        format="%Y-%m-%d",
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
     )
 
     # Assuming get_recetas() returns a list of tuples like [(id, name), ...]
-    receta = SelectField("Receta", choices=[], validators=[validators.DataRequired()])
+    receta = SelectField(
+        "Receta",
+        choices=[],
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
+    )
 
 
 class MermaGalletaForm(Form):
     lot_id = HiddenField("Lot ID")
     tipo_medida = SelectField(
         "Tipo de Medida",
-        choices=[("g", "Gramos"), ("u", "Unidades")],
-        validators=[validators.DataRequired()],
+        choices=[("g", "Gramos"), ("p", "Piezas")],
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
     )
     cantidad = IntegerField(
         "Cantidad",
         validators=[
-            validators.DataRequired(),
+            validators.DataRequired(message="Este campo no puede estar vacìo."),
             validators.NumberRange(min=1, message="La cantidad debe ser mayor a 0"),
         ],
     )
@@ -113,7 +127,7 @@ class MermaInsumoForm(Form):
     cantidad = IntegerField(
         "Cantidad",
         validators=[
-            validators.DataRequired(),
+            validators.DataRequired(message="Este campo no puede estar vacìo."),
             validators.NumberRange(min=1, message="La cantidad debe ser mayor a 0"),
         ],
     )
@@ -121,27 +135,65 @@ class MermaInsumoForm(Form):
 
 class BusquedaCompra(Form):
     fecha_inicio = DateField(
-        "Fecha de Inicio", format="%Y-%m-%d", validators=[validators.DataRequired()]
+        "Fecha de Inicio",
+        format="%Y-%m-%d",
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
     )
     fecha_fin = DateField(
-        "Fecha de Fin", format="%Y-%m-%d", validators=[validators.DataRequired()]
+        "Fecha de Fin",
+        format="%Y-%m-%d",
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
     )
-
-    insumo = SelectField("Insumo", choices=[], validators=[validators.DataRequired()])
+    usa_dinero_caja = BooleanField("Usó dinero de caja")
+    insumo = SelectField(
+        "Insumo",
+        choices=[],
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
+    )
 
 
 class LoteInsumoForm(Form):
-    insumos = SelectField("Insumo", choices=[], validators=[validators.DataRequired()])
-    cantidad = IntegerField("Cantidad", validators=[validators.DataRequired()])
-    fecha_caducidad = DateField(
-        "Fecha de Caducidad", format="%Y-%m-%d", validators=[validators.DataRequired()]
+    insumos = SelectField(
+        "Insumo",
+        choices=[],
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
     )
-    costo_lote = FloatField("Costo del Lote", validators=[validators.DataRequired()])
+    cantidad = IntegerField(
+        "Cantidad",
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
+    )
+    fecha_caducidad = DateField(
+        "Fecha de Caducidad",
+        format="%Y-%m-%d",
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
+    )
+    costo_lote = DecimalField(
+        "Costo del Lote",
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
+    )
 
 
 class NuevaCompraForm(Form):
     proveedores = SelectField(
-        "Proveedor", choices=[], validators=[validators.DataRequired()]
+        "Proveedor",
+        choices=[],
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacìo.")
+        ],
     )
     caja = BooleanField("¿Retirar dinero de la caja?", default=True)
     lotes_insumos = FieldList(FormField(LoteInsumoForm), min_entries=1)

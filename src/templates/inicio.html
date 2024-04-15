@@ -183,6 +183,7 @@
         {% endblock %}
       </div>
     </div>
+    {% block bootstrap_modals %}{% endblock %}
     <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
     {% with messages = get_flashed_messages(with_categories=true) %} {% for
     category, message in messages %}

@@ -11,6 +11,8 @@ class Config:
     SESSION_COOKIE_SECURE = False
 
 
+
+
 class DevelopmentConfig(Config):
     DEBUG = True
     # encriptar esta madre

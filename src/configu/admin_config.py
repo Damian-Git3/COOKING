@@ -122,27 +122,10 @@ def setup_admin(app, db):
                 url_relative_path="img/cookies/",
             ),
             "estatus": BooleanField("Activar Receta"),
-            "utilidad": DecimalField(
-                "Utilidad (%)",
-                validators=[
-                    NumberRange(
-                        min=0,
-                        message="La utilidad no puede ser menor a 0 porque genera perdidas",
-                    )
-                ],
-            ),
-        }
-        form_args = {
-            "utilidad": {
-                "description": "La utilidad es tomada como porcentaje"
-                + "una utilidad del 100% genera un precio de venta del doble del costo de producción.",
-                "type": "number",
-                "step": "1",
-            }
         }
 
         form_overrides = {"descripcion": TextAreaField}
-
+        
         def peso_estimado_formatter(view, context, model, name):
             return f"{model.peso_estimado * 1000:.0f} gr"
 
