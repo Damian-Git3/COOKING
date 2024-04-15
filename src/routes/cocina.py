@@ -26,7 +26,7 @@ def recetas():
 @cocina.route("/lotes/insumos")
 @login_required
 def lotes_insumos():
-    return render_template("modulos/cocina/recetas.html")
+    return render_template("modulos/cocina/lotes_insumos.html")
 
 
 @cocina.route("/aceptar-solicitud/<int:idSolicitud>")

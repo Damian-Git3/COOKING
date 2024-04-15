@@ -125,7 +125,7 @@ def setup_admin(app, db):
         }
 
         form_overrides = {"descripcion": TextAreaField}
-        
+
         def peso_estimado_formatter(view, context, model, name):
             return f"{model.peso_estimado * 1000:.0f} gr"
 
