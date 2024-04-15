@@ -11,9 +11,9 @@ from flask_login import current_user
 from flask import redirect, url_for, request
 from wtforms.fields import BooleanField, DecimalField
 from wtforms.validators import NumberRange
+from wtforms import TextAreaField
 
 import os
-
 
 
 class AdminModelView(ModelView):
@@ -24,7 +24,7 @@ class AdminModelView(ModelView):
         """
         if not current_user.is_authenticated:
             return False
-        if not current_user.has_rol("admin"):
+        if not current_user.has_role("admin"):
             return False
         return True
 
@@ -44,7 +44,7 @@ class AdminIndexView(AdminIndexView):
         """
         if not current_user.is_authenticated:
             return False
-        if not current_user.has_rol("admin"):
+        if not current_user.has_role("admin"):
             return False
         return True
 
@@ -129,6 +129,8 @@ def setup_admin(app, db):
             }
         }
 
+        form_overrides = {"descripcion": TextAreaField}
+
         def peso_estimado_formatter(view, context, model, name):
             return f"{model.peso_estimado * 1000:.0f} gr"
 
@@ -138,7 +140,7 @@ def setup_admin(app, db):
         # Asigna el formateador personalizado a la columna peso_estimado
         column_formatters = {
             "peso_estimado": peso_estimado_formatter,
-            "utilidad": utilidad_formatter
+            "utilidad": utilidad_formatter,
         }
         inline_models = (
             (
@@ -268,4 +270,3 @@ def setup_admin(app, db):
     )
 
     return admin
-

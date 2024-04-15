@@ -1,14 +1,26 @@
-from wtforms import Form, PasswordField
+"""Clase que define el formulario de usuario"""
+
+from wtforms import Form, PasswordField, SubmitField
 from wtforms import StringField
 from wtforms import validators
+from wtforms import EmailField
 
 
 class UsuarioForm(Form):
+    """Clase que define el formulario de usuario"""
+
     nombre = StringField(
-        "nombre",
+        "Nombre",
         [
             validators.DataRequired(message="el campo es requerido"),
             validators.Length(min=4, max=10, message="ingresa nombre valido"),
+        ],
+    )
+    correo = EmailField(
+        "Correo",
+        [
+            validators.DataRequired(message="el campo es requerido"),
+            validators.Email(message="ingresa un correo electrónico válido"),
         ],
     )
     contrasenia = PasswordField(
@@ -19,10 +31,5 @@ class UsuarioForm(Form):
         ],
     )
     confirmacion = PasswordField("Confirmar Contraseña")
-    correo = StringField(
-        "Correo",
-        [
-            validators.DataRequired(message="el campo es requerido"),
-            validators.Email(message="ingresa un correo electrónico válido"),
-        ],
-    )
+
+    submit = SubmitField("Guardar")

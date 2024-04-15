@@ -1,0 +1,6 @@
+{
+  "editor.formatOnSave": true,
+  "python.formatting.provider": "black",
+  "python.formatting.blackPath": "${workspaceFolder}/env/bin/black",
+  "python.formatting.blackArgs": ["--quiet"]
+}

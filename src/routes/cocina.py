@@ -37,7 +37,9 @@ def aceptarSolicitud(idSolicitud):
     if solicitudProduccion:
         solicitudProduccion.estatus = 2
 
-        insumosReceta = InsumosReceta.query.filter_by(idReceta=solicitudProduccion.idReceta).all()
+        insumosReceta = InsumosReceta.query.filter_by(
+            idReceta=solicitudProduccion.idReceta
+        ).all()
 
         receta = Receta.query.get(solicitudProduccion.idReceta)
 
@@ -46,17 +48,18 @@ def aceptarSolicitud(idSolicitud):
 
         for insumoReceta in insumosReceta:
             insumo = Insumo.query.get(insumoReceta.idInsumo)
-            mensajeReceta += (
-                f"{insumo.nombre}: {insumoReceta.cantidad * solicitudProduccion.tandas:.2f} {insumo.unidad_medida}\n"
-            )
-            
+            mensajeReceta += f"{insumo.nombre}: {insumoReceta.cantidad * solicitudProduccion.tandas:.2f} {insumo.unidad_medida}\n"
+
         db.session.commit()
-        
+
         flash(mensajeReceta, "receta")
 
         return redirect(url_for("cocina.cocinar"))
     else:
-        flash("No se encontro la solicitud de producción con los datos proporcionados", "info")
+        flash(
+            "No se encontro la solicitud de producción con los datos proporcionados",
+            "info",
+        )
         return redirect(url_for("cocina.cocinar"))
 
 

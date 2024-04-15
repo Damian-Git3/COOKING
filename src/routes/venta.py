@@ -27,7 +27,7 @@ from database.models import (
     Proveedor,
     LoteGalleta,
     InsumosReceta,
-    LoteInsumo
+    LoteInsumo,
 )
 
 from forms import forms
@@ -70,70 +70,80 @@ def solicitud_produccion():
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
     form.receta.choices = [(receta.id, receta.nombre) for receta in Receta.query.all()]
-    recetas = [(receta.id, receta.imagen, receta.piezas) for receta in Receta.query.all()]
+    recetas = [
+        (receta.id, receta.imagen, receta.piezas) for receta in Receta.query.all()
+    ]
 
     if request.method == "GET":
         return render_template(
             "modulos/venta/solicitudesProduccion/create.html",
             form=form,
             nuevo=True,
-            recetas=recetas
+            recetas=recetas,
         )
     else:
         if form.validate():
-            insumosReceta = InsumosReceta.query.filter_by(idReceta=form.receta.data).all()
-            
+            insumosReceta = InsumosReceta.query.filter_by(
+                idReceta=form.receta.data
+            ).all()
+
             if len(insumosReceta) > 0:
                 recetaSePuedeProcesar = True
                 mensajeInsumosCantidadesFaltantes = ""
-                
+
                 for insumoReceta in insumosReceta:
                     lotesInsumosCumplenCantidad = True
-                    
+
                     cantidadNecesaria = insumoReceta.cantidad * form.tandas.data
-                    
+
                     print("----------------------")
                     print(f"Insumo: {insumoReceta.insumo.nombre}")
                     print(f"Insumo cantidad en receta: {insumoReceta.cantidad}")
                     print(f"Tandas: {form.tandas.data}")
                     print(f"Cantidad necesaria: {cantidadNecesaria}")
-                    
-                    lotesInsumosReceta = LoteInsumo.query.filter_by(idInsumo=insumoReceta.idInsumo).order_by(asc(LoteInsumo.fecha_caducidad)).all()
-                    
-                    print(f"Cantidad de lotes insumos para este insumo: {len(lotesInsumosReceta)}")
-                    
-                    if(len(lotesInsumosReceta) > 0):
+
+                    lotesInsumosReceta = (
+                        LoteInsumo.query.filter_by(idInsumo=insumoReceta.idInsumo)
+                        .order_by(asc(LoteInsumo.fecha_caducidad))
+                        .all()
+                    )
+
+                    print(
+                        f"Cantidad de lotes insumos para este insumo: {len(lotesInsumosReceta)}"
+                    )
+
+                    if len(lotesInsumosReceta) > 0:
                         recetaSePuedeProcesar = False
-                        
+
                         for loteInsumo in lotesInsumosReceta:
                             print("----------------------")
                             print(f"Lote insumo: {loteInsumo.cantidad}")
-                            
+
                             if loteInsumo.cantidad <= cantidadNecesaria:
                                 pass
                             else:
                                 pass
                     else:
-                        if(insumoReceta.insumo.unidad_medida == "Kilos"):
-                            if (cantidadNecesaria >= 1):
+                        if insumoReceta.insumo.unidad_medida == "Kilos":
+                            if cantidadNecesaria >= 1:
                                 unidadMedida = "kg"
                             else:
                                 unidadMedida = "g"
-                                cantidadNecesaria*1000
-                        elif(insumoReceta.insumo.unidad_medida == "Litros"):
-                            if (cantidadNecesaria >= 1):
+                                cantidadNecesaria * 1000
+                        elif insumoReceta.insumo.unidad_medida == "Litros":
+                            if cantidadNecesaria >= 1:
                                 unidadMedida = "l"
                             else:
                                 unidadMedida = "ml"
-                                cantidadNecesaria*1000
-                        
+                                cantidadNecesaria * 1000
+
                         mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadNecesaria} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
                         print(mensajeInsumosCantidadesFaltantes)
-                
-                #Termina FOR DE INSUMOS
+
+                # Termina FOR DE INSUMOS
                 usuario_cocinero = 0
                 rol_cocinero = Rol.query.filter_by(nombre="cocinero").first()
-                
+
                 if rol_cocinero is not None:
                     # Luego, filtra los usuarios que tienen el rol 'cocinero' y ordena por 'is_active'
                     usuario_cocinero = (
@@ -167,21 +177,24 @@ def solicitud_produccion_nuevo():
                     estatus=1,
                 )
 
-                #db.session.add(solicitud)
-                #db.session.commit()
+                # db.session.add(solicitud)
+                # db.session.commit()
 
                 flash("Solicitud de producción creada correctamente", "success")
 
                 return redirect(url_for("venta.solicitud_produccion"))
             else:
-                flash("Esta receta no cuenta con insumos agregados, consultalo con un administrador", "error")
-                
+                flash(
+                    "Esta receta no cuenta con insumos agregados, consultalo con un administrador",
+                    "error",
+                )
+
                 return render_template(
-                "modulos/venta/solicitudesProduccion/create.html",
-                form=form,
-                recetas=recetas,
-                nuevo=True,
-            )
+                    "modulos/venta/solicitudesProduccion/create.html",
+                    form=form,
+                    recetas=recetas,
+                    nuevo=True,
+                )
         else:
             return render_template(
                 "modulos/venta/solicitudesProduccion/create.html",
@@ -218,16 +231,19 @@ def edit_solicitud_produccion(id):
 def delete_solicitud_produccion():
     id = request.form.get("id")
     solicitud = SolicitudProduccion.query.get_or_404(id)
-    
-    if (solicitud.estatus == 1):
+
+    if solicitud.estatus == 1:
         db.session.delete(solicitud)
         db.session.commit()
         flash("Solicitud de producción eliminada correctamente", "success")
-        
+
         return redirect(url_for("venta.solicitud_produccion"))
     else:
-        flash("La solicitud se encuentra en un status diferente a realizada, solicita al cocinero que descienda los status para poder eliminarla", "error")
-        
+        flash(
+            "La solicitud se encuentra en un status diferente a realizada, solicita al cocinero que descienda los status para poder eliminarla",
+            "error",
+        )
+
         return redirect(url_for("venta.solicitud_produccion"))
 
 

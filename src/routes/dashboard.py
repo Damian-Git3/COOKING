@@ -17,6 +17,6 @@ def index():
         "dashboard/dashboard.html",
         galletaVentasMes=galletaVentasMes,
         ventasMes=ventasMes,
-        galletasTipos=['Chocolate', 'Vainilla', 'Fresa', 'Nuez'],
-        galletasVendidas=[120, 100, 90, 80]
+        galletasTipos=["Chocolate", "Vainilla", "Fresa", "Nuez"],
+        galletasVendidas=[120, 100, 90, 80],
     )

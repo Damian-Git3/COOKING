@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CooKing - {% block title %}{% endblock %}</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/sidebar.css')}}"
@@ -10,18 +11,11 @@
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='libs/bootstrap5/css/bootstrap.min.css')}}"
-    />
-    <title>CooKing - {% block title %}{% endblock %}</title>
-    <script src="{{ url_for('static', filename='libs/bootstrap5/js/bootstrap.bundle.js')}}"></script>
+    />  
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='libs/fontawesome/css/all.css')}}"
     />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='libs/fontawesome/js/all.js')}}"
-    />
-
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans"
       rel="stylesheet"
@@ -31,19 +25,18 @@
       type="image/png"
       href="{{ url_for('static', filename='img/cookie_1.png')}}"
     />
-
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='libs/sweetalert2/src/sweetalert2.scss')}}"
-    />
+  
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
-
+    <script src="{{ url_for('static', filename='libs/bootstrap5/js/bootstrap.bundle.js')}}"></script>
     <script src="{{ url_for('static', filename='js/jquery.js')}}"></script>
     <script src="{{ url_for('static', filename='js/jqueryui.js')}}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-    {% block styles %}{% endblock %}
+    
+    {% block styles %}
+
+    {% endblock %}
   </head>
   <body>
     <div class="Menu">
@@ -185,9 +178,11 @@
     <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
     {% with messages = get_flashed_messages(with_categories=true) %} {% for
     category, message in messages %}
+
     <script>
       console.log("{{ message }}");
     </script>
+
     {% if category == 'success' %}
     <script>
       Toast.fire({
@@ -195,26 +190,48 @@
         title: "{{ message }}",
       });
     </script>
+    {% endif %}
 
-    {% elif category == 'error' %}
+    {% if category == 'error' %}
     <script>
       Toast.fire({
         icon: "error",
         title: "{{ message }}",
       });
     </script>
-
-    {% elif category == 'receta' %}
+    {% endif %} 
+    
+    {% if category == 'info' %}
     <script>
-      Swal.fire(`{{ message }}`);
+      Toast.fire({
+        icon: "info",
+        title: "{{ message }}",
+      });
     </script>
+    {% endif %} 
+    
+    {% if category == 'warning' %}
+    <script>
+      Toast.fire({
+        icon: "warning",
+        title: "{{ message }}",
+      });
+    </script>
+    {% endif %}
 
-    {% else %}
+    {% if category == 'receta' %}
+      <script>
+        Swal.fire(`{{ message }}`);
+      </script>
+    {% endif %}
 
     <script>
       console.log("Mensaje diferente: {{ message }}");
     </script>
 
-    {% endif %} {% endfor %} {% endwith %} {% block jscode %} {% endblock %}
+    {% endfor %} {% endwith %} 
+    
+    <!-- BLOQUE PARA CODIGO -->
+    {% block jscode %} {% endblock %}
   </body>
 </html>
