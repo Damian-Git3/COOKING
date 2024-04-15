@@ -1,17 +1,11 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request
-from flask_login import login_required, current_user
-from database.models import (
-    SolicitudProduccion,
-    Receta,
-    Insumo,
-    InsumosReceta,
-    LoteInsumo,
-    Compra,
-    Usuario,
-)
-from database.models import db
-from forms import forms
 from datetime import datetime
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+
+from database.models import (Compra, Insumo, InsumosReceta, LoteInsumo, Receta,
+                             SolicitudProduccion, Usuario, db)
+from forms import forms
 
 cocina = Blueprint("cocina", __name__, url_prefix="/cocina")
 
@@ -31,6 +25,7 @@ def cocinar():
 @login_required
 def recetas():
     return redirect(url_for("cocina."))
+
 
 @cocina.route("/aceptar-solicitud/<int:idSolicitud>")
 @login_required

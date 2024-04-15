@@ -1,20 +1,12 @@
 """ Este archivo contiene las clases de los formularios que se utilizan en la aplicación. """
 
-from wtforms import Form, FormField, FieldList
-from wtforms import (
-    StringField,
-    TextAreaField,
-    IntegerField,
-    SelectField,
-    RadioField,
-    BooleanField,
-    PasswordField,
-    DateField,
-    FloatField
-    )
-from wtforms import EmailField, HiddenField, DecimalField
-from wtforms import validators
 from datetime import date
+
+from wtforms import (BooleanField, DateField, DecimalField, EmailField,
+                     FieldList, FloatField, Form, FormField, HiddenField,
+                     IntegerField, PasswordField, RadioField, SelectField,
+                     StringField, TextAreaField, validators)
+
 
 class SignupForm(Form):
     nombre = StringField(
@@ -107,7 +99,6 @@ class MermaGalletaForm(Form):
     lot_id = HiddenField("Lot ID")
     tipo_medida = SelectField(
         "Tipo de Medida",
-
         choices=[("g", "Gramos"), ("p", "Piezas")],
         validators=[
             validators.DataRequired(message="Este campo no puede estar vacío.")
@@ -117,7 +108,6 @@ class MermaGalletaForm(Form):
         "Cantidad",
         validators=[
             validators.DataRequired(message="Este campo no puede estar vacío."),
-
             validators.NumberRange(min=1, message="La cantidad debe ser mayor a 0"),
         ],
     )

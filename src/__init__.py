@@ -57,11 +57,10 @@ if __name__ == "__main__":
 
     app.register_blueprint(cocina)
 
-
     from routes.dashboard import dashboard
 
     app.register_blueprint(dashboard)
-    
+
     from routes.venta import venta
 
     app.register_blueprint(venta)
