@@ -81,14 +81,14 @@ class BusquedaLoteGalletaForm(Form):
         "Fecha de Inicio",
         format="%Y-%m-%d",
         validators=[
-            validators.DataRequired(message="Este campo no puede estar vacìo.")
+            validators.DataRequired(message="Este campo no puede estar vacío.")
         ],
     )
     fecha_fin = DateField(
         "Fecha de Fin",
         format="%Y-%m-%d",
         validators=[
-            validators.DataRequired(message="Este campo no puede estar vacìo.")
+            validators.DataRequired(message="Este campo no puede estar vacío.")
         ],
     )
 
@@ -97,7 +97,7 @@ class BusquedaLoteGalletaForm(Form):
         "Receta",
         choices=[],
         validators=[
-            validators.DataRequired(message="Este campo no puede estar vacìo.")
+            validators.DataRequired(message="Este campo no puede estar vacío.")
         ],
     )
 
@@ -108,13 +108,13 @@ class MermaGalletaForm(Form):
         "Tipo de Medida",
         choices=[("g", "Gramos"), ("p", "Piezas")],
         validators=[
-            validators.DataRequired(message="Este campo no puede estar vacìo.")
+            validators.DataRequired(message="Este campo no puede estar vacío.")
         ],
     )
     cantidad = IntegerField(
         "Cantidad",
         validators=[
-            validators.DataRequired(message="Este campo no puede estar vacìo."),
+            validators.DataRequired(message="Este campo no puede estar vacío."),
             validators.NumberRange(min=1, message="La cantidad debe ser mayor a 0"),
         ],
     )
@@ -122,11 +122,11 @@ class MermaGalletaForm(Form):
 
 class MermaInsumoForm(Form):
     lot_id = HiddenField("Lot ID")
-    cantidad = IntegerField(
+    cantidad = DecimalField(
         "Cantidad",
         validators=[
-            validators.DataRequired(message="Este campo no puede estar vacìo."),
-            validators.NumberRange(min=1, message="La cantidad debe ser mayor a 0"),
+            validators.DataRequired(message="Este campo no puede estar vacío."),
+            validators.NumberRange(min=0.001, message="La cantidad debe ser mayor a 0.001"),
         ],
     )
 
@@ -136,17 +136,40 @@ class BusquedaCompra(Form):
         "Fecha de Inicio",
         format="%Y-%m-%d",
         validators=[
-            validators.DataRequired(message="Este campo no puede estar vacìo.")
+            validators.DataRequired(message="Este campo no puede estar vacío.")
         ],
     )
     fecha_fin = DateField(
         "Fecha de Fin",
         format="%Y-%m-%d",
         validators=[
-            validators.DataRequired(message="Este campo no puede estar vacìo.")
+            validators.DataRequired(message="Este campo no puede estar vacío.")
         ],
     )
     usa_dinero_caja = BooleanField("Usó dinero de caja")
+    insumo = SelectField(
+        "Insumo",
+        choices=[],
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacío.")
+        ],
+    )
+    
+class BusquedaLoteInsumoForm(Form):
+    fecha_inicio = DateField(
+        "Fecha de Inicio",
+        format="%Y-%m-%d",
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacío.")
+        ],
+    )
+    fecha_fin = DateField(
+        "Fecha de Fin",
+        format="%Y-%m-%d",
+        validators=[
+            validators.DataRequired(message="Este campo no puede estar vacío.")
+        ],
+    )
     insumo = SelectField(
         "Insumo",
         choices=[],

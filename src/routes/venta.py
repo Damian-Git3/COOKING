@@ -169,6 +169,7 @@ def delete_solicitud_produccion():
 
 
 @venta.route("/almacen/galletas", methods=["GET", "POST"])
+@requires_role("vendedor")
 def lotes_galletas():
     form = forms.BusquedaLoteGalletaForm(request.form)
 
@@ -232,6 +233,7 @@ def lotes_galletas():
 
 
 @venta.route("/merma/galletas/<int:id>", methods=["GET", "POST"])
+@requires_role("vendedor")
 def merma_galletas(id):
     form = forms.MermaGalletaForm(request.form)
     form.lot_id.data = id
@@ -450,3 +452,4 @@ def compras_crear():
     return render_template(
         "modulos/venta/compras/crear.html", form=form, insumos=insumos_choices
     )
+
