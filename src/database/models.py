@@ -256,8 +256,8 @@ class LoteInsumo(db.Model):
     precio_unidad = db.Column(db.Float, nullable=False)
     merma = db.Column(db.Float, nullable=False, default=0)
 
-    idInsumo = db.Column(db.Integer, db.ForeignKey("insumos.id"), primary_key=True)
-    idCompra = db.Column(db.Integer, db.ForeignKey("compras.id"), primary_key=True)
+    idInsumo = db.Column(db.Integer, db.ForeignKey("insumos.id"), nullable=False)
+    idCompra = db.Column(db.Integer, db.ForeignKey("compras.id"), nullable=False)
 
     compra = db.relationship(
         "Compra",
