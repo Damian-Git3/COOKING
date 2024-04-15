@@ -4,11 +4,9 @@ from forms import usuario
 
 main = Blueprint("main", __name__)
 
-
 @main.route("/")
 def index():
     return render_template("index.html")
-
 
 @main.route("/inicio")
 @login_required
@@ -39,11 +37,10 @@ def menu():
 
     return render_template("inicio.html", mensaje=mensaje)
 
-
 @main.route("/configuracion")
 @login_required
 def configuracion():
     """Ruta para la configuración del usuario"""
 
-    formUsuario = usuario.UsuarioForm(request.form)
-    return render_template("configuracion/configuracion.html", formUsuario=formUsuario)
+    form_usuario = usuario.UsuarioForm(request.form)
+    return render_template("configuracion/configuracion.html", formUsuario=form_usuario)

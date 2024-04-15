@@ -1,10 +1,10 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
 from flask_cors import CORS
 from flask_login import LoginManager
+from sassutils.wsgi import SassMiddleware
 from configu.config import DevelopmentConfig
 from database.models import db, Usuario
-from sassutils.wsgi import SassMiddleware
 from configu.admin_config import setup_admin
 
 if __name__ == "__main__":
@@ -79,11 +79,9 @@ if __name__ == "__main__":
     def site_map():
         links = []
         for rule in app.url_map.iter_rules():
-            # Filter out rules we can't navigate to in a browser
-            # and rules that require parameters
-            if "GET" in rule.methods and has_no_empty_params(rule):
-                url = url_for(rule.endpoint, **(rule.defaults or {}))
-                links.append((url, rule.endpoint))
-        print(links)
+            links.append(rule)
+            print(rule)
+
+        return str(links)
 
     app.run(port=4000)

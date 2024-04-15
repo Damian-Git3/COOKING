@@ -58,7 +58,7 @@ class Insumo(db.Model):
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
     def __str__(self):
-        return self.nombre
+        return self.nombre + " (" + self.unidad_medida + ")"
 
 
 class Rol(db.Model):
@@ -131,17 +131,39 @@ class Proveedor(db.Model):
     contacto = db.Column(db.String(45), nullable=True)
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
+    # Método para obtener solo el nombre
+    def __str__(self):
+        return self.empresa
+
 
 class Compra(db.Model):
     __tablename__ = "compras"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     pago_proveedor = db.Column(db.Float, nullable=False)
-
-    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
-    idTransaccionCaja = db.Column(db.Integer, primary_key=True)
+    estatus = db.Column(db.Boolean, nullable=False, default=True)
+    fecha_compra = db.Column(db.Date, nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
+    idTransaccionCaja = db.Column(
+        db.Integer, db.ForeignKey("transacciones_caja.id"), nullable=True
+    )
     idProveedores = db.Column(
-        db.Integer, db.ForeignKey("proveedores.id"), primary_key=True
+        db.Integer, db.ForeignKey("proveedores.id"), nullable=False
+    )
+
+    transaccion = db.relationship(
+        "TransaccionCaja",
+        foreign_keys=[idTransaccionCaja],
+        backref=db.backref("compras_transaccion", lazy="dynamic"),
+    )
+    proveedor = db.relationship(
+        "Proveedor",
+        foreign_keys=[idProveedores],
+        backref=db.backref("compras_proveedor", lazy="dynamic"),
+    )
+    lotes_insumo_compra = db.relationship(
+        "LoteInsumo",
+        back_populates="compra",
     )
 
 
@@ -206,8 +228,9 @@ class LoteGalleta(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha_entrada = db.Column(db.Date)
     cantidad = db.Column(db.Integer, nullable=False)
-    merma = db.Column(db.Float, nullable=False, default=0)
+    merma = db.Column(db.Integer, nullable=False, default=0)
     tipo_venta = db.Column(db.Integer, nullable=False)
+    # agregar el costo de produccion y precio de venta
 
     idProduccion = db.Column(
         db.Integer, db.ForeignKey("solicitudes_produccion.id"), nullable=False
@@ -220,17 +243,12 @@ class LoteGalleta(db.Model):
         foreign_keys=[idReceta],
         backref=db.backref("lotes_receta", lazy="dynamic"),
     )
-    usuario = db.relationship(
-        "Usuario",
-        foreign_keys=[idUsuarios],
-        backref=db.backref("lotes_usuario", lazy="dynamic"),
-    )
 
 
 class LoteInsumo(db.Model):
     __tablename__ = "lotes_insumo"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     fecha_caducidad = db.Column(db.Date, nullable=False)
     cantidad = db.Column(db.Float, nullable=False)
     fecha_compra = db.Column(db.Date, nullable=False)
@@ -239,6 +257,17 @@ class LoteInsumo(db.Model):
 
     idInsumo = db.Column(db.Integer, db.ForeignKey("insumos.id"), primary_key=True)
     idCompra = db.Column(db.Integer, db.ForeignKey("compras.id"), primary_key=True)
+
+    compra = db.relationship(
+        "Compra",
+        foreign_keys=[idCompra],
+        back_populates="lotes_insumo_compra",
+    )
+    insumo = db.relationship(
+        "Insumo",
+        foreign_keys=[idInsumo],
+        backref=db.backref("lotes_insumo", lazy="dynamic"),
+    )
 
 
 class SolicitudProduccion(db.Model):

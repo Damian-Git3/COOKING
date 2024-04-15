@@ -1,0 +1,152 @@
+{% extends 'inicio.html' %} {% block title %}Almacen{% endblock %} {% block
+styles %} {% endblock %} {%from "macros.html" import render_field%} {% block
+content %}
+<div style="width: 100%; text-align: center">
+  <h1>Compras</h1>
+</div>
+{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
+messages %}
+<div class="alert alert-success" style="width: 90%">{{ message }}</div>
+{% endfor %} {% endif %} {% endwith %}
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a href="{{url_for('venta.compras_ver')}}" style="text-decoration: none">
+      <button
+        class="nav-link active"
+        id="nav-1-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-1"
+        type="button"
+        role="tab"
+        aria-controls="nav-1"
+        aria-selected="true"
+      >
+        Buscar Lotes de Galletas
+      </button>
+    </a>
+
+    <a href="{{url_for('venta.compras_crear')}}" style="text-decoration: none">
+      <button
+        class="nav-link"
+        id="nav-2-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-2"
+        type="button"
+        role="tab"
+        aria-controls="nav-2"
+        aria-selected="false"
+      >
+        Nuevo Lote
+      </button>
+    </a>
+  </div>
+</nav>
+
+<div class="container">
+  <form method="POST" class="form-inline mt-3">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+    <div class="row">
+      <div class="col-md-3">
+        <div class="row control-group">
+          <div class="form-group col-xs-12 float-label-form-group controls">
+            {{render_field(form.fecha_inicio, class="form-control")}}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row control-group">
+          <div class="form-group col-xs-12 float-label-form-group controls">
+            {{render_field(form.fecha_fin, class="form-control")}}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row control-group">
+          <div class="form-group col-xs-12 float-label-form-group controls">
+            {{render_field(form.insumo, class="form-control")}}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <br />
+        <button type="submit" class="btn btn-primary ml-2" style="width: 100%">
+          Buscar
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <table class="table table-striped table-bordered mt-5">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">ID compra</th>
+        <th scope="col">Proveedor</th>
+        <th scope="col">Insumos</th>
+        <th scope="col">Pago total</th>
+        <th scope="col">Retiro de caja</th>
+        <th scope="col">Responsable</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for compra, usuario, proveedor in compras %}
+      <tr>
+        <td
+          class="list-buttons-column"
+          style="display: flex; justify-content: space-around; border: none"
+        >
+          {% if compra.estatus %}
+          <a
+            class="icon"
+            href="{{ url_for('venta.compras_editar', id=compra.id) }}"
+            title="Editar Registro"
+            style="text-decoration: none; color: black"
+          >
+            <span class="fa fa-pencil glyphicon glyphicon-pencil"></span>
+          </a>
+          {% endif%}
+        </td>
+        <td>{{ compra.id }}</td>
+        <td>{{ proveedor }}</td>
+        <td>
+          <a href="{{ url_for('venta.compras_ver', id=compra.id) }}"
+            ><i class="fa-solid fa-circle-info"></i>{{ compra.insumos }}</a
+          >
+        </td>
+        <td>{{ compra.pago_proveedor }}</td>
+        <td>{{ compra.insumos }}</td>
+        <td>{{ usuario }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div
+  class="modal fade"
+  id="modalDetalleCompra"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="modalDetalleCompraLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDetalleCompraLabel">Titulo</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">...</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
