@@ -316,19 +316,19 @@ def compras_crear():
     form.proveedores.choices = [
         (proveedor.id, proveedor.empresa) for proveedor in Proveedor.query.all()
     ]
-    
+
     insumos_choices = [(insumo.id, insumo.nombre) for insumo in Insumo.query.all()]
 
     for lote_insumo_form in form.lotes_insumos:
         lote_insumo_form.insumos.choices = insumos_choices
-    
+
     if request.method == "POST" and form.validate():
-        
+
         compra = Compra(
             idUsuario=current_user.id,
             idProveedores=form.proveedores.data,
             fecha_compra=datetime.now(),
-            pago_proveedor= sum([lote.costo_lote.data for lote in form.lotes_insumos])
+            pago_proveedor=sum([lote.costo_lote.data for lote in form.lotes_insumos]),
         )
         if form.caja.data:
             compra.idTransaccionCaja = form.caja.data
@@ -338,11 +338,12 @@ def compras_crear():
 
         for lote_insumo_form in form.lotes_insumos:
             lote_insumo = LoteInsumo(
-                idCompra=compra.id,  
-                idInsumo=lote_insumo_form.insumos.data,  
+                idCompra=compra.id,
+                idInsumo=lote_insumo_form.insumos.data,
                 cantidad=lote_insumo_form.cantidad.data,
                 fecha_caducidad=lote_insumo_form.fecha_caducidad.data,
-                precio_unidad = lote_insumo_form.costo_lote.data / lote_insumo_form.cantidad.data,
+                precio_unidad=lote_insumo_form.costo_lote.data
+                / lote_insumo_form.cantidad.data,
             )
             db.session.add(lote_insumo)
 
