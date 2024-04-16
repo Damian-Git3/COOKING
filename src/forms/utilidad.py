@@ -11,7 +11,7 @@ class UtilidadForm(Form):
         [
             validators.DataRequired(message="El Campo es Requerido"),
         ],
-        choices=[]
+        choices=[],
     )
     porcentaje = FloatField(
         "Porcentaje",
@@ -20,13 +20,13 @@ class UtilidadForm(Form):
             validators.NumberRange(
                 min=0, max=100, message="Ingresa un Porcentaje Válido"
             ),
-        ]
+        ],
     )
     cantidad = FloatField(
         "Cantidad",
         [
             validators.DataRequired(message="El Campo es Requerido"),
             validators.NumberRange(min=1, message="Ingresa una Cantidad Válida"),
-        ]
+        ],
     )
     submit = SubmitField("GUARDAR")
