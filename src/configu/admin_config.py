@@ -1,44 +1,19 @@
-from flask import (
-    flash,
-    abort,
-    Blueprint,
-    render_template,
-    redirect,
-    url_for,
-    request,
-    get_flashed_messages,
-    session,
-)
-from datetime import datetime
-from flask_admin import Admin, AdminIndexView
-from flask_admin.form import ImageUploadField
-from flask_admin.contrib.sqla import ModelView
-from werkzeug.security import generate_password_hash
-from werkzeug.exceptions import BadRequest
-from database.models import (
-    Usuario,
-    Rol,
-    Insumo,
-    Proveedor,
-    Receta,
-    InsumosReceta,
-    Compra,
-    LoteInsumo,
-    CorteCaja,
-    TransaccionCaja,
-)
-from flask_admin.form import Select2Widget
-from wtforms.fields import SelectField
-from flask_babel import Babel
-from wtforms.validators import DataRequired
-from markupsafe import Markup
-from flask_login import current_user
-from wtforms.fields import BooleanField, DecimalField, FloatField
-from wtforms.validators import NumberRange
-from sqlalchemy import event
-from sqlalchemy.orm import validates
+""" Configuración de Flask-Admin """
 
 import os
+
+from flask import flash, redirect, request, url_for
+from flask_admin import Admin, AdminIndexView
+from flask_admin.contrib.sqla import ModelView
+from flask_admin.form import ImageUploadField
+from flask_babel import Babel
+from flask_login import current_user
+from werkzeug.security import generate_password_hash
+from wtforms import TextAreaField
+from wtforms.fields import BooleanField, DecimalField
+from wtforms.validators import NumberRange
+
+from database.models import Insumo, InsumosReceta, Proveedor, Receta, Usuario
 
 
 class AdminModelView(ModelView):
@@ -99,6 +74,9 @@ def setup_admin(app, db):
         form_columns = ["nombre", "correo", "estatus", "roles"]
         column_list = ["nombre", "correo", "estatus", "roles"]
         column_searchable_list = ("nombre", "correo")
+        form_columns = ["nombre", "correo", "estatus", "roles"]
+        column_list = ["nombre", "correo", "estatus", "roles"]
+        column_searchable_list = ("nombre", "correo")
 
         def on_model_change(self, form, Usuario, is_created):
             if is_created:
@@ -113,7 +91,7 @@ def setup_admin(app, db):
     @app.errorhandler(RecetaImagenValidationError)
     def handle_custom_validation_error(error):
         return redirect("/admin/receta/edit")
-    
+
     class RecetaView(BaseModelConfiguration):
         can_delete = False
         form_columns = [
@@ -132,7 +110,8 @@ def setup_admin(app, db):
             "estatus",
         ]
         column_labels = {
-            "peso_estimado": "Peso promedio por Pieza"  # Cambia el nombre de la columna para especificar gramos
+            # Cambia el nombre de la columna para especificar gramos
+            "peso_estimado": "Peso promedio por Pieza"
         }
         form_extra_fields = {
             "imagen": ImageUploadField(
@@ -140,17 +119,23 @@ def setup_admin(app, db):
                 base_path=os.path.join(
                     os.path.dirname(__file__), "..", "static", "img", "cookies"
                 ),
-                url_relative_path="img/cookies/"
+                url_relative_path="img/cookies/",
             ),
-            "estatus": BooleanField("Activar Receta")
+            "estatus": BooleanField("Activar Receta"),
         }
+
+        form_overrides = {"descripcion": TextAreaField}
 
         def peso_estimado_formatter(view, context, model, name):
             return f"{model.peso_estimado * 1000:.0f} gr"
 
+        def utilidad_formatter(view, context, model, name):
+            return f"{model.utilidad * 1:.2f}%"
+
         # Asigna el formateador personalizado a la columna peso_estimado
         column_formatters = {
             "peso_estimado": peso_estimado_formatter,
+            "utilidad": utilidad_formatter,
         }
         inline_models = (
             (
@@ -164,11 +149,11 @@ def setup_admin(app, db):
 
         def on_model_change(self, form, model, is_created):
             if not model.imagen:
-                    db.session.rollback()
-                    flash("Debe agregar una foto para la receta.", "error")
-                    raise RecetaImagenValidationError(
-                        "No se puede crear la receta sin una imagen."
-                    )
+                db.session.rollback()
+                flash("Debe agregar una foto para la receta.", "error")
+                raise RecetaImagenValidationError(
+                    "No se puede crear la receta sin una imagen."
+                )
 
             total_cantidad = sum(insumo.cantidad for insumo in model.insumos)
             model.peso_estimado = total_cantidad / model.piezas if model.piezas else 0
@@ -188,8 +173,7 @@ def setup_admin(app, db):
             "cantidad_maxima",
             "cantidad_minima",
             "merma",
-            "estatus"
-            
+            "estatus",
         ]
         column_list = [
             "nombre",
@@ -198,7 +182,7 @@ def setup_admin(app, db):
             "cantidad_maxima",
             "cantidad_minima",
             "merma",
-            "estatus"
+            "estatus",
         ]
 
         inline_models = (
@@ -233,8 +217,6 @@ def setup_admin(app, db):
         can_delete = False
         form_excluded_columns = ["compras"]
 
-    
-
     babel = Babel(app)
 
     # Modificiar idioma de flask_admin
@@ -249,8 +231,6 @@ def setup_admin(app, db):
             Usuario, db.session, menu_icon_type="fa-solid", menu_icon_value="fa-user"
         )
     )
-    # admin.add_view(RolView(Rol, db.session,
-    # menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
     admin.add_view(
         InsumoView(
             Insumo, db.session, menu_icon_type="fa-solid", menu_icon_value="fa-carrot"
@@ -273,7 +253,5 @@ def setup_admin(app, db):
             endpoint="receta",
         )
     )
-
-    
 
     return admin

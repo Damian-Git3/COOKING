@@ -1,17 +1,11 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request
-from flask_login import login_required, current_user
-from database.models import (
-    SolicitudProduccion,
-    Receta,
-    Insumo,
-    InsumosReceta,
-    LoteInsumo,
-    Compra,
-    Usuario,
-)
-from database.models import db
-from forms import forms
 from datetime import datetime
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+
+from database.models import (Compra, Insumo, InsumosReceta, LoteInsumo, Receta,
+                             SolicitudProduccion, Usuario, db)
+from forms import forms
 
 cocina = Blueprint("cocina", __name__, url_prefix="/cocina")
 
@@ -30,7 +24,7 @@ def cocinar():
 @cocina.route("/recetas")
 @login_required
 def recetas():
-    return redirect(url_for("admin.receta"))
+    return redirect(url_for("cocina."))
 
 
 @cocina.route("/aceptar-solicitud/<int:idSolicitud>")
@@ -40,8 +34,6 @@ def aceptarSolicitud(idSolicitud):
 
     if solicitudProduccion:
         solicitudProduccion.estatus = 2
-        solicitudProduccion.idUsuarioProduccion = current_user.id
-        db.session.commit()
 
         insumosReceta = InsumosReceta.query.filter_by(
             idReceta=solicitudProduccion.idReceta
@@ -54,9 +46,9 @@ def aceptarSolicitud(idSolicitud):
 
         for insumoReceta in insumosReceta:
             insumo = Insumo.query.get(insumoReceta.idInsumo)
-            mensajeReceta += (
-                f"{insumo.nombre}: {insumoReceta.cantidad} {insumo.unidad_medida}\n"
-            )
+            mensajeReceta += f"{insumo.nombre}: {insumoReceta.cantidad * solicitudProduccion.tandas:.2f} {insumo.unidad_medida}\n"
+
+        db.session.commit()
 
         flash(mensajeReceta, "receta")
 

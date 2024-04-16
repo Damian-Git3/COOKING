@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required, current_user
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
+
 import forms.forms as forms
-from database.models import Usuario
-from database.models import db
-from database.models import LogLogin
+from database.models import LogLogin, Usuario, db
 
 auth = Blueprint("auth", __name__)
 
@@ -36,6 +36,7 @@ def login_post():
     recordar = True if request.form.get("recordarme") else False
 
     user = Usuario.query.filter_by(nombre=usuario).first()
+
     if not user:
         flash(
             "No se ha encontrado un usuario con esas credenciales. Por favor, verifica la información"
@@ -76,6 +77,7 @@ def login_post():
         db.session.add(log_login)
         db.session.commit()
         return render_template("login.html")
+
     elif not check_password_hash(user.contrasenia, contrasenia):
         flash("Credenciales incorrectas. Por favor, inténtelo de nuevo.")
         log_login = LogLogin(fecha=datetime.now(), exito=False, idUsuario=user.id)

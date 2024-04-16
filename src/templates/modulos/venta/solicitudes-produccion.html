@@ -1,13 +1,9 @@
 {% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock%}
-{% block styles %} {% endblock %} {%from "macros.html" import render_field%} {%
+{% block styles %} {% endblock %} {%from "_macros.html" import render_field%} {%
 block content %}
 <div style="width: 100%; text-align: center">
   <h1>Solicitudes de producción</h1>
 </div>
-{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
-messages %}
-<div class="alert alert-success" style="width: 90%">{{ message }}</div>
-{% endfor %} {% endif %} {% endwith %}
 
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -25,8 +21,8 @@ messages %}
         aria-selected="{%if not nuevo %}true{%else%}false{%endif%}"
       >
         Pendientes
-      </button></a
-    >
+      </button>
+    </a>
     <a
       href="{{ url_for('venta.solicitud_produccion_nuevo') }}"
       style="text-decoration: none; color: black"
@@ -62,14 +58,14 @@ messages %}
   </div>
 </nav>
 
-<div class="tab-content" id="nav-tabContent">
+<div class="tab-content">
   <div
     class="tab-pane fade {%if not nuevo %}show active{% endif %}"
     id="nav-home"
     role="tabpanel"
     aria-labelledby="nav-home-tab"
   >
-    <table class="table table-bordered">
+    <table class="table table-bordered" id="tabla-principal">
       <thead>
         <tr>
           <th></th>
@@ -89,14 +85,10 @@ messages %}
             class="list-buttons-column"
             style="display: flex; justify-content: space-around; border: none"
           >
-            <a
-              class="icon"
-              href="/venta/solicitud_produccion/edit/{{ solicitud.id }}"
-              title="Editar Registro"
-              style="text-decoration: none; color: black"
-            >
+            <!-- <a class="icon" href="/venta/solicitud_produccion/edit/{{ solicitud.id }}" title="Editar Registro"
+              style="text-decoration: none; color: black">
               <span class="fa fa-pencil glyphicon glyphicon-pencil"></span>
-            </a>
+            </a> -->
 
             <form
               id="deleteForm"
@@ -120,6 +112,7 @@ messages %}
                 <span class="fa-solid fa-trash"></span>
               </button>
             </form>
+
             <script>
               function confirmDelete() {
                 Swal.fire({
@@ -162,4 +155,25 @@ messages %}
     </table>
   </div>
 </div>
+
+<script>
+  var data = [
+    [
+      "Tiger Nixon",
+      "System Architect",
+      "Edinburgh",
+      "5421",
+      "2011/04/25",
+      "$3,120",
+    ],
+    [
+      "Garrett Winters",
+      "Director",
+      "Edinburgh",
+      "8422",
+      "2011/07/25",
+      "$5,300",
+    ],
+  ];
+</script>
 {% endblock %}

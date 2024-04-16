@@ -1,18 +1,11 @@
-from wtforms import Form, FormField, FieldList
-from wtforms import (
-    StringField,
-    TextAreaField,
-    IntegerField,
-    SelectField,
-    RadioField,
-    BooleanField,
-    PasswordField,
-    DateField,
-    FloatField,
-)
-from wtforms import EmailField, HiddenField, DecimalField
-from wtforms import validators
+""" Este archivo contiene las clases de los formularios que se utilizan en la aplicación. """
+
 from datetime import date
+
+from wtforms import (BooleanField, DateField, DecimalField, EmailField,
+                     FieldList, FloatField, Form, FormField, HiddenField,
+                     IntegerField, PasswordField, RadioField, SelectField,
+                     StringField, TextAreaField, validators)
 
 
 class SignupForm(Form):
@@ -126,7 +119,9 @@ class MermaInsumoForm(Form):
         "Cantidad",
         validators=[
             validators.DataRequired(message="Este campo no puede estar vacío."),
-            validators.NumberRange(min=0.001, message="La cantidad debe ser mayor a 0.001"),
+            validators.NumberRange(
+                min=0.001, message="La cantidad debe ser mayor a 0.001"
+            ),
         ],
     )
 
@@ -154,7 +149,8 @@ class BusquedaCompra(Form):
             validators.DataRequired(message="Este campo no puede estar vacío.")
         ],
     )
-    
+
+
 class BusquedaLoteInsumoForm(Form):
     fecha_inicio = DateField(
         "Fecha de Inicio",

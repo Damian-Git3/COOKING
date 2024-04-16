@@ -1,13 +1,12 @@
-from flask import Flask, render_template, url_for
-from flask_wtf.csrf import CSRFProtect
+from flask import Flask, render_template
 from flask_cors import CORS
 from flask_login import LoginManager
-from werkzeug.security import generate_password_hash
-from configu.config import DevelopmentConfig
-from database.models import db, Usuario
+from flask_wtf.csrf import CSRFProtect
 from sassutils.wsgi import SassMiddleware
-from configu.admin_config import setup_admin
 
+from configu.admin_config import setup_admin
+from configu.config import DevelopmentConfig
+from database.models import Usuario, db
 
 if __name__ == "__main__":
     app = Flask(__name__)
@@ -129,13 +128,21 @@ if __name__ == "__main__":
 
     app.register_blueprint(cocina)
 
-    from routes.dashboard import dashboard as dashboard_blueprint
+    from routes.dashboard import dashboard
 
-    app.register_blueprint(dashboard_blueprint)
+    app.register_blueprint(dashboard)
 
     from routes.venta import venta
 
     app.register_blueprint(venta)
+
+    from routes.configuracion import configuracion
+
+    app.register_blueprint(configuracion)
+
+    from routes.utilidad import utilidad
+
+    app.register_blueprint(utilidad)
 
     setup_admin(app, db)
 

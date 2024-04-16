@@ -1,7 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
 from datetime import datetime
-from sqlalchemy import func, Enum
+
+from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Enum, func
 
 db = SQLAlchemy()
 
@@ -32,14 +33,17 @@ class Receta(db.Model):
     peso_estimado = db.Column(db.Float, nullable=False)
     utilidad = db.Column(db.Float)
     piezas = db.Column(db.Integer, nullable=False)
-    descripcion = db.Column(db.String(500))
+    descripcion = db.Column(db.String(800))
     nombre = db.Column(db.String(50), nullable=False, unique=True)
-    imagen = db.Column(db.String(2550), nullable=False)
+    imagen = db.Column(db.String(2550))
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
     # Método para obtener solo el nombre
     def __str__(self):
         return self.nombre
+
+    def serialize(self):
+        return {"id": self.id, "nombre": self.nombre, "imagen": self.imagen}
 
 
 class Insumo(db.Model):
@@ -55,7 +59,7 @@ class Insumo(db.Model):
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
     def __str__(self):
-        return self.nombre + " (" + self.unidad_medida + ")" 
+        return self.nombre + " (" + self.unidad_medida + ")"
 
 
 class Rol(db.Model):
@@ -138,15 +142,16 @@ class Compra(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     pago_proveedor = db.Column(db.Float, nullable=False)
-    estatus = db.Column(db.Boolean, nullable=False, 
-                        default=True)
+    estatus = db.Column(db.Boolean, nullable=False, default=True)
     fecha_compra = db.Column(db.Date, nullable=False)
     idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
     idTransaccionCaja = db.Column(
-        db.Integer, db.ForeignKey("transacciones_caja.id"), nullable=True)
+        db.Integer, db.ForeignKey("transacciones_caja.id"), nullable=True
+    )
     idProveedores = db.Column(
-        db.Integer, db.ForeignKey("proveedores.id"), nullable=False)
-    
+        db.Integer, db.ForeignKey("proveedores.id"), nullable=False
+    )
+
     transaccion = db.relationship(
         "TransaccionCaja",
         foreign_keys=[idTransaccionCaja],
@@ -159,7 +164,7 @@ class Compra(db.Model):
     )
     lotes_insumo_compra = db.relationship(
         "LoteInsumo",
-        back_populates = "compra",
+        back_populates="compra",
     )
 
 
@@ -226,7 +231,7 @@ class LoteGalleta(db.Model):
     cantidad = db.Column(db.Integer, nullable=False)
     merma = db.Column(db.Integer, nullable=False, default=0)
     tipo_venta = db.Column(db.Integer, nullable=False)
-    #agregar el costo de produccion y precio de venta
+    # agregar el costo de produccion y precio de venta
 
     idProduccion = db.Column(
         db.Integer, db.ForeignKey("solicitudes_produccion.id"), nullable=False
@@ -239,7 +244,6 @@ class LoteGalleta(db.Model):
         foreign_keys=[idReceta],
         backref=db.backref("lotes_receta", lazy="dynamic"),
     )
-    
 
 
 class LoteInsumo(db.Model):
@@ -258,12 +262,12 @@ class LoteInsumo(db.Model):
     compra = db.relationship(
         "Compra",
         foreign_keys=[idCompra],
-        back_populates = "lotes_insumo_compra",
+        back_populates="lotes_insumo_compra",
     )
     insumo = db.relationship(
         "Insumo",
         foreign_keys=[idInsumo],
-        backref=db.backref("lotes_insumo", lazy="dynamic")
+        backref=db.backref("lotes_insumo", lazy="dynamic"),
     )
 
 
