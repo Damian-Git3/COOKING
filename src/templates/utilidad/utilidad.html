@@ -1,29 +1,69 @@
-{% import '_macros.html' as macro %}
-{% extends "inicio.html" %}
-{% block title %}
-    UTILIDADES
-{% endblock %}
+{% import '_macros.html' as macro %} 
+
+{% extends "inicio.html" %} 
+
+{% block title %} UTILIDADES {% endblock %} 
+
 {% block content %}
 <div>
-    <div class=" text-center h1">
+    <div class="text-center h1">
         <kbd>UTILIDADES</kbd>
     </div>
-    
-    {{ macro.select(form.receta) }}
-    
     <div class="row">
         <div class="col-6">
-            {{ macro.input_float(form.porcentaje) }}
+            <form id="ingredientesForm" action="{{ url_for('utilidad.obtener_ingredientes')}}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+                
+                {{ macro.select(form.receta) }}                        
+                {{ macro.input_float(form.cantidad) }} 
+                {{ macro.submit_button(form.submit) }}
+
+            </form>
+            
         </div>
         <div class="col-6">
-            {{ macro.input_float(form.cantidad) }}      
-        </div>            
+            <div class="row mb-3 mx-5">
+                
+            </div>
+            <div class="row mb-3 mt-3 mx-5">
+                <div class="row">
+                    <h2>TITULO</h2>
+                </div>
+                <div class="card p-0">
+                    <div class="card-header text-center">
+                        <h3>Ingredientes</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Ingrediente</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ingrediente in ingredientes %}
+                                <tr>
+                                    <td>{{ ingrediente.nombre }}</td>
+                                    <td>{{ ingrediente.cantidad }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %} 
 
 {% block jscode %}
-    <script>
-        
-    </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('select[name="receta"]').addEventListener('change', function() {
+        document.getElementById('ingredientesForm').submit();
+    });
+});
+</script>
 {% endblock %}
