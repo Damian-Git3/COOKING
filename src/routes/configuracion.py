@@ -4,7 +4,6 @@ import hashlib
 import requests
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 
 from database.models import Usuario, db
@@ -30,34 +29,34 @@ def guardar_informacion_usuario():
 
         result = check_password_compromised(contrasenia)
 
-            if result:
-                flash(
-                    f"La contraseña que ingresaste ha sido filtrada {result}"
-                    + " veces en bases de datos de contraseñas filtradas"
-                    + "Usa otra contraseña",
-                    "error",
-                )
-                return render_template(
-                    "configuracion/configuracion.html", formUsuario=form_usuario
-                )
-            if nombre:
-                usuario_actual.nombre = nombre
-            if correo:
-                usuario_actual.correo = correo
-            if contrasenia and confirmacion and contrasenia == confirmacion:
-                usuario_actual.contrasenia = generate_password_hash(contrasenia)
-
-            db.session.commit()
-            return redirect(url_for("auth.logout"))
-        else:
-
-            flash("La información proporcionada no es válida", "error")
+        if result:
+            flash(
+                f"La contraseña que ingresaste ha sido filtrada {result}"
+                + " veces en bases de datos de contraseñas filtradas"
+                + "Usa otra contraseña",
+                "error",
+            )
             return render_template(
                 "configuracion/configuracion.html", formUsuario=form_usuario
             )
+        if nombre:
+            usuario_actual.nombre = nombre
+        if correo:
+            usuario_actual.correo = correo
+        if contrasenia and confirmacion and contrasenia == confirmacion:
+            usuario_actual.contrasenia = generate_password_hash(contrasenia)
+
+            db.session.commit()
+            return redirect(url_for("auth.logout"))
+    else:
+        flash("La información proporcionada no es válida", "error")
+        return render_template(
+            "configuracion/configuracion.html", formUsuario=form_usuario
+        )
 
 
 def check_password_compromised(password):
+    """Verifica si la contraseña ha sido comprometida en una filtración de datos"""
 
     # Crea un hash SHA-1 de la contraseña
     sha1_hash = hashlib.sha1(password.encode("utf-8")).hexdigest().upper()

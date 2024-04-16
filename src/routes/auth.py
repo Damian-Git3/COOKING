@@ -105,38 +105,6 @@ def login_post():
     return redirect(url_for("main.menu"))
 
 
-@auth.route("/signup")
-def signup():
-    form = forms.SignupForm(request.form)
-    return render_template("signup_temporal.html", form=form)
-
-
-@auth.route("/signup", methods=["POST"])
-def signup_post():
-    form = forms.SignupForm(request.form)
-    correo = request.form.get("correo")
-    nombre = request.form.get("nombre")
-    contrasenia = request.form.get("contrasenia")
-
-    if not form.validate():
-        return render_template("signup_temporal.html", form=form)
-
-    user = Usuario.query.filter_by(correo=correo).first()
-
-    if user:
-        flash("Este correo ya existe.")
-        return redirect(url_for("auth.signup"))
-
-    new_user = Usuario(
-        correo=correo, nombre=nombre, contrasenia=generate_password_hash(contrasenia)
-    )
-
-    db.session.add(new_user)
-    db.session.commit()
-
-    return redirect(url_for("auth.login"))
-
-
 @auth.route("/logout")
 @login_required
 def logout():
