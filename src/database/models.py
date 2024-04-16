@@ -171,13 +171,13 @@ class Compra(db.Model):
 class Venta(db.Model):
     __tablename__ = "ventas"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     fecha_venta = db.Column(db.DateTime, nullable=False)
     total_venta = db.Column(db.Float, nullable=False)
 
-    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
-    idProveedores = db.Column(
-        db.Integer, db.ForeignKey("proveedores.id"), primary_key=True
+    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
+    idTransaccionCaja = db.Column(
+        db.Integer, db.ForeignKey("transacciones_caja.id"), nullable=False
     )
 
 
@@ -192,14 +192,13 @@ class CorteCaja(db.Model):
 
 class DetalleVenta(db.Model):
     __tablename__ = "detalles_venta"
+    id = db.Column(db.Integer, primary_key=True)
 
     precio = db.Column(db.Float, nullable=False)
     cantidad = db.Column(db.Integer)
 
-    idVenta = db.Column(db.Integer, db.ForeignKey("ventas.id"), primary_key=True)
-    idStock = db.Column(
-        db.Integer, db.ForeignKey("lotes_galletas.id"), primary_key=True
-    )
+    idVenta = db.Column(db.Integer, db.ForeignKey("ventas.id"))
+    idStock = db.Column(db.Integer, db.ForeignKey("lotes_galletas.id"))
 
 
 class LogAccion(db.Model):

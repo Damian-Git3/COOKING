@@ -6,13 +6,22 @@ from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import forms.forms as forms
-from database.models import LogLogin, Usuario, db
+from database.models import CorteCaja, LogLogin, Usuario, db
 
 auth = Blueprint("auth", __name__)
 
 
 @auth.route("/login")
 def login():
+
+    corte_de_hoy = CorteCaja.query.filter_by(fecha_corte=datetime.now().date()).first()
+
+    if not corte_de_hoy:
+        nuevo_corte = CorteCaja(fecha_corte=datetime.now().date(), monto_inicial=1000)
+        db.session.add(nuevo_corte)
+        # Guarda los cambios en la base de datos
+        db.session.commit()
+
     if current_user.is_authenticated:
 
         usuario_id = current_user.get_id()
@@ -23,8 +32,6 @@ def login():
         user.last_login_at = user.current_login_at
         user.current_login_at = datetime.now()
 
-        # Guarda los cambios en la base de datos
-        db.session.commit()
         return redirect(url_for("main.menu"))
     return render_template("login.html")
 

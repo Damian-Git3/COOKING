@@ -198,7 +198,7 @@ class LoteInsumoForm(Form):
         ],
     )
     cantidad = IntegerField(
-        "Cantidad",
+        "Cantidad (Kilos o Litros)",
         validators=[
             validators.DataRequired(message="Este campo no puede estar vacìo.")
         ],
