@@ -17,18 +17,18 @@ configuracion = Blueprint("configuracion", __name__, url_prefix="/configuracion"
 @login_required
 def guardar_informacion_usuario():
     """Guarda la información del usuario en la base de datos"""
-    try:
-        form_usuario = usuario.UsuarioForm(request.form)
-        # Busca el usuario actual en la base de datos
-        usuario_actual = Usuario.query.get(current_user.id)
 
-        if request.method == "POST" and form_usuario.validate():
-            nombre = form_usuario.nombre.data
-            correo = form_usuario.correo.data
-            contrasenia = form_usuario.contrasenia.data
-            confirmacion = form_usuario.confirmacion.data
+    form_usuario = usuario.UsuarioForm(request.form)
+    # Busca el usuario actual en la base de datos
+    usuario_actual = Usuario.query.get(current_user.id)
 
-            result = check_password_compromised(contrasenia)
+    if request.method == "POST" and form_usuario.validate():
+        nombre = form_usuario.nombre.data
+        correo = form_usuario.correo.data
+        contrasenia = form_usuario.contrasenia.data
+        confirmacion = form_usuario.confirmacion.data
+
+        result = check_password_compromised(contrasenia)
 
             if result:
                 flash(
@@ -55,10 +55,6 @@ def guardar_informacion_usuario():
             return render_template(
                 "configuracion/configuracion.html", formUsuario=form_usuario
             )
-
-    except SQLAlchemyError as e:
-        # Aquí puedes manejar el error, por ejemplo, mostrándolo al usuario o registrándolo
-        print(f"Error al guardar el usuario: {e}")
 
 
 def check_password_compromised(password):

@@ -126,7 +126,7 @@ class Proveedor(db.Model):
     __tablename__ = "proveedores"
 
     id = db.Column(db.Integer, primary_key=True)
-    empresa = db.Column(db.String(45), nullable=False)
+    empresa = db.Column(db.String(45), nullable=False, unique=True)
     direccion = db.Column(db.String(45), nullable=False)
     nombre_contacto = db.Column(db.String(45), nullable=False)
     contacto = db.Column(db.String(45), nullable=True)

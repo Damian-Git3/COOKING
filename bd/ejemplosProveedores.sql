@@ -1,0 +1,10 @@
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (1, 'Harina de Trigo', 'Harina de trigo para galletas', 'kilos', 100, 50, 0, 1);
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (2, 'Azúcar', 'Azúcar refinada para galletas', 'kilos', 50, 10, 0, 1);
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (3, 'Huevos', 'Huevos para galletas', 'unidades', 12, 6, 0, 1);
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (4, 'Leche', 'Leche para galletas', 'litros', 2, 1, 0, 1);
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (5, 'Mantequilla', 'Mantequilla para galletas', 'kilos', 10, 2, 0, 1);
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (6, 'Sal', 'Sal para galletas', 'kilos', 1000, 500, 0, 1);
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (7, 'Vainilla', 'Extracto de vainilla para galletas', 'mililitros', 500, 100, 0, 1);
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (8, 'Chocolate', 'Chocolate para galletas', 'kilos', 20, 10, 0, 1);
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (9, 'Cacao', 'Cacao en polvo para galletas', 'kilos', 15, 5, 0, 1);
+INSERT INTO cooking.insumos (id, nombre, descripcion, unidad_medida, cantidad_maxima, cantidad_minima, merma, estatus) VALUES (10, 'Mermelada', 'Mermelada para galletas', 'litros', 5, 2, 0, 1);

@@ -15,7 +15,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import asc, desc, extract, text
+from sqlalchemy import asc, desc, extract, func, text
 from sqlalchemy.orm import joinedload
 
 from configu.config import DevelopmentConfig
@@ -45,12 +45,6 @@ venta = Blueprint("venta", __name__, url_prefix="/venta")
 @requires_role("vendedor")
 def compras():
     return render_template("modulos/venta/compras.html")
-
-
-@venta.route("/punto_venta")
-@requires_role("vendedor")
-def punto_venta():
-    return render_template("modulos/venta/punto-venta.html")
 
 
 @venta.route("/solicitud_produccion")
@@ -533,3 +527,137 @@ def compras_crear():
     return render_template(
         "modulos/venta/compras/crear.html", form=form, insumos=insumos_choices
     )
+
+
+@venta.route("/punto_venta", methods=["GET"])
+@requires_role("vendedor")
+def punto_venta():
+    form = forms.busquedaRecetaPuntoVenta(request.form)
+    form2 = forms.agregarProductoPuntoVenta(request.form)
+    # galletas debe contener elnombre de la receta, id, cantidad de stock, imagen
+    galletas = db.session.query(Receta).filter(Receta.estatus == 1).all()
+    for galleta in galletas:
+        galleta.stock = (
+            db.session.query(func.sum(LoteGalleta.cantidad))
+            .filter(LoteGalleta.cantidad > 0, LoteGalleta.idReceta == galleta.id)
+            .scalar()
+        )
+
+        galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
+
+    return render_template(
+        "modulos/venta/punto-venta.html",
+        galletas=galletas,
+        form_busqueda=form,
+        form=form2,
+    )
+
+
+@venta.route("/punto_venta/buscar", methods=["POST"])
+@requires_role("vendedor")
+def punto_venta_buscar():
+    form = forms.busquedaRecetaPuntoVenta(request.form)
+    form2 = forms.agregarProductoPuntoVenta(request.form)
+
+    if form.validate():
+        galletas = (
+            db.session.query(Receta)
+            .filter(Receta.estatus == 1, Receta.nombre.like(f"%{form.buscar.data}%"))
+            .all()
+        )
+        for galleta in galletas:
+            galleta.stock = (
+                db.session.query(func.sum(LoteGalleta.cantidad))
+                .filter(LoteGalleta.cantidad > 0, LoteGalleta.idReceta == galleta.id)
+                .scalar()
+            )
+
+            galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
+
+        return render_template(
+            "modulos/venta/punto-venta.html",
+            galletas=galletas,
+            form_busqueda=form,
+            form=form2,
+        )
+
+    galletas = db.session.query(Receta).filter(Receta.estatus == 1).all()
+    for galleta in galletas:
+        galleta.stock = (
+            db.session.query(func.sum(LoteGalleta.cantidad))
+            .filter(LoteGalleta.cantidad > 0, LoteGalleta.idReceta == galleta.id)
+            .scalar()
+        )
+
+        galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
+
+    return render_template(
+        "modulos/venta/punto-venta.html",
+        galletas=galletas,
+        form_busqueda=form,
+        form=form2,
+    )
+
+
+carrito = []
+
+
+@venta.route("/punto_venta/agregar", methods=["POST"])
+@requires_role("vendedor")
+def punto_venta_agregar():
+    form = forms.busquedaRecetaPuntoVenta(request.form)
+    form2 = forms.agregarProductoPuntoVenta(request.form)
+    # galletas debe contener elnombre de la receta, id, cantidad de stock, imagen
+
+    if form2.validate():
+        idReceta = form2.id.data
+        cantidad = form2.cantidad.data
+
+        receta = Receta.query.get(idReceta)
+
+        carrito.append(
+            {
+                "id": idReceta,
+                "nombre": receta.nombre,
+                "cantidad": cantidad,
+                "precio": receta.utilidad,
+                "imagen": receta.imagen,
+            }
+        )
+
+        flash("Galleta agregada correctamente", "success")
+
+    galletas = db.session.query(Receta).filter(Receta.estatus == 1).all()
+    for galleta in galletas:
+        galleta.stock = (
+            db.session.query(func.sum(LoteGalleta.cantidad))
+            .filter(LoteGalleta.cantidad > 0, LoteGalleta.idReceta == galleta.id)
+            .scalar()
+        )
+
+        galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
+
+    return render_template(
+        "modulos/venta/punto-venta.html",
+        galletas=galletas,
+        form_busqueda=form,
+        form=form2,
+    )
+
+
+@venta.route("/punto_venta/eliminar/<int:id>", methods=["POST"])
+@requires_role("vendedor")
+def punto_venta_eliminar(id):
+    return render_template("modulos/venta/punto-venta.html")
+
+
+@venta.route("/punto_venta/cancelar", methods=["POST"])
+@requires_role("vendedor")
+def punto_venta_cancelar():
+    return render_template("modulos/venta/punto-venta.html")
+
+
+@venta.route("/punto_venta/confirmar", methods=["POST"])
+@requires_role("vendedor")
+def punto_venta_confirmar():
+    return render_template("modulos/venta/punto-venta.html")

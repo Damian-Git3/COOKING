@@ -228,3 +228,19 @@ class NuevaCompraForm(Form):
     )
     caja = BooleanField("¿Retirar dinero de la caja?", default=True)
     lotes_insumos = FieldList(FormField(LoteInsumoForm), min_entries=1)
+
+
+class busquedaRecetaPuntoVenta(Form):
+    buscar = StringField(
+        "Buscar",
+        render_kw={"placeholder": "Buscar galleta"},
+    )
+
+
+class agregarProductoPuntoVenta(Form):
+    id = HiddenField("id")
+    cantidad = IntegerField(
+        "Cantidad",
+        [validators.DataRequired(message="Ingresa un valor")],
+        render_kw={"placeholder": "Cantidad"},
+    )

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
@@ -39,13 +39,45 @@ def login_post():
 
     if not user:
         flash(
-            "No se ha encontrado un usuario con esas credenciales"
-            + "Por favor, verifica la información"
+            "No se ha encontrado un usuario con esas credenciales. Por favor, verifica la información"
+        )
+        return render_template("login.html")
+    print(user)
+    una_hora_atras = datetime.now() - timedelta(minutes=30)
+    intentos_fallidos = (
+        db.session.query(LogLogin)
+        .filter(
+            LogLogin.idUsuario == user.id,
+            LogLogin.fecha >= datetime.date(una_hora_atras),
+        )
+        .order_by(LogLogin.fecha.desc())
+        .limit(4)
+        .all()
+    )
+
+    intentos = 0
+
+    for intento in intentos_fallidos:
+        if not intento.exito:
+            intentos += 1
+    if intentos > 3:
+        flash(
+            "Has alcanzado el límite de intentos fallidos. Por favor, inténtalo de nuevo más tarde."
         )
         log_login = LogLogin(fecha=datetime.now(), exito=False)
         db.session.add(log_login)
         db.session.commit()
         return render_template("login.html")
+
+    if not user:
+        flash(
+            "No se ha encontrado un usuario con esas credenciales. Por favor, verifica la información"
+        )
+        log_login = LogLogin(fecha=datetime.now(), exito=False)
+        db.session.add(log_login)
+        db.session.commit()
+        return render_template("login.html")
+
     elif not check_password_hash(user.contrasenia, contrasenia):
         flash("Credenciales incorrectas. Por favor, inténtelo de nuevo.")
         log_login = LogLogin(fecha=datetime.now(), exito=False, idUsuario=user.id)

@@ -1,23 +1,38 @@
 {%macro render_field(field)%}
-<td>{{field.label}}</td>
-{{field(**kwargs) | safe}}
-{%if field.errors%}
-    <ul class="errors">
+  <td>{{field.label}}</td>
+  {{field(**kwargs) | safe}} 
+
+  {%if field.errors%}
+  <ul class="errors">
     {%for error in field.errors%}
-        <li style="color:red">{{error}}</li>
+    <li style="color: red">{{error}}</li>
     {%endfor%}
-    </ul>
-{%endif%}
+  </ul>
+  {%endif%} 
+
+{%endmacro%} 
+
+{%macro render_field_nolabel(field)%} 
+  
+  {{field(**kwargs) | safe}} 
+
+  {%if field.errors%}
+  <ul class="errors">
+    {%for error in field.errors%}
+    <li style="color: red">{{error}}</li>
+    {%endfor%}
+  </ul>
+  {%endif%} 
+
 {%endmacro%} 
 
 {%macro datos(name, placeholder, type='text')%}
-<p><input name="{{name}}" placeholder="{{placeholder}}" type="{{type}}"></p>
-{%endmacro%}
+<p><input name="{{name}}" placeholder="{{placeholder}}" type="{{type}}" /></p>
+{%endmacro%} 
 
 {% macro input_float(field) %}
 <div class="form-floating mb-3 mt-3 mx-5">
-
-    <input 
+  <input 
         type="{{ field.type }}" 
         class="form-control {{ 'is-invalid' if field.errors else '' }}" 
         id="{{ field.name }}" 
@@ -28,13 +43,13 @@
         {% endif %}
         
     >
-    <label for="{{ field.name }}">
+  <label for="{{ field.name }}">
         {{field.label.text}}
     </label>    
 
 </div>
 
-{% if field.errors %}
+  {% if field.errors %}
     <ul class="errors">
         {% for error in field.errors %}
         <li style="color: red;">
@@ -42,48 +57,45 @@
         </li>
         {% endfor %}
     </ul>
+  {% endif %}
 
-    {% endif %}
 {% endmacro %}
 
 {% macro date_field(field) %}
 <div class="mb-3 mt-3">
-    <label for="{{field.id}}">{{field.label}}</label>
-    {{field(**kwargs)|safe}}
+  <label for="{{field.id}}">{{field.label}}</label>
+  {{field(**kwargs)|safe}} {% if field.errors %}
+  <ul>
+    {% for error in field.errors %}
+    <li style="color: red">{{ error }}</li>
+    {% endfor %}
+  </ul>
 
-    {% if field.errors %}
-    <ul>
-        {% for error in field.errors %}
-        <li style="color: red;">
-            {{ error }}
-        </li>
-        {% endfor %}
-    </ul>
-
-    {% endif %}
+  {% endif %}
 </div>
-{% endmacro %}
+{% endmacro %} 
 
-{% macro radio_list(field) %}
-{% for option in field %}
-<div class="form-check">
-    <label class="form-check-label" for="{{ option.id }}">
+{% macro radio_list(field) %} 
+
+  {% for option in field %}
+    <div class="form-check">
+      <label class="form-check-label" for="{{ option.id }}">
         {{option.label.text|safe}}
-    </label>
-    {{option(**kwargs)|safe}}
+      </label>
+      {{option(**kwargs)|safe}}
+    </div>
+  {% endfor %} 
 
-</div>
-{% endfor %}
-{% endmacro %}
+{% endmacro %} 
 
 {% macro check_box(field) %}
 
-<div class="form-check">
+  <div class="form-check">
     {{field(**kwargs)|safe}}
     <label class="form-check-label text-uppercase" for="{{ field.id }}">
-        {{field.label}}
+      {{field.label}}
     </label>
-</div>
+  </div>
 
 {% endmacro %}
 
@@ -108,16 +120,14 @@
     </label>
     
 
-    {% if field.errors %}
-    <ul>
-        {% for error in field.errors %}
-        <li style="color: red;">
-            {{ error }}
-        </li>
-        {% endfor %}
-    </ul>
+  {% if field.errors %}
+  <ul>
+    {% for error in field.errors %}
+    <li style="color: red">{{ error }}</li>
+    {% endfor %}
+  </ul>
 
-    {% endif %}
+  {% endif %}
 </div>
 {% endmacro %}
 

@@ -15,14 +15,12 @@
     <a href="{{ url_for('utilidad.gestion')}}">
       <li>
         <i class="fa-solid fa-dollar-sign"></i>
-        <span class="tooltip">UTILIDADES</span>
+        <span class="tooltip">Utilidades</span>
       </li>
     </a>
 
-
-    {% endif %} 
-    
-    {%if current_user.has_role('vendedor') or current_user.has_role('admin') %}
+    {% endif %} {%if current_user.has_role('vendedor') or
+    current_user.has_role('admin') %}
 
     <a href="{{url_for('venta.punto_venta')}}">
       <li>
@@ -51,9 +49,8 @@
       </li></a
     >
 
-    {% endif %} 
-
-    {% if current_user.has_role('cocinero') or current_user.has_role('admin') %}
+    {% endif %} {% if current_user.has_role('cocinero') or
+    current_user.has_role('admin') %}
 
     <a href="{{url_for('cocina.recetas')}}">
       <li>
@@ -77,15 +74,15 @@
       </li>
     </a>
 
-    {% endif %} 
-    
+    {% endif %}
+
     <a href="{{url_for('dashboard.index')}}">
       <li>
         <i class="fa-solid fa-chart-line"></i>
         <span class="tooltip">DASHBOARD</span>
       </li>
     </a>
-    
+
     <a href="{{url_for('main.configuracion')}}">
       <li>
         <i class="fa-solid fa-gear"></i>
@@ -99,6 +96,5 @@
         <span class="tooltip">CERRAR SESIÓN</span>
       </li>
     </a>
-
   </ul>
 </div>
