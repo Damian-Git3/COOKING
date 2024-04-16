@@ -1,12 +1,9 @@
 """ Modulo que se encarga de manejar los errores de la aplicacion """
 
-from math import log
 
 from flask import render_template
 
-from logger import get_logger
-
-log = get_logger()
+from logger import logger as log
 
 
 def page_not_found(e):
