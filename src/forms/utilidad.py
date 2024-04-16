@@ -12,7 +12,6 @@ class UtilidadForm(Form):
             validators.DataRequired(message="el campo es requerido"),
         ],
         choices=[],
-        
     )
     porcentaje = FloatField(
         "Porcentaje",

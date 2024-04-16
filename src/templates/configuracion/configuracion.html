@@ -1,9 +1,18 @@
-{% extends 'inicio.html' %} {% block title %}Configuración{% endblock %} {% block
-styles %} {% endblock %} {% block content %}
+{% import '_macros.html' as macro %}
+
+{% extends 'inicio.html' %} 
+
+{% block title %}Configuración{% endblock %} 
+
+{% block styles %} 
+
+{% endblock %} 
+
+{% block content %}
 <div class="container">
   <div class="row">
     <div class="col-12 h1 text-uppercase text-center">
-      <kbd>Configuración</kbd>
+      <h1>Configuración</h>
     </div>
   </div>
 
@@ -14,18 +23,18 @@ styles %} {% endblock %} {% block content %}
       novalidate
     >
       <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-      {{ formUsuario.nombre.label }} 
-      {{ formUsuario.nombre(class="form-control")}} 
-      {{ formUsuario.correo.label }} 
-      {{ formUsuario.correo(class="form-control") }} 
-      {{ formUsuario.contrasenia.label }}
-      {{ formUsuario.contrasenia(class="form-control") }}
-      {{ formUsuario.confirmacion.label }} 
-      {{ formUsuario.confirmacion(class="form-control") }}
-      {{ formUsuario.submit(class="btn btn-primary") }}
+      
+      {{ macro.input_float(formUsuario.correo) }}
+      {{ macro.input_float(formUsuario.contrasenia) }}
+      {{ macro.input_float(formUsuario.confirmacion) }}
+      {{ macro.submit_button(formUsuario.submit , class="btn btn-primary text-uppercase") }}
       
     </form>
   </div>
 </div>
 
-{% endblock %} {% block jscode %} {% endblock %}
+{% endblock %} 
+
+{% block jscode %}
+
+{% endblock %}

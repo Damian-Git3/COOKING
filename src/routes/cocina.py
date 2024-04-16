@@ -3,8 +3,16 @@ from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from database.models import (Compra, Insumo, InsumosReceta, LoteInsumo, Receta,
-                             SolicitudProduccion, Usuario, db)
+from database.models import (
+    Compra,
+    Insumo,
+    InsumosReceta,
+    LoteInsumo,
+    Receta,
+    SolicitudProduccion,
+    Usuario,
+    db,
+)
 from forms import forms
 
 cocina = Blueprint("cocina", __name__, url_prefix="/cocina")

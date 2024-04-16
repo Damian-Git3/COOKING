@@ -1,33 +1,37 @@
 """Clase que define el formulario de usuario"""
 
-from wtforms import (EmailField, Form, PasswordField, StringField, SubmitField,
-                     validators)
+from numpy import place
+from wtforms import (
+    EmailField,
+    Form,
+    PasswordField,
+    StringField,
+    SubmitField,
+    validators,
+)
 
 
 class UsuarioForm(Form):
     """Clase que define el formulario de usuario"""
 
-    nombre = StringField(
-        "Nombre",
-        [
-            validators.DataRequired(message="el campo es requerido"),
-            validators.Length(min=4, max=10, message="ingresa nombre valido"),
-        ],
-    )
     correo = EmailField(
         "Correo",
         [
-            validators.DataRequired(message="el campo es requerido"),
-            validators.Email(message="ingresa un correo electrónico válido"),
+            validators.DataRequired(message="Campo Requerido"),
+            validators.Email(message="Ingresa un Correo Electrónico Válido"),
         ],
+        render_kw={"placeholder": "CORREO"},
     )
     contrasenia = PasswordField(
         "Contraseña",
         [
-            validators.DataRequired(message="el campo es requerido"),
-            validators.EqualTo("confirmacion", message="las contraseñas no coinciden"),
+            validators.DataRequired(message="Campo Requerido"),
+            validators.EqualTo("confirmacion", message="Las Contraseñas no Coinciden"),
         ],
+        render_kw={"placeholder": "CONTRASENIA"},
     )
-    confirmacion = PasswordField("Confirmar Contraseña")
+    confirmacion = PasswordField(
+        "Confirmar Contraseña", render_kw={"placeholder": "CORREO"}
+    )
 
     submit = SubmitField("Guardar")

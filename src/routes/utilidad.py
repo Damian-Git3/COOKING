@@ -2,6 +2,7 @@
 
 from flask import Blueprint, render_template, request
 from flask_login import login_required
+
 from forms import utilidad as utilidad_form
 
 utilidad = Blueprint("utilidad", __name__, url_prefix="/utilidad")

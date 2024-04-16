@@ -68,9 +68,9 @@ if __name__ == "__main__":
     from routes.configuracion import configuracion
 
     app.register_blueprint(configuracion)
-    
+
     from routes.utilidad import utilidad
-    
+
     app.register_blueprint(utilidad)
 
     setup_admin(app, db)

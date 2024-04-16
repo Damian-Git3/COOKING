@@ -1,18 +1,40 @@
 import math
 from datetime import datetime, timedelta
 
-from flask import (Blueprint, Flask, Response, flash, g, jsonify, redirect,
-                   render_template, request, url_for)
+from flask import (
+    Blueprint,
+    Flask,
+    Response,
+    flash,
+    g,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import current_user, login_required
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import asc, desc, extract, text
 from sqlalchemy.orm import joinedload
 
 from configu.config import DevelopmentConfig
-from database.models import (Compra, DetalleVenta, Insumo, InsumosReceta,
-                             LoteGalleta, LoteInsumo, Proveedor, Receta, Rol,
-                             SolicitudProduccion, Usuario, Venta,
-                             asignacion_rol_usuario, db)
+from database.models import (
+    Compra,
+    DetalleVenta,
+    Insumo,
+    InsumosReceta,
+    LoteGalleta,
+    LoteInsumo,
+    Proveedor,
+    Receta,
+    Rol,
+    SolicitudProduccion,
+    Usuario,
+    Venta,
+    asignacion_rol_usuario,
+    db,
+)
 from forms import forms
 from routes.auth import requires_role
 

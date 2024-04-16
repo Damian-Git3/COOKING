@@ -2,7 +2,7 @@ import binascii
 import hashlib
 
 import requests
-from flask import Blueprint, flash, redirect, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
@@ -37,7 +37,9 @@ def guardar_informacion_usuario():
                     + "Usa otra contraseña",
                     "error",
                 )
-                return redirect(url_for("main.configuracion"))
+                return render_template(
+                    "configuracion/configuracion.html", formUsuario=form_usuario
+                )
             if nombre:
                 usuario_actual.nombre = nombre
             if correo:
@@ -48,8 +50,11 @@ def guardar_informacion_usuario():
             db.session.commit()
             return redirect(url_for("auth.logout"))
         else:
+
             flash("La información proporcionada no es válida", "error")
-            return redirect(url_for("main.configuracion"))
+            return render_template(
+                "configuracion/configuracion.html", formUsuario=form_usuario
+            )
 
     except SQLAlchemyError as e:
         # Aquí puedes manejar el error, por ejemplo, mostrándolo al usuario o registrándolo
@@ -57,6 +62,7 @@ def guardar_informacion_usuario():
 
 
 def check_password_compromised(password):
+
     # Crea un hash SHA-1 de la contraseña
     sha1_hash = hashlib.sha1(password.encode("utf-8")).hexdigest().upper()
     prefix = sha1_hash[:5]
