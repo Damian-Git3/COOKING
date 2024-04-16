@@ -15,7 +15,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import asc, desc, extract, text, func
+from sqlalchemy import asc, desc, extract, func, text
 from sqlalchemy.orm import joinedload
 
 from configu.config import DevelopmentConfig
@@ -529,7 +529,6 @@ def compras_crear():
     )
 
 
-
 @venta.route("/punto_venta", methods=["GET"])
 @requires_role("vendedor")
 def punto_venta():
@@ -599,7 +598,9 @@ def punto_venta_buscar():
         form=form2,
     )
 
+
 carrito = []
+
 
 @venta.route("/punto_venta/agregar", methods=["POST"])
 @requires_role("vendedor")
@@ -607,24 +608,25 @@ def punto_venta_agregar():
     form = forms.busquedaRecetaPuntoVenta(request.form)
     form2 = forms.agregarProductoPuntoVenta(request.form)
     # galletas debe contener elnombre de la receta, id, cantidad de stock, imagen
-    
+
     if form2.validate():
         idReceta = form2.id.data
         cantidad = form2.cantidad.data
 
         receta = Receta.query.get(idReceta)
-        
-        carrito.append({
-            "id": idReceta,
-            "nombre": receta.nombre,
-            "cantidad": cantidad,
-            "precio": receta.utilidad,
-            "imagen": receta.imagen,
-        })
+
+        carrito.append(
+            {
+                "id": idReceta,
+                "nombre": receta.nombre,
+                "cantidad": cantidad,
+                "precio": receta.utilidad,
+                "imagen": receta.imagen,
+            }
+        )
 
         flash("Galleta agregada correctamente", "success")
-    
-    
+
     galletas = db.session.query(Receta).filter(Receta.estatus == 1).all()
     for galleta in galletas:
         galleta.stock = (
