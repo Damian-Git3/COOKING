@@ -1,4 +1,3 @@
-
 const Toast = Swal.mixin({
   toast: true,
   position: "bottom-end",
@@ -8,5 +7,5 @@ const Toast = Swal.mixin({
   didOpen: (toast) => {
     toast.onmouseenter = Swal.stopTimer;
     toast.onmouseleave = Swal.resumeTimer;
-  }
+  },
 });

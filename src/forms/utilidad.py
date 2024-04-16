@@ -1,7 +1,6 @@
 """ FORMULARIOS DE UTILIDADES """
 
-from wtforms import (FloatField, Form, IntegerField, SelectField, SubmitField,
-                     validators)
+from wtforms import FloatField, Form, IntegerField, SelectField, SubmitField, validators
 
 
 class UtilidadForm(Form):

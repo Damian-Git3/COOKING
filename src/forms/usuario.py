@@ -1,7 +1,13 @@
 """Clase que define el formulario de usuario"""
 
-from wtforms import (EmailField, Form, PasswordField, StringField, SubmitField,
-                     validators)
+from wtforms import (
+    EmailField,
+    Form,
+    PasswordField,
+    StringField,
+    SubmitField,
+    validators,
+)
 
 
 class UsuarioForm(Form):
