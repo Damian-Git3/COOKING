@@ -9,17 +9,21 @@
         <kbd>UTILIDADES</kbd>
     </div>
     
-    {{ macro.select(form.receta, class="form-control text-uppercase") }}
-    {{ macro.input_float(form.porcentaje, class="form-control text-uppercase") }}
-    {{ macro.input_float(form.cantidad, class="form-control text-uppercase") }}
-    {{ form.submit }}
+    {{ macro.select(form.receta) }}
     
+    <div class="row">
+        <div class="col-6">
+            {{ macro.input_float(form.porcentaje) }}
+        </div>
+        <div class="col-6">
+            {{ macro.input_float(form.cantidad) }}      
+        </div>            
+    </div>
 </div>
 {% endblock %}
 
 {% block jscode %}
     <script>
-        console.log("Hola mundo");
         
     </script>
 {% endblock %}

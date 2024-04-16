@@ -1,6 +1,6 @@
 """ FORMULARIOS DE UTILIDADES """
 
-from wtforms import FloatField, Form, IntegerField, SelectField, SubmitField, validators
+from wtforms import FloatField, Form, SelectField, SubmitField, validators
 
 
 class UtilidadForm(Form):
@@ -9,24 +9,24 @@ class UtilidadForm(Form):
     receta = SelectField(
         "Receta",
         [
-            validators.DataRequired(message="el campo es requerido"),
+            validators.DataRequired(message="El Campo es Requerido"),
         ],
-        choices=[],
+        choices=[]
     )
     porcentaje = FloatField(
         "Porcentaje",
         [
-            validators.DataRequired(message="el campo es requerido"),
+            validators.DataRequired(message="El campo es Requerido"),
             validators.NumberRange(
-                min=0, max=100, message="ingresa un porcentaje válido"
+                min=0, max=100, message="Ingresa un Porcentaje Válido"
             ),
-        ],
+        ]
     )
-    cantidad = IntegerField(
+    cantidad = FloatField(
         "Cantidad",
         [
-            validators.DataRequired(message="el campo es requerido"),
-            validators.NumberRange(min=1, message="ingresa una cantidad válida"),
-        ],
+            validators.DataRequired(message="El Campo es Requerido"),
+            validators.NumberRange(min=1, message="Ingresa una Cantidad Válida"),
+        ]
     )
-    submit = SubmitField("Guardar")
+    submit = SubmitField("GUARDAR")

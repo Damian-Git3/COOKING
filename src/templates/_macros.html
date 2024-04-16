@@ -28,7 +28,9 @@
         {% endif %}
         
     >
-    {{field.label}}
+    <label for="{{ field.name }}">
+        {{field.label.text}}
+    </label>    
 
 </div>
 
@@ -86,10 +88,25 @@
 {% endmacro %}
 
 
-{% macro select(field) %}
-<div class="form-floating mb-3 mt-3">
-    {{field(**kwargs)|safe}}
-    <label for="{{field.id}}">{{field.label}}</label>
+{% macro select(field, options) %}
+<div class="form-floating mb-3 mt-3 mx-5">
+    <select 
+        type="{{ field.type }}" 
+        class="form-select {{ 'is-invalid' if field.errors else '' }}" 
+        id="{{ field.name }}" 
+        name="{{ field.name }}" 
+        
+    >
+        {% for option in options %}
+        <option value="{{ option[0] }}" {% if field.data == option[0] %} selected {% endif %}>
+            {{ option[1] }}
+        </option>
+        {% endfor %}
+    </select>
+    <label for="{{ field.name}}">
+        {{field.label.text}}
+    </label>
+    
 
     {% if field.errors %}
     <ul>
@@ -106,23 +123,9 @@
 
 {% macro submit_button(button) %}
 <div class="text-center">
-    {{ button(**kwargs)|safe }}
+    <button type="{{ button.type }}" class="btn btn-primary">
+        {{ button.label.text }}
+    </button>
 </div>
-{% endmacro %}
-
-{# Macro para un input flotante con Bootstrap y manejo de errores de WTForms #}
-{% macro input_flotante(campo) %}
-    <div class="form-group">
-        <input type="{{ campo.type }}" class="form-control {{ 'is-invalid' if campo.errors else '' }}" id="{{ campo.name }}" name="{{ campo.name }}" placeholder="{{ campo.label.text }}">
-        
-    </div>
-
-    {% if campo.errors %}
-            <div class="invalid-feedback">
-                {% for error in campo.errors %}
-                    <p>{{ error }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
 {% endmacro %}
 
