@@ -201,14 +201,25 @@ render_field_nolabel %} {% block content %}
           border-radius: 10px;
         "
       >
-        <table class="table table-dark table-hover table-striped-columns">
-          <thead>
-            <tr>
-              <th scope="col">Galleta</th>
-              <th scope="col">Cantidad</th>
-              <th scope="col">Precio Unidad</th>
-              <th scope="col">Subtotal</th>
-              <th scope="col"></th>
+        <table class="table table-hover table-striped-columns table-bordered">
+          <thead style="color: white; background-color: black">
+            <tr style="color: white; background-color: black">
+              <th style="color: white; background-color: black" scope="col">
+                Galleta
+              </th>
+              <th style="color: white; background-color: black" scope="col">
+                Cantidad
+              </th>
+              <th style="color: white; background-color: black" scope="col">
+                Precio Unidad
+              </th>
+              <th style="color: white; background-color: black" scope="col">
+                Subtotal
+              </th>
+              <th
+                style="color: white; background-color: black"
+                scope="col"
+              ></th>
             </tr>
           </thead>
           <tbody>
@@ -216,22 +227,26 @@ render_field_nolabel %} {% block content %}
             <tr>
               <td scope="row">{{ producto.nombre }}</td>
               <td>{{ producto.cantidad }}</td>
-              <td>{{ producto.precio_unidad }}</td>
-              <td>{{ producto.subtotal }}</td>
+              <td>{{ producto.precio_unidad | round(2) }}</td>
+              <td>{{ producto.subtotal | round(2) }}</td>
               <td>
                 <form
-                  action="{{ url_for(venta.punto_venta_eliminar, id=producto.id) }}"
+                  action="{{ url_for('venta.punto_venta_eliminar', id=producto.idCarrito) }}"
                   method="POST"
-                  id="deleteProductForm"
+                  id="deleteProductForm-{{ producto.idCarrito }}"
                 >
-                  <input type="hidden" name="id" value="{{ producto.id }}" />
+                  <input
+                    type="hidden"
+                    name="id"
+                    value="{{ producto.idCarrito }}"
+                  />
                   <input
                     type="hidden"
                     name="csrf_token"
                     value="{{csrf_token()}}"
                   />
                   <button
-                    onclick="event.preventDefault(); confirmDelete();"
+                    onclick="event.preventDefault(); confirmDelete({{ producto.idCarrito }});"
                     title="Delete record"
                     style="border: none; background: none"
                   >
@@ -239,7 +254,7 @@ render_field_nolabel %} {% block content %}
                   </button>
                 </form>
                 <script>
-                  function confirmDelete() {
+                  function confirmDelete(id) {
                     Swal.fire({
                       title: "¿Confirmar eliminación?",
                       icon: "warning",
@@ -249,7 +264,9 @@ render_field_nolabel %} {% block content %}
                       confirmButtonText: "Eliminar",
                     }).then((result) => {
                       if (result.isConfirmed) {
-                        document.getElementById("deleteProductForm").submit();
+                        document
+                          .getElementById("deleteProductForm-" + id)
+                          .submit();
                       }
                     });
                   }
@@ -260,21 +277,28 @@ render_field_nolabel %} {% block content %}
           </tbody>
         </table>
       </div>
-      <div class="d-flex justify-content-between">
-        <form
-          action=" {{ url_for('venta.punto_venta_cancelar') }}"
-          method="POST"
-        >
-          <button type="submit" class="btn btn-danger" style="margin: 10px">
-            Borrar todo
-          </button>
-        </form>
+      <div class="d-flex justify-content-around" style="width: 100%">
         <form
           action=" {{ url_for('venta.punto_venta_confirmar') }}"
           method="POST"
         >
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
           <button type="submit" class="btn btn-success" style="margin: 10px">
             Confirmar compra
+          </button>
+        </form>
+        <div
+          style="display: flex; justify-content: center; align-items: center"
+        >
+          Total: {{ total | round(2) }}
+        </div>
+        <form
+          action=" {{ url_for('venta.punto_venta_cancelar') }}"
+          method="POST"
+        >
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <button type="submit" class="btn btn-danger" style="margin: 10px">
+            Borrar todo
           </button>
         </form>
       </div>
