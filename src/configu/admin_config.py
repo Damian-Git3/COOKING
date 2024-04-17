@@ -1,18 +1,19 @@
+""" Configuración de Flask-Admin """
+
+import os
+
+from flask import flash, redirect, request, url_for
 from flask_admin import Admin, AdminIndexView
-from flask_admin.form import ImageUploadField
 from flask_admin.contrib.sqla import ModelView
-from werkzeug.security import generate_password_hash
-from database.models import Usuario, Rol, Insumo, Proveedor, Receta, InsumosReceta
+from flask_admin.form import ImageUploadField
 from flask_babel import Babel
-from flask import flash, url_for
-from wtforms.validators import DataRequired
-from markupsafe import Markup
 from flask_login import current_user
-from flask import redirect, url_for, request
+from werkzeug.security import generate_password_hash
+from wtforms import TextAreaField
 from wtforms.fields import BooleanField, DecimalField
 from wtforms.validators import NumberRange
 
-import os
+from database.models import Insumo, InsumosReceta, Proveedor, Receta, Usuario
 
 
 class AdminModelView(ModelView):
@@ -69,6 +70,10 @@ def setup_admin(app, db):
 
     # Clase de vista personalizada para Usuario
     class UsuarioView(BaseModelConfiguration):
+        can_delete = False
+        form_columns = ["nombre", "correo", "estatus", "roles"]
+        column_list = ["nombre", "correo", "estatus", "roles"]
+        column_searchable_list = ("nombre", "correo")
         form_columns = ["nombre", "correo", "estatus", "roles"]
         column_list = ["nombre", "correo", "estatus", "roles"]
         column_searchable_list = ("nombre", "correo")
@@ -78,12 +83,21 @@ def setup_admin(app, db):
                 Usuario.contrasenia = generate_password_hash("1234")
                 flash(f"La contraseña automatica para {Usuario.nombre} es 1234")
 
+    class RecetaImagenValidationError(Exception):
+        """Excepción personalizada para errores de validación."""
+
+        pass
+
+    @app.errorhandler(RecetaImagenValidationError)
+    def handle_custom_validation_error(error):
+        return redirect("/admin/receta/edit")
+
     class RecetaView(BaseModelConfiguration):
+        can_delete = False
         form_columns = [
             "nombre",
             "descripcion",
             "piezas",
-            "utilidad",
             "imagen",
             "estatus",
         ]
@@ -96,7 +110,8 @@ def setup_admin(app, db):
             "estatus",
         ]
         column_labels = {
-            "peso_estimado": "Peso promedio por Pieza"  # Cambia el nombre de la columna para especificar gramos
+            # Cambia el nombre de la columna para especificar gramos
+            "peso_estimado": "Peso promedio por Pieza"
         }
         form_extra_fields = {
             "imagen": ImageUploadField(
@@ -107,23 +122,9 @@ def setup_admin(app, db):
                 url_relative_path="img/cookies/",
             ),
             "estatus": BooleanField("Activar Receta"),
-            "utilidad": DecimalField(
-                "Utilidad (%)",
-                validators=[
-                    NumberRange(
-                        min=0,
-                        message="La utilidad no puede ser menor a 0 porque genera perdidas",
-                    )
-                ],
-            ),
         }
-        form_args = {
-            "utilidad": {
-                "description": "La utilidad es tomada como porcentaje, una utilidad del 100% genera un precio de venta del doble del costo de producción.",
-                "type": "number",
-                "step": "1",
-            }
-        }
+
+        form_overrides = {"descripcion": TextAreaField}
 
         def peso_estimado_formatter(view, context, model, name):
             return f"{model.peso_estimado * 1000:.0f} gr"
@@ -134,7 +135,7 @@ def setup_admin(app, db):
         # Asigna el formateador personalizado a la columna peso_estimado
         column_formatters = {
             "peso_estimado": peso_estimado_formatter,
-            "utilidad": utilidad_formatter
+            "utilidad": utilidad_formatter,
         }
         inline_models = (
             (
@@ -147,31 +148,24 @@ def setup_admin(app, db):
         )
 
         def on_model_change(self, form, model, is_created):
+            if not model.imagen:
+                db.session.rollback()
+                flash("Debe agregar una foto para la receta.", "error")
+                raise RecetaImagenValidationError(
+                    "No se puede crear la receta sin una imagen."
+                )
 
             total_cantidad = sum(insumo.cantidad for insumo in model.insumos)
             model.peso_estimado = total_cantidad / model.piezas if model.piezas else 0
             model.estatus = form.estatus.data
+            model.utilidad = 0
 
         def on_model_delete(self, model):
             model.estatus = 0
             db.session.commit()
 
-        def delete_model(self, model):
-            try:
-                # Eliminar los registros relacionados en la tabla InsumosReceta
-                InsumosReceta.query.filter_by(idReceta=model.id).delete()
-                # Llamar al método delete_model de la superclase para eliminar la receta
-                return super(RecetaView, self).delete_model(model)
-            except Exception as e:
-                flash(
-                    "Error al eliminar la receta y los registros relacionados: {}".format(
-                        str(e)
-                    ),
-                    "error",
-                )
-                return False
-
     class InsumoView(BaseModelConfiguration):
+        can_delete = False
         form_columns = [
             "nombre",
             "descripcion",
@@ -179,6 +173,7 @@ def setup_admin(app, db):
             "cantidad_maxima",
             "cantidad_minima",
             "merma",
+            "estatus",
         ]
         column_list = [
             "nombre",
@@ -187,6 +182,7 @@ def setup_admin(app, db):
             "cantidad_maxima",
             "cantidad_minima",
             "merma",
+            "estatus",
         ]
 
         inline_models = (
@@ -211,19 +207,15 @@ def setup_admin(app, db):
                 return super(InsumoView, self).delete_model(model)
             except Exception as e:
                 flash(
-                    "Error al eliminar el insumo y los registros relacionados: {}".format(
-                        str(e)
-                    ),
-                    "error",
+                    "Error al eliminar el insumo y los registros relacionados", "error"
                 )
                 return False
 
     # Clase de vista personalizada para Rol
-    class RolView(BaseModelConfiguration):
+    class ProveedorView(BaseModelConfiguration):
         can_create = True
         can_delete = False
-        form_colums = ["descripcion", "usuarios"]
-        column_list = ["nombre", "descripcion", "usuarios"]
+        form_excluded_columns = ["compras"]
 
     babel = Babel(app)
 
@@ -239,15 +231,13 @@ def setup_admin(app, db):
             Usuario, db.session, menu_icon_type="fa-solid", menu_icon_value="fa-user"
         )
     )
-    # admin.add_view(RolView(Rol, db.session,
-    # menu_icon_type='fa-solid', menu_icon_value='fa-ruler'))
     admin.add_view(
         InsumoView(
             Insumo, db.session, menu_icon_type="fa-solid", menu_icon_value="fa-carrot"
         )
     )
     admin.add_view(
-        AdminModelView(
+        ProveedorView(
             Proveedor,
             db.session,
             menu_icon_type="fa-solid",
@@ -260,6 +250,7 @@ def setup_admin(app, db):
             db.session,
             menu_icon_type="fa-solid",
             menu_icon_value="fa-clipboard",
+            endpoint="receta",
         )
     )
 

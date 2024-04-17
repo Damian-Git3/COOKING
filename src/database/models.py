@@ -1,7 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
 from datetime import datetime
-from sqlalchemy import func, Enum
+
+from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Enum, func
 
 db = SQLAlchemy()
 
@@ -14,10 +15,8 @@ asignacion_rol_usuario = db.Table(
 
 class InsumosReceta(db.Model):
     __tablename__ = "insumos_receta"
-    idReceta = db.Column(db.Integer, db.ForeignKey(
-        "recetas.id"), primary_key=True)
-    idInsumo = db.Column(db.Integer, db.ForeignKey(
-        "insumos.id"), primary_key=True)
+    idReceta = db.Column(db.Integer, db.ForeignKey("recetas.id"), primary_key=True)
+    idInsumo = db.Column(db.Integer, db.ForeignKey("insumos.id"), primary_key=True)
     cantidad = db.Column(db.Float, nullable=False)
 
     receta = db.relationship("Receta", backref="insumos")
@@ -44,11 +43,7 @@ class Receta(db.Model):
         return self.nombre
 
     def serialize(self):
-        return {
-            'id': self.id,
-            'nombre': self.nombre,
-            'imagen': self.imagen
-        }
+        return {"id": self.id, "nombre": self.nombre, "imagen": self.imagen}
 
 
 class Insumo(db.Model):
@@ -64,7 +59,7 @@ class Insumo(db.Model):
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
     def __str__(self):
-        return self.nombre
+        return self.nombre + " (" + self.unidad_medida + ")"
 
 
 class Rol(db.Model):
@@ -131,36 +126,58 @@ class Proveedor(db.Model):
     __tablename__ = "proveedores"
 
     id = db.Column(db.Integer, primary_key=True)
-    empresa = db.Column(db.String(45), nullable=False)
+    empresa = db.Column(db.String(45), nullable=False, unique=True)
     direccion = db.Column(db.String(45), nullable=False)
     nombre_contacto = db.Column(db.String(45), nullable=False)
     contacto = db.Column(db.String(45), nullable=True)
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
+    # Método para obtener solo el nombre
+    def __str__(self):
+        return self.empresa
+
 
 class Compra(db.Model):
     __tablename__ = "compras"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     pago_proveedor = db.Column(db.Float, nullable=False)
-
-    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
-    idTransaccionCaja = db.Column(db.Integer, primary_key=True)
+    estatus = db.Column(db.Boolean, nullable=False, default=True)
+    fecha_compra = db.Column(db.Date, nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
+    idTransaccionCaja = db.Column(
+        db.Integer, db.ForeignKey("transacciones_caja.id"), nullable=True
+    )
     idProveedores = db.Column(
-        db.Integer, db.ForeignKey("proveedores.id"), primary_key=True
+        db.Integer, db.ForeignKey("proveedores.id"), nullable=False
+    )
+
+    transaccion = db.relationship(
+        "TransaccionCaja",
+        foreign_keys=[idTransaccionCaja],
+        backref=db.backref("compras_transaccion", lazy="dynamic"),
+    )
+    proveedor = db.relationship(
+        "Proveedor",
+        foreign_keys=[idProveedores],
+        backref=db.backref("compras_proveedor", lazy="dynamic"),
+    )
+    lotes_insumo_compra = db.relationship(
+        "LoteInsumo",
+        back_populates="compra",
     )
 
 
 class Venta(db.Model):
     __tablename__ = "ventas"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     fecha_venta = db.Column(db.DateTime, nullable=False)
     total_venta = db.Column(db.Float, nullable=False)
 
-    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
-    idProveedores = db.Column(
-        db.Integer, db.ForeignKey("proveedores.id"), primary_key=True
+    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
+    idTransaccionCaja = db.Column(
+        db.Integer, db.ForeignKey("transacciones_caja.id"), nullable=False
     )
 
 
@@ -175,15 +192,13 @@ class CorteCaja(db.Model):
 
 class DetalleVenta(db.Model):
     __tablename__ = "detalles_venta"
+    id = db.Column(db.Integer, primary_key=True)
 
     precio = db.Column(db.Float, nullable=False)
     cantidad = db.Column(db.Integer)
 
-    idVenta = db.Column(db.Integer, db.ForeignKey(
-        "ventas.id"), primary_key=True)
-    idStock = db.Column(
-        db.Integer, db.ForeignKey("lotes_galletas.id"), primary_key=True
-    )
+    idVenta = db.Column(db.Integer, db.ForeignKey("ventas.id"))
+    idStock = db.Column(db.Integer, db.ForeignKey("lotes_galletas.id"))
 
 
 class LogAccion(db.Model):
@@ -194,8 +209,7 @@ class LogAccion(db.Model):
     modulo = db.Column(db.String(45), nullable=False)
     detalles = db.Column(db.String(200), nullable=False)
 
-    idUsuario = db.Column(db.Integer, db.ForeignKey(
-        "usuarios.id"), nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
 
 
 class LogLogin(db.Model):
@@ -205,8 +219,7 @@ class LogLogin(db.Model):
     fecha = db.Column(db.DateTime, nullable=False)
     exito = db.Column(db.Boolean, nullable=False)
 
-    idUsuario = db.Column(db.Integer, db.ForeignKey(
-        "usuarios.id"), nullable=True)
+    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=True)
 
 
 class LoteGalleta(db.Model):
@@ -215,43 +228,46 @@ class LoteGalleta(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha_entrada = db.Column(db.Date)
     cantidad = db.Column(db.Integer, nullable=False)
-    merma = db.Column(db.Float, nullable=False, default=0)
+    merma = db.Column(db.Integer, nullable=False, default=0)
     tipo_venta = db.Column(db.Integer, nullable=False)
+    # agregar el costo de produccion y precio de venta
 
     idProduccion = db.Column(
         db.Integer, db.ForeignKey("solicitudes_produccion.id"), nullable=False
     )
-    idReceta = db.Column(db.Integer, db.ForeignKey(
-        "recetas.id"), nullable=False)
-    idUsuarios = db.Column(db.Integer, db.ForeignKey(
-        "usuarios.id"), nullable=False)
+    idReceta = db.Column(db.Integer, db.ForeignKey("recetas.id"), nullable=False)
+    idUsuarios = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
 
     receta = db.relationship(
         "Receta",
         foreign_keys=[idReceta],
         backref=db.backref("lotes_receta", lazy="dynamic"),
     )
-    usuario = db.relationship(
-        "Usuario",
-        foreign_keys=[idUsuarios],
-        backref=db.backref("lotes_usuario", lazy="dynamic"),
-    )
 
 
 class LoteInsumo(db.Model):
     __tablename__ = "lotes_insumo"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     fecha_caducidad = db.Column(db.Date, nullable=False)
     cantidad = db.Column(db.Float, nullable=False)
     fecha_compra = db.Column(db.Date, nullable=False)
     precio_unidad = db.Column(db.Float, nullable=False)
     merma = db.Column(db.Float, nullable=False, default=0)
 
-    idInsumo = db.Column(db.Integer, db.ForeignKey(
-        "insumos.id"), primary_key=True)
-    idCompra = db.Column(db.Integer, db.ForeignKey(
-        "compras.id"), primary_key=True)
+    idInsumo = db.Column(db.Integer, db.ForeignKey("insumos.id"), nullable=False)
+    idCompra = db.Column(db.Integer, db.ForeignKey("compras.id"), nullable=False)
+
+    compra = db.relationship(
+        "Compra",
+        foreign_keys=[idCompra],
+        back_populates="lotes_insumo_compra",
+    )
+    insumo = db.relationship(
+        "Insumo",
+        foreign_keys=[idInsumo],
+        backref=db.backref("lotes_insumo", lazy="dynamic"),
+    )
 
 
 class SolicitudProduccion(db.Model):
@@ -270,8 +286,7 @@ class SolicitudProduccion(db.Model):
     fecha_produccion = db.Column(db.Date)
 
     posicion = db.Column(db.Integer, default=1)
-    idReceta = db.Column(db.Integer, db.ForeignKey(
-        "recetas.id"), nullable=False)
+    idReceta = db.Column(db.Integer, db.ForeignKey("recetas.id"), nullable=False)
 
     idUsuarioSolicitud = db.Column(
         db.Integer, db.ForeignKey("usuarios.id"), nullable=False
@@ -298,8 +313,7 @@ class SolicitudProduccion(db.Model):
     @staticmethod
     def get_next_position():
         # Obtiene la siguiente posición disponible
-        max_position = db.session.query(
-            func.max(SolicitudProduccion.posicion)).scalar()
+        max_position = db.session.query(func.max(SolicitudProduccion.posicion)).scalar()
         return (max_position or 0) + 1
 
     def __init__(self, *args, **kwargs):
@@ -318,5 +332,4 @@ class TransaccionCaja(db.Model):
     monto_ingreso = db.Column(db.Float)
     fecha_transaccion = db.Column(db.Date)
 
-    idCorteCaja = db.Column(db.Integer, db.ForeignKey(
-        "cortes_caja.id"), nullable=False)
+    idCorteCaja = db.Column(db.Integer, db.ForeignKey("cortes_caja.id"), nullable=False)

@@ -1,108 +1,154 @@
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import Blueprint, render_template, redirect, url_for, request, flash
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required, current_user
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
+
 import forms.forms as forms
-from database.models import Usuario
-from database.models import db
-from database.models import LogLogin
+from database.models import CorteCaja, LogLogin, Usuario, db
 
-auth = Blueprint('auth', __name__)
+auth = Blueprint("auth", __name__)
 
-@auth.route('/login')
+
+@auth.route("/login")
 def login():
+
+    corte_de_hoy = CorteCaja.query.filter_by(fecha_corte=datetime.now().date()).first()
+
+    if not corte_de_hoy:
+        nuevo_corte = CorteCaja(fecha_corte=datetime.now().date(), monto_inicial=1000)
+        db.session.add(nuevo_corte)
+        # Guarda los cambios en la base de datos
+        db.session.commit()
+
     if current_user.is_authenticated:
-        
+
         usuario_id = current_user.get_id()
 
         # Obtiene el usuario de la base de datos
         user = Usuario.query.filter_by(id=usuario_id).first()
-    
+
         user.last_login_at = user.current_login_at
         user.current_login_at = datetime.now()
-        
 
-        # Guarda los cambios en la base de datos
-        db.session.commit()
-        return redirect(url_for('main.menu'))
-    return render_template('login.html')
+        return redirect(url_for("main.menu"))
+    return render_template("login.html")
 
-@auth.route('/login', methods=['POST'])
+
+@auth.route("/login", methods=["POST"])
 def login_post():
-    usuario = request.form.get('usuario')
-    contrasenia = request.form.get('contrasenia')
-    recordar = True if request.form.get('recordarme') else False
+    usuario = request.form.get("usuario")
+    contrasenia = request.form.get("contrasenia")
+    recordar = True if request.form.get("recordarme") else False
 
     user = Usuario.query.filter_by(nombre=usuario).first()
-    
+
     if not user:
-        flash('No se ha encontrado un usuario con esas credenciales. Por favor, verifica la información')
+        flash(
+            "No se ha encontrado un usuario con esas credenciales. Por favor, verifica la información"
+        )
+        return render_template("login.html")
+    print(user)
+    una_hora_atras = datetime.now() - timedelta(minutes=30)
+    intentos_fallidos = (
+        db.session.query(LogLogin)
+        .filter(
+            LogLogin.idUsuario == user.id,
+            LogLogin.fecha >= datetime.date(una_hora_atras),
+        )
+        .order_by(LogLogin.fecha.desc())
+        .limit(4)
+        .all()
+    )
+
+    intentos = 0
+
+    for intento in intentos_fallidos:
+        if not intento.exito:
+            intentos += 1
+    if intentos > 3:
+        flash(
+            "Has alcanzado el límite de intentos fallidos. Por favor, inténtalo de nuevo más tarde."
+        )
         log_login = LogLogin(fecha=datetime.now(), exito=False)
         db.session.add(log_login)
         db.session.commit()
-        return render_template('login.html')
+        return render_template("login.html")
+
+    if not user:
+        flash(
+            "No se ha encontrado un usuario con esas credenciales. Por favor, verifica la información"
+        )
+        log_login = LogLogin(fecha=datetime.now(), exito=False)
+        db.session.add(log_login)
+        db.session.commit()
+        return render_template("login.html")
+
     elif not check_password_hash(user.contrasenia, contrasenia):
-        flash('Credenciales incorrectas. Por favor, inténtelo de nuevo.')
+        flash("Credenciales incorrectas. Por favor, inténtelo de nuevo.")
         log_login = LogLogin(fecha=datetime.now(), exito=False, idUsuario=user.id)
         db.session.add(log_login)
         db.session.commit()
-        return render_template('login.html')
+        return render_template("login.html")
     elif not user.estatus:
-        flash('Usuario no activo. Por favor, consulta con tu administrador.')
+        flash("Usuario no activo. Por favor, consulta con tu administrador.")
         log_login = LogLogin(fecha=datetime.now(), exito=False, idUsuario=user.id)
         db.session.add(log_login)
         db.session.commit()
-        return render_template('login.html')
+        return render_template("login.html")
 
     user.last_login_at = user.current_login_at
     user.current_login_at = datetime.now()
 
     # Guarda los cambios en la base de datos
     db.session.commit()
-    
-    
+
     log_login = LogLogin(fecha=datetime.now(), exito=True, idUsuario=user.id)
     db.session.add(log_login)
     db.session.commit()
-    
+
     login_user(user, remember=recordar)
-    return redirect(url_for('main.menu'))
+    return redirect(url_for("main.menu"))
 
 
-@auth.route('/signup')
+@auth.route("/signup")
 def signup():
     form = forms.SignupForm(request.form)
-    return render_template('signup_temporal.html',form=form)
+    return render_template("signup_temporal.html", form=form)
 
-@auth.route('/signup', methods=['POST'])
+
+@auth.route("/signup", methods=["POST"])
 def signup_post():
     form = forms.SignupForm(request.form)
-    correo = request.form.get('correo')
-    nombre = request.form.get('nombre')
-    contrasenia = request.form.get('contrasenia')
-    
+    correo = request.form.get("correo")
+    nombre = request.form.get("nombre")
+    contrasenia = request.form.get("contrasenia")
+
     if not form.validate():
-        return render_template('signup_temporal.html', form=form)
+        return render_template("signup_temporal.html", form=form)
 
     user = Usuario.query.filter_by(correo=correo).first()
 
     if user:
-        flash('Este correo ya existe.')
-        return redirect(url_for('auth.signup'))
+        flash("Este correo ya existe.")
+        return redirect(url_for("auth.signup"))
 
-    new_user = Usuario(correo=correo, nombre=nombre, contrasenia=generate_password_hash(contrasenia))
+    new_user = Usuario(
+        correo=correo, nombre=nombre, contrasenia=generate_password_hash(contrasenia)
+    )
 
     db.session.add(new_user)
     db.session.commit()
 
-    return redirect(url_for('auth.login'))
+    return redirect(url_for("auth.login"))
 
-@auth.route('/logout')
+
+@auth.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('auth.login'))
+    return redirect(url_for("auth.login"))
 
 
 def requires_role(role_name):
@@ -111,11 +157,13 @@ def requires_role(role_name):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if not current_user.is_authenticated:
-                return redirect(url_for('auth.login', next=request.url))
-            if current_user.has_role('admin'):
+                return redirect(url_for("auth.login", next=request.url))
+            if current_user.has_role("admin"):
                 return f(*args, **kwargs)
             if not current_user.has_role(role_name):
-                return redirect(url_for('main.menu'))
+                return redirect(url_for("main.menu"))
             return f(*args, **kwargs)
+
         return decorated_function
+
     return decorator

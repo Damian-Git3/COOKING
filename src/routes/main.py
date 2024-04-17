@@ -1,21 +1,25 @@
-from flask import Blueprint, render_template 
-from flask_login import login_required, current_user
+from flask import Blueprint, render_template, request
+from flask_login import current_user, login_required
 
-main = Blueprint('main', __name__)
+from forms import usuario
 
-@main.route('/')
+main = Blueprint("main", __name__)
+
+
+@main.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@main.route('/inicio')
+
+@main.route("/inicio")
 @login_required
 def menu():
     usuario = current_user.nombre
-    admin = current_user.has_role('admin')
-    vendedor = current_user.has_role('vendedor')
-    cocinero = current_user.has_role('cocinero')
+    admin = current_user.has_role("admin")
+    vendedor = current_user.has_role("vendedor")
+    cocinero = current_user.has_role("cocinero")
     mensaje = f"Bienvenido {usuario} "
-    if admin or vendedor or cocinero: 
+    if admin or vendedor or cocinero:
         mensaje += " tienes "
         if admin and vendedor and cocinero:
             mensaje += "todos los permisos del sistema."
@@ -33,10 +37,14 @@ def menu():
             mensaje += "permisos de cocinero."
     else:
         mensaje += "no tienes rol asignado."
-        
-    return render_template('inicio.html', mensaje=mensaje)
 
-@main.route('/config')
+    return render_template("inicio.html", mensaje=mensaje)
+
+
+@main.route("/configuracion")
 @login_required
 def configuracion():
-    return render_template('modulos/config.html')
+    """Ruta para la configuración del usuario"""
+
+    form_usuario = usuario.UsuarioForm(request.form)
+    return render_template("configuracion/configuracion.html", formUsuario=form_usuario)

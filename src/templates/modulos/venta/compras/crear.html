@@ -1,0 +1,261 @@
+{% extends 'inicio.html' %} {% block title %} Compras {% endblock %} {% block
+styles %} {% endblock %} {%from "_macros.html" import render_field%} {% block
+content %}
+<div style="width: 100%; text-align: center">
+  <h1>Nueva compra</h1>
+</div>
+{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
+messages %}
+<div class="alert alert-success" style="width: 90%">{{ message }}</div>
+{% endfor %} {% endif %} {% endwith %}
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a href="{{url_for('venta.compras_ver')}}" style="text-decoration: none">
+      <button
+        class="nav-link"
+        id="nav-1-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-1"
+        type="button"
+        role="tab"
+        aria-controls="nav-1"
+        aria-selected="false"
+      >
+        Buscar Lotes de Galletas
+      </button>
+    </a>
+
+    <a href="{{url_for('venta.compras_crear')}}" style="text-decoration: none">
+      <button
+        class="nav-link active"
+        id="nav-2-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-2"
+        type="button"
+        role="tab"
+        aria-controls="nav-2"
+        aria-selected="true"
+      >
+        Nuevo Lote
+      </button>
+    </a>
+  </div>
+</nav>
+
+<div class="container">
+  <form method="POST" class="form-inline mt-3">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+
+    <div class="row control-group">
+      <div class="form-group col-xs-12 float-label-form-group controls">
+        {{render_field(form.proveedores, class="form-control")}}
+      </div>
+    </div>
+    <br />
+    {% if current_user.has_role('admin') %}
+
+    <div class="row control-group">
+      <div class="form-group col-xs-12 float-label-form-group controls">
+        <label for="{{ form.caja.id }}">¿Retirar dinero de la caja?</label>
+        {{ form.caja(class="form-check-input") }}
+      </div>
+    </div>
+    {% endif %}
+    <br />
+    <script>
+      var insumosOptions = {{ insumos|tojson }};
+    </script>
+    {% for lote_insumo_form in form.lotes_insumos %}
+    <div class="lotes-insumo-container">
+      <div
+        class="lote-insumo-form"
+        style="
+          margin: 10px;
+          border: solid 3px steelblue;
+          border-radius: 10px;
+          overflow: hidden;
+        "
+      >
+        <h4
+          style="
+            width: 100%;
+            background-color: steelblue;
+            padding: 3px;
+            text-align: center;
+            color: white;
+          "
+        >
+          Nuevo Lote de Insumo
+        </h4>
+        <div style="padding: 10px">
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{ render_field(lote_insumo_form.insumos, class="form-control") }}
+            </div>
+          </div>
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{ render_field(lote_insumo_form.cantidad, class="form-control")
+              }}
+            </div>
+          </div>
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{ render_field(lote_insumo_form.fecha_caducidad,
+              class="form-control") }}
+            </div>
+          </div>
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{ render_field(lote_insumo_form.costo_lote, class="form-control")
+              }}
+            </div>
+          </div>
+          <br />
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <br />
+    <button type="button" class="btn btn-primary" id="add-lote-button">
+      Agregar lote
+    </button>
+    <script>
+      function addLoteForm() {
+        var contenedor = document.querySelector(".lotes-insumo-container");
+        // Contar cuántos formularios ya existen
+        var numFormularios =
+          contenedor.querySelectorAll(".lote-insumo-form").length;
+
+        var newLoteForm = document.createElement("div");
+        newLoteForm.className = "lote-insumo-form";
+
+        newLoteForm.style =
+          "margin: 10px; border: solid 3px steelblue; border-radius: 10px; overflow: hidden;";
+        // Establecer el texto del nuevo elemento
+        newLoteForm.innerHTML = `
+                <h4 style="
+                    width: 100%;
+                    background-color: steelblue;
+                    padding: 3px;
+                    text-align: center;
+                    color: white;
+                    ">
+                    Nuevo Lote de Insumo
+                </h4>
+                <div style="padding: 10px">
+                    <div class="row control-group">
+                    <div class="form-group col-xs-12 float-label-form-group controls">
+                        
+            <label for="lotes_insumos-${numFormularios}-insumos">Insumo</label>
+            <select class="form-control" id="lotes_insumos-${numFormularios}-insumos" name="lotes_insumos-${numFormularios}-insumos" required=""></select>
+
+
+                    </div>
+                    </div>
+                    <div class="row control-group">
+                    <div class="form-group col-xs-12 float-label-form-group controls">
+                        
+            <label for="lotes_insumos-${numFormularios}-cantidad">Cantidad (Kilos o Litros)</label>
+            <input class="form-control" id="lotes_insumos-${numFormularios}-cantidad" name="lotes_insumos-${numFormularios}-cantidad" required="" type="number" value="">
+
+
+                    </div>
+                    </div>
+                    <div class="row control-group">
+                    <div class="form-group col-xs-12 float-label-form-group controls">
+                        
+            <label for="lotes_insumos-${numFormularios}-fecha_caducidad">Fecha de Caducidad</label>
+            <input class="form-control" id="lotes_insumos-${numFormularios}-fecha_caducidad" name="lotes_insumos-${numFormularios}-fecha_caducidad" required="" type="date" value="">
+
+
+                    </div>
+                    </div>
+                    <div class="row control-group">
+                    <div class="form-group col-xs-12 float-label-form-group controls">
+                        
+            <label for="lotes_insumos-${numFormularios}-costo_lote">Costo del Lote</label>
+            <input class="form-control" id="lotes_insumos-${numFormularios}-costo_lote" name="lotes_insumos-${numFormularios}-costo_lote" required="" type="number" value="">
+
+
+                    </div>
+                    </div>
+                    <br>
+                    <!-- Botón de eliminar agregado -->
+                    <button type="button" class="btn btn-danger delete-lote-button">
+                    Eliminar lote
+                    </button>
+                </div>
+        `;
+
+        // Agregar el nuevo elemento al contenedor
+        contenedor.appendChild(newLoteForm);
+
+        var newLoteForm = document.querySelector(
+          ".lote-insumo-form:last-child"
+        );
+        var selectInsumos = newLoteForm.querySelector(
+          'select[name*="insumos"]'
+        );
+
+        // Limpia las opciones existentes
+        selectInsumos.innerHTML = "";
+
+        // Establece las nuevas opciones basadas en la lista de JavaScript
+        insumosOptions.forEach(function (insumo) {
+          var option = document.createElement("option");
+          option.value = insumo[0]; // Asume que el primer elemento es el ID
+          option.textContent = insumo[1]; // Asume que el segundo elemento es el nombre
+          selectInsumos.appendChild(option);
+        });
+
+        var deleteButtons = document.querySelectorAll(".delete-lote-button");
+        deleteButtons.forEach(function (button) {
+          button.addEventListener("click", deleteLoteForm);
+        });
+      }
+
+      function deleteLoteForm(event) {
+        var loteForm = event.target.closest(".lote-insumo-form");
+        loteForm.remove();
+        console.log("Lote eliminado");
+      }
+
+      document
+        .getElementById("add-lote-button")
+        .addEventListener("click", addLoteForm);
+    </script>
+    <hr />
+
+    <button type="submit" class="btn btn-success ml-2">Registrar compra</button>
+
+    <a href="{{ url_for('venta.compras_ver') }}"
+      ><button type="button" class="btn btn-secondary ml-2">Cancelar</button></a
+    >
+  </form>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var form = document.querySelector("form"); // Asegúrate de seleccionar el formulario correcto
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault(); // Previene el envío del formulario por defecto
+
+        Swal.fire({
+          title: "Confirmar compra",
+          text: "Verifica que los datos de los lotes y el proveedor sean correctos, una vez registrado no se podrán modificar.",
+          showCancelButton: true,
+          confirmButtonText: "Si",
+        }).then((result) => {
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+            form.submit();
+          } else if (result.isDenied) {
+            Swal.fire("Se canceló el envío", "", "info");
+          }
+        });
+      });
+    });
+  </script>
+</div>
+
+{% endblock %}

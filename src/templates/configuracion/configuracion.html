@@ -1,0 +1,31 @@
+{% extends 'inicio.html' %} {% block title %}Configuración{% endblock %} {% block
+styles %} {% endblock %} {% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12 h1 text-uppercase text-center">
+      <kbd>Configuración</kbd>
+    </div>
+  </div>
+
+  <div class="row">
+    <form
+      action="{{ url_for('configuracion.guardar_informacion_usuario') }}"
+      method="POST"
+      novalidate
+    >
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+      {{ formUsuario.nombre.label }} 
+      {{ formUsuario.nombre(class="form-control")}} 
+      {{ formUsuario.correo.label }} 
+      {{ formUsuario.correo(class="form-control") }} 
+      {{ formUsuario.contrasenia.label }}
+      {{ formUsuario.contrasenia(class="form-control") }}
+      {{ formUsuario.confirmacion.label }} 
+      {{ formUsuario.confirmacion(class="form-control") }}
+      {{ formUsuario.submit(class="btn btn-primary") }}
+      
+    </form>
+  </div>
+</div>
+
+{% endblock %} {% block jscode %} {% endblock %}

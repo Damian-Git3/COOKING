@@ -1,5 +1,5 @@
 {% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock%}
-{% block styles %} {% endblock %} {%from "macros.html" import render_field%} {%
+{% block styles %} {% endblock %} {%from "_macros.html" import render_field%} {%
 block content %}
 <div style="width: 100%; text-align: center">
   <h1>Solicitudes de producción</h1>
@@ -7,24 +7,51 @@ block content %}
 
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
-    <a href="{{ url_for('venta.solicitud_produccion') }}" style="text-decoration: none; color: black"><button
-        class="nav-link {%if not nuevo %}active{%endif%}" id="nav-home-tab" data-bs-toggle="tab"
-        data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
-        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}">
+    <a
+      href="{{ url_for('venta.solicitud_produccion') }}"
+      style="text-decoration: none; color: black"
+      ><button
+        class="nav-link {%if not nuevo %}active{%endif%}"
+        id="nav-home-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-home"
+        type="button"
+        role="tab"
+        aria-controls="nav-home"
+        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}"
+      >
         Pendientes
       </button>
     </a>
-    <a href="{{ url_for('venta.solicitud_produccion_nuevo') }}" style="text-decoration: none; color: black">
-      <button class="nav-link {%if nuevo %}active{%endif%}" id="nav-profile-tab" data-bs-toggle="tab"
-        data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
-        aria-selected="{%if nuevo %}true{%else%}false{%endif%}">
+    <a
+      href="{{ url_for('venta.solicitud_produccion_nuevo') }}"
+      style="text-decoration: none; color: black"
+    >
+      <button
+        class="nav-link {%if nuevo %}active{%endif%}"
+        id="nav-profile-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-profile"
+        type="button"
+        role="tab"
+        aria-controls="nav-profile"
+        aria-selected="{%if nuevo %}true{%else%}false{%endif%}"
+      >
         Nueva
       </button>
     </a>
 
     {% if editar %}
-    <button class="nav-link" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab"
-      aria-controls="nav-edit" aria-selected="false">
+    <button
+      class="nav-link"
+      id="nav-edit-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-edit"
+      type="button"
+      role="tab"
+      aria-controls="nav-edit"
+      aria-selected="false"
+    >
       Editar
     </button>
     {% endif %}
@@ -32,8 +59,12 @@ block content %}
 </nav>
 
 <div class="tab-content">
-  <div class="tab-pane fade {%if not nuevo %}show active{% endif %}" id="nav-home" role="tabpanel"
-    aria-labelledby="nav-home-tab">
+  <div
+    class="tab-pane fade {%if not nuevo %}show active{% endif %}"
+    id="nav-home"
+    role="tabpanel"
+    aria-labelledby="nav-home-tab"
+  >
     <table class="table table-bordered" id="tabla-principal">
       <thead>
         <tr>
@@ -50,18 +81,34 @@ block content %}
       <tbody>
         {% for solicitud in solicitudes %}
         <tr>
-          <td class="list-buttons-column" style="display: flex; justify-content: space-around; border: none">
+          <td
+            class="list-buttons-column"
+            style="display: flex; justify-content: space-around; border: none"
+          >
             <!-- <a class="icon" href="/venta/solicitud_produccion/edit/{{ solicitud.id }}" title="Editar Registro"
               style="text-decoration: none; color: black">
               <span class="fa fa-pencil glyphicon glyphicon-pencil"></span>
             </a> -->
 
-            <form id="deleteForm" method="POST" action="/venta/solicitud_produccion/delete">
-              <input id="id" name="id" required="" type="hidden" value="{{solicitud.id}}" />
+            <form
+              id="deleteForm"
+              method="POST"
+              action="/venta/solicitud_produccion/delete"
+            >
+              <input
+                id="id"
+                name="id"
+                required=""
+                type="hidden"
+                value="{{solicitud.id}}"
+              />
               <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
 
-              <button onclick="event.preventDefault(); confirmDelete();" title="Delete record"
-                style="border: none; background: none">
+              <button
+                onclick="event.preventDefault(); confirmDelete();"
+                title="Delete record"
+                style="border: none; background: none"
+              >
                 <span class="fa-solid fa-trash"></span>
               </button>
             </form>
@@ -85,8 +132,10 @@ block content %}
             </script>
           </td>
           <td>
-            <img src="{{ url_for('static', filename='img/cookies/' + solicitud.receta.imagen) }}"
-              style="max-width: 80px; max-height: 80px; border-radius: 10px" />
+            <img
+              src="{{ url_for('static', filename='img/cookies/' + solicitud.receta.imagen) }}"
+              style="max-width: 80px; max-height: 80px; border-radius: 10px"
+            />
           </td>
           <td>{{ solicitud.receta.nombre }}</td>
           <td>{{ solicitud.tandas }}</td>
@@ -115,7 +164,7 @@ block content %}
       "Edinburgh",
       "5421",
       "2011/04/25",
-      "$3,120"
+      "$3,120",
     ],
     [
       "Garrett Winters",
@@ -123,9 +172,8 @@ block content %}
       "Edinburgh",
       "8422",
       "2011/07/25",
-      "$5,300"
-    ]
-  ]
-
+      "$5,300",
+    ],
+  ];
 </script>
 {% endblock %}

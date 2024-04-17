@@ -4,7 +4,10 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="../static/libs/bootstrap5/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="../static/libs/bootstrap5/css/bootstrap.min.css"
+    />
     <script src="../static/libs/bootstrap5/js/bootstrap.bundle.min.js"></script>
     <style>
       body {
@@ -40,7 +43,7 @@
 
   <body>
     <div class="form-container">
-      {%from "macros.html" import render_field%}
+      {%from "_macros.html" import render_field%}
 
       <form method="POST" action="/signup">
         <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
