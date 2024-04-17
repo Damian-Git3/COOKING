@@ -1,34 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CooKing - {% block title %}{% endblock %}</title>
-    
-    {% include 'librerias/librerias.html'   %}
-    
-    {% block styles %}
 
-    {% endblock %}
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CooKing - {% block title %}{% endblock %}</title>
 
-  <body>
-    <div class="Menu">
-      <div class="logo-container">
-        <a href="{{url_for('main.menu')}}"
-          ><img
-            src="{{ url_for('static', filename='img/logo.png')}}"
-            alt="Logo de la empresa"
-            class="company-logo"
-        /></a>
-      </div>
-      
-      {% include 'sidebar/sidebar.html'   %}
-      
-      <div class="Content">
-        {% block content %}
-        <div
-          style="
+  {% include 'librerias/librerias.html' %}
+
+  {% block styles %}
+
+  {% endblock %}
+</head>
+
+<body>
+  <div class="Menu">
+    <div class="logo-container">
+      <a href="{{url_for('main.menu')}}"><img src="{{ url_for('static', filename='img/logo.png')}}"
+          alt="Logo de la empresa" class="company-logo" /></a>
+    </div>
+
+    {% include 'sidebar/sidebar.html' %}
+
+    <div class="Content">
+      {% block content %}
+      <div style="
             display: flex;
             height: 100%;
             width: 100%;
@@ -37,10 +33,8 @@
             background-image: url(../static/img/cookie_17.png);
             background-size: cover;
             overflow: hidden;
-          "
-        >
-          <h1
-            style="
+          ">
+        <h1 style="
               padding: 150px 200px;
               margin: 0 50px;
               background: #00000095;
@@ -49,15 +43,14 @@
               font-size: 5rem;
               text-align: center;
               color: #ffe8bd;
-            "
-          >
-            Bievenido a CooKing
-          </h1>
-        </div>
+            ">
+          Bievenido a CooKing
+        </h1>
+      </div>
 
-        <script>
-          localStorage.setItem("mensaje", "{{mensaje}}");
-        </script>
+      <script>
+        localStorage.setItem("mensaje", "{{mensaje}}");
+      </script>
 
         <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
         <script>

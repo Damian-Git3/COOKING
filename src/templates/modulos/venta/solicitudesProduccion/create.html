@@ -90,6 +90,16 @@ block content %}
             <span id="piezasTotales">Esperando tandas...</span>
           </p>
         </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        {% if category == 'receta-error' %}
+        <div class="text-danger mt-3">
+          {{ message.replace('\n', '<br>') | safe }}
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endwith %}
       </div>
     </div>
     <hr />

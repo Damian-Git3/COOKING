@@ -111,32 +111,65 @@ def solicitud_produccion_nuevo():
                     )
 
                     if len(lotesInsumosReceta) > 0:
-                        recetaSePuedeProcesar = False
+                        print(
+                            "-----------VAMOS A VERIFICAR CANTIDADES INSUMO-----------"
+                        )
 
                         for loteInsumo in lotesInsumosReceta:
-                            print("----------------------")
-                            print(f"Lote insumo: {loteInsumo.cantidad}")
-
-                            if loteInsumo.cantidad <= cantidadNecesaria:
-                                pass
+                            if loteInsumo.cantidad >= cantidadNecesaria:
+                                loteInsumo.cantidad -= cantidadNecesaria
+                                cantidadNecesaria = 0
+                                break
                             else:
-                                pass
+                                cantidadNecesaria -= loteInsumo.cantidad
+                                loteInsumo.cantidad = 0
+
+                        if cantidadNecesaria != 0:
+                            recetaSePuedeProcesar = False
+
+                            if insumoReceta.insumo.unidad_medida == "Kilos":
+                                if cantidadNecesaria >= 1:
+                                    unidadMedida = "kg"
+                                    cantidadFormateada = cantidadNecesaria
+                                else:
+                                    unidadMedida = "g"
+                                    cantidadFormateada = cantidadNecesaria * 1000
+
+                            elif insumoReceta.insumo.unidad_medida == "Litros":
+                                if cantidadNecesaria >= 1:
+                                    unidadMedida = "l"
+                                    cantidadFormateada = cantidadNecesaria
+                                else:
+                                    unidadMedida = "ml"
+                                    cantidadFormateada = cantidadNecesaria * 1000
+
+                            mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadFormateada:.2f} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
                     else:
+                        recetaSePuedeProcesar = False
+
                         if insumoReceta.insumo.unidad_medida == "Kilos":
                             if cantidadNecesaria >= 1:
                                 unidadMedida = "kg"
+                                cantidadFormateada = cantidadNecesaria
                             else:
                                 unidadMedida = "g"
-                                cantidadNecesaria * 1000
+                                cantidadFormateada = cantidadNecesaria * 1000
                         elif insumoReceta.insumo.unidad_medida == "Litros":
                             if cantidadNecesaria >= 1:
                                 unidadMedida = "l"
+                                cantidadFormateada = cantidadNecesaria
                             else:
                                 unidadMedida = "ml"
-                                cantidadNecesaria * 1000
+                                cantidadFormateada = cantidadNecesaria * 1000
 
-                        mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadNecesaria} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
-                        print(mensajeInsumosCantidadesFaltantes)
+                        mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadFormateada} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
+
+                if not recetaSePuedeProcesar:
+                    flash(
+                        f"La receta no se puede procesar debido a los siguientes productos faltantes: \n\n{mensajeInsumosCantidadesFaltantes}",
+                        "receta-error",
+                    )
+                    return redirect(url_for("venta.solicitud_produccion_nuevo"))
 
                 # Termina FOR DE INSUMOS
                 usuario_cocinero = 0
@@ -175,13 +208,19 @@ def solicitud_produccion_nuevo():
                     estatus=1,
                 )
 
-                # db.session.add(solicitud)
-                # db.session.commit()
+                db.session.add(solicitud)
+                db.session.commit()
 
                 flash("Solicitud de producción creada correctamente", "success")
 
                 return redirect(url_for("venta.solicitud_produccion"))
             else:
+                flash(
+                    "Esta receta no cuenta con insumos agregados, consultalo con un administrador",
+                    "error",
+                )
+
+                return redirect(url_for("venta.solicitud_produccion_nuevo"))
                 flash(
                     "Esta receta no cuenta con insumos agregados, consultalo con un administrador",
                     "error",
@@ -194,12 +233,7 @@ def solicitud_produccion_nuevo():
                     nuevo=True,
                 )
         else:
-            return render_template(
-                "modulos/venta/solicitudesProduccion/create.html",
-                form=form,
-                recetas=recetas,
-                nuevo=True,
-            )
+            return redirect(url_for("venta.solicitud_produccion_nuevo"))
 
 
 @venta.route("/solicitud_produccion/edit/<int:id>", methods=["GET", "POST"])
