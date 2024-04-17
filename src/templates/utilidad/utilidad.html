@@ -13,9 +13,9 @@
         <div class="col-6">
             <form id="ingredientesForm" action="{{ url_for('utilidad.obtener_ingredientes')}}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-                
-                {{ macro.select(form.receta) }}                        
-                {{ macro.input_float(form.cantidad) }} 
+                {% set valor_seleccionado = receta_seleccionada if receta_seleccionada else '' %}
+
+                {{ macro.select(form.receta, valor_seleccionado) }}                        
                 {{ macro.submit_button(form.submit) }}
 
             </form>
@@ -27,7 +27,10 @@
             </div>
             <div class="row mb-3 mt-3 mx-5">
                 <div class="row">
-                    <h2>TITULO</h2>
+                    {% if titulo_receta %}
+                        <h2>{{titulo_receta}}</h2>
+                    {% endif %}
+                    
                 </div>
                 <div class="card p-0">
                     <div class="card-header text-center">

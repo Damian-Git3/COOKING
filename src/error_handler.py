@@ -1,6 +1,5 @@
 """ Modulo que se encarga de manejar los errores de la aplicacion """
 
-
 from flask import render_template
 
 from logger import logger as log

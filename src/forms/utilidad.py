@@ -1,9 +1,13 @@
 """ FORMULARIOS DE UTILIDADES """
 
+from math import cos
+
 from wtforms import FloatField, Form, SelectField, SubmitField, validators
 
+from database.models import Receta
 
-class UtilidadForm(Form):
+
+class GetRecetaForm(Form):
     """CLASE QUE DEFINE EL FORMULARIO DE LA UTILIDAD DE LAS RECETAS"""
 
     receta = SelectField(
@@ -12,13 +16,6 @@ class UtilidadForm(Form):
             validators.DataRequired(message="El Campo es Requerido"),
         ],
         choices=[],
-    )
-    cantidad = FloatField(
-        "Cantidad",
-        [
-            validators.DataRequired(message="El Campo es Requerido"),
-            validators.NumberRange(min=1, message="Ingresa una Cantidad Válida"),
-        ],
     )
     submit = SubmitField("GUARDAR")
 
@@ -40,3 +37,30 @@ class UtilidadForm(Form):
         form_representation = form_representation.rstrip(", ")
 
         return form_representation
+
+    def __init__(self, *args, **kwargs):
+        super(GetRecetaForm, self).__init__(*args, **kwargs)
+        # Consultar la base de datos para obtener las recetas
+        self.receta.choices = [
+            (receta.id, receta.nombre) for receta in Receta.query.all()
+        ]
+
+
+class UtilidadForm(Form):
+    """Formulario para calcular la utilidad de una receta"""
+
+    costo_total = FloatField(
+        "Costo Total",
+        [
+            validators.DataRequired(message="El Campo es Requerido"),
+            validators.NumberRange(min=1, message="Ingresa un Costo Válido"),
+        ],
+    )
+    costo_venta = FloatField(
+        "Costo de Venta",
+        [
+            validators.DataRequired(message="El Campo es Requerido"),
+            validators.NumberRange(min=1, message="Ingresa un Costo Válido"),
+        ],
+    )
+    submit = SubmitField("CALCULAR")

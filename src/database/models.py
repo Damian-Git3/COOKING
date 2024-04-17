@@ -3,6 +3,7 @@ from datetime import datetime
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, func
+from sqlalchemy.schema import Index
 
 db = SQLAlchemy()
 
@@ -38,6 +39,8 @@ class Receta(db.Model):
     imagen = db.Column(db.String(2550))
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
+    __table_args__ = (Index("idx_nombre_receta", "nombre"),)
+
     # Método para obtener solo el nombre
     def __str__(self):
         return self.nombre
@@ -58,6 +61,8 @@ class Insumo(db.Model):
     merma = db.Column(db.Float, nullable=False)
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
+    __table_args__ = (Index("idx_nombre_insumo", "nombre"),)
+
     def __str__(self):
         return self.nombre + " (" + self.unidad_medida + ")"
 
@@ -71,6 +76,8 @@ class Rol(db.Model):
     usuarios = db.relationship(
         "Usuario", secondary=asignacion_rol_usuario, back_populates="roles"
     )
+
+    __table_args__ = (Index("idx_nombre_rol", "nombre"),)
 
     # Método para obtener solo el nombre
     def __str__(self):
@@ -100,6 +107,8 @@ class Usuario(UserMixin, db.Model):
     roles = db.relationship(
         "Rol", secondary=asignacion_rol_usuario, back_populates="usuarios"
     )
+
+    __table_args__ = (Index("idx_nombre_usuario", "nombre"),)
 
     # Método para obtener solo el nombre
     def __str__(self):
@@ -131,6 +140,8 @@ class Proveedor(db.Model):
     nombre_contacto = db.Column(db.String(45), nullable=False)
     contacto = db.Column(db.String(45), nullable=True)
     estatus = db.Column(db.Boolean, nullable=False, default=True)
+
+    __table_args__ = (Index("idx_empresa_proveedor", "empresa"),)
 
     # Método para obtener solo el nombre
     def __str__(self):
@@ -167,6 +178,8 @@ class Compra(db.Model):
         back_populates="compra",
     )
 
+    __table_args__ = (Index("idx_fecha_compra", "fecha_compra"),)
+
 
 class Venta(db.Model):
     __tablename__ = "ventas"
@@ -179,6 +192,7 @@ class Venta(db.Model):
     idProveedores = db.Column(
         db.Integer, db.ForeignKey("proveedores.id"), primary_key=True
     )
+    __table_args__ = (Index("idx_fecha_venta", "fecha_venta"),)
 
 
 class CorteCaja(db.Model):
