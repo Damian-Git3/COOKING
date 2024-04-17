@@ -67,7 +67,8 @@ def solicitud_produccion():
 @requires_role("vendedor")
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
-    form.receta.choices = [(receta.id, receta.nombre) for receta in Receta.query.all()]
+    form.receta.choices = [(receta.id, receta.nombre)
+                           for receta in Receta.query.all()]
     recetas = [
         (receta.id, receta.imagen, receta.piezas) for receta in Receta.query.all()
     ]
@@ -96,55 +97,73 @@ def solicitud_produccion_nuevo():
 
                     print("----------------------")
                     print(f"Insumo: {insumoReceta.insumo.nombre}")
-                    print(f"Insumo cantidad en receta: {insumoReceta.cantidad}")
+                    print(
+                        f"Insumo cantidad en receta: {insumoReceta.cantidad}")
                     print(f"Tandas: {form.tandas.data}")
                     print(f"Cantidad necesaria: {cantidadNecesaria}")
 
                     lotesInsumosReceta = (
-                        LoteInsumo.query.filter_by(idInsumo=insumoReceta.idInsumo)
+                        LoteInsumo.query.filter_by(
+                            idInsumo=insumoReceta.idInsumo)
                         .order_by(asc(LoteInsumo.fecha_caducidad))
                         .all()
                     )
 
-                    print(
-                        f"Cantidad de lotes insumos para este insumo: {len(lotesInsumosReceta)}"
-                    )
+                    print(f"Cantidad de lotes insumos para este insumo: {len(lotesInsumosReceta)}")
 
                     if len(lotesInsumosReceta) > 0:
-                        recetaSePuedeProcesar = False
+                        print(
+                            "-----------VAMOS A VERIFICAR CANTIDADES INSUMO-----------")
 
                         for loteInsumo in lotesInsumosReceta:
-                            print("----------------------")
-                            print(f"Lote insumo: {loteInsumo.cantidad}")
-
-                            if loteInsumo.cantidad <= cantidadNecesaria:
-                                pass
+                            if loteInsumo.cantidad >= cantidadNecesaria:
+                                loteInsumo.cantidad -= cantidadNecesaria
+                                cantidadNecesaria = 0
+                                break
                             else:
-                                pass
+                                cantidadNecesaria -= loteInsumo.cantidad
+                                loteInsumo.cantidad = 0
+
+                        if cantidadNecesaria != 0:
+                            recetaSePuedeProcesar = False
+                            
+                            if insumoReceta.insumo.unidad_medida == "Kilos":
+                                if cantidadNecesaria >= 1:
+                                    unidadMedida = "kg"
+                                    cantidadFormateada = cantidadNecesaria
+                                else:
+                                    unidadMedida = "g"
+                                    cantidadFormateada = cantidadNecesaria * 1000
+                                    
+                            elif insumoReceta.insumo.unidad_medida == "Litros":
+                                if cantidadNecesaria >= 1:
+                                    unidadMedida = "l"
+                                    cantidadFormateada = cantidadNecesaria
+                                else:
+                                    unidadMedida = "ml"
+                                    cantidadFormateada = cantidadNecesaria * 1000
+                            
+                            mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadFormateada:.2f} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
                     else:
                         recetaSePuedeProcesar = False
-                        
+
                         if insumoReceta.insumo.unidad_medida == "Kilos":
                             if cantidadNecesaria >= 1:
                                 unidadMedida = "kg"
-                                
                                 cantidadFormateada = cantidadNecesaria
                             else:
                                 unidadMedida = "g"
-                                
                                 cantidadFormateada = cantidadNecesaria * 1000
                         elif insumoReceta.insumo.unidad_medida == "Litros":
                             if cantidadNecesaria >= 1:
                                 unidadMedida = "l"
-                                
                                 cantidadFormateada = cantidadNecesaria
                             else:
                                 unidadMedida = "ml"
-                                
                                 cantidadFormateada = cantidadNecesaria * 1000
 
                         mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadFormateada} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
-                
+
                 if not recetaSePuedeProcesar:
                     flash(f"La receta no se puede procesar debido a los siguientes productos faltantes: \n\n{mensajeInsumosCantidadesFaltantes}", "receta-error")
                     return redirect(url_for("venta.solicitud_produccion_nuevo"))
@@ -186,15 +205,16 @@ def solicitud_produccion_nuevo():
                     estatus=1,
                 )
 
-                # db.session.add(solicitud)
-                # db.session.commit()
+                db.session.add(solicitud)
+                db.session.commit()
 
                 flash("Solicitud de producción creada correctamente", "success")
 
                 return redirect(url_for("venta.solicitud_produccion"))
             else:
-                flash("Esta receta no cuenta con insumos agregados, consultalo con un administrador", "error")
-                
+                flash(
+                    "Esta receta no cuenta con insumos agregados, consultalo con un administrador", "error")
+
                 return redirect(url_for("venta.solicitud_produccion_nuevo"))
                 flash(
                     "Esta receta no cuenta con insumos agregados, consultalo con un administrador",
@@ -209,6 +229,7 @@ def solicitud_produccion_nuevo():
                 )
         else:
             return redirect(url_for("venta.solicitud_produccion_nuevo"))
+
 
 @venta.route("/solicitud_produccion/edit/<int:id>", methods=["GET", "POST"])
 @requires_role("vendedor")
@@ -419,7 +440,8 @@ def compras_ver():
                 .all()
             )
 
-            compra.insumos = ", ".join([lote.nombre for loteInsumo, lote in lotes])
+            compra.insumos = ", ".join(
+                [lote.nombre for loteInsumo, lote in lotes])
             compra.caja = True if compra.idTransaccionCaja else False
 
         return render_template(
@@ -498,7 +520,8 @@ def compras_crear():
         (proveedor.id, proveedor.empresa) for proveedor in Proveedor.query.all()
     ]
 
-    insumos_choices = [(insumo.id, insumo.nombre) for insumo in Insumo.query.all()]
+    insumos_choices = [(insumo.id, insumo.nombre)
+                       for insumo in Insumo.query.all()]
 
     for lote_insumo_form in form.lotes_insumos:
         lote_insumo_form.insumos.choices = insumos_choices
@@ -509,7 +532,8 @@ def compras_crear():
             idUsuario=current_user.id,
             idProveedores=form.proveedores.data,
             fecha_compra=datetime.now(),
-            pago_proveedor=sum([lote.costo_lote.data for lote in form.lotes_insumos]),
+            pago_proveedor=sum(
+                [lote.costo_lote.data for lote in form.lotes_insumos]),
         )
         if form.caja.data:
             compra.idTransaccionCaja = form.caja.data
@@ -764,7 +788,8 @@ def punto_venta_confirmar():
 
         galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
 
-    corte_de_hoy = CorteCaja.query.filter_by(fecha_corte=datetime.now().date()).first()
+    corte_de_hoy = CorteCaja.query.filter_by(
+        fecha_corte=datetime.now().date()).first()
 
     transaccion = TransaccionCaja(
         monto_ingreso=total,
