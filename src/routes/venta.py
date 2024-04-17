@@ -114,21 +114,32 @@ def solicitud_produccion_nuevo():
                             else:
                                 pass
                     else:
+                        recetaSePuedeProcesar = False
+                        
                         if(insumoReceta.insumo.unidad_medida == "Kilos"):
                             if (cantidadNecesaria >= 1):
                                 unidadMedida = "kg"
+                                
+                                cantidadFormateada = cantidadNecesaria
                             else:
                                 unidadMedida = "g"
-                                cantidadNecesaria*1000
+                                
+                                cantidadFormateada = cantidadNecesaria*1000
                         elif(insumoReceta.insumo.unidad_medida == "Litros"):
                             if (cantidadNecesaria >= 1):
                                 unidadMedida = "l"
+                                
+                                cantidadFormateada = cantidadNecesaria
                             else:
                                 unidadMedida = "ml"
-                                cantidadNecesaria*1000
+                                
+                                cantidadFormateada = cantidadNecesaria*1000
                         
-                        mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadNecesaria} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
-                        print(mensajeInsumosCantidadesFaltantes)
+                        mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadFormateada} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
+                
+                if not recetaSePuedeProcesar:
+                    flash(f"La receta no se puede procesar debido a los siguientes productos faltantes: \n\n{mensajeInsumosCantidadesFaltantes}", "receta-error")
+                    return redirect(url_for("venta.solicitud_produccion_nuevo"))
                 
                 #Termina FOR DE INSUMOS
                 usuario_cocinero = 0
@@ -176,20 +187,9 @@ def solicitud_produccion_nuevo():
             else:
                 flash("Esta receta no cuenta con insumos agregados, consultalo con un administrador", "error")
                 
-                return render_template(
-                "modulos/venta/solicitudesProduccion/create.html",
-                form=form,
-                recetas=recetas,
-                nuevo=True,
-            )
+                return redirect(url_for("venta.solicitud_produccion_nuevo"))
         else:
-            return render_template(
-                "modulos/venta/solicitudesProduccion/create.html",
-                form=form,
-                recetas=recetas,
-                nuevo=True,
-            )
-
+            return redirect(url_for("venta.solicitud_produccion_nuevo"))
 
 @venta.route("/solicitud_produccion/edit/<int:id>", methods=["GET", "POST"])
 @requires_role("vendedor")
