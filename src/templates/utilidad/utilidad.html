@@ -7,57 +7,72 @@
 {% block content %}
 <div>
     <div class="text-center h1">
-        <kbd>UTILIDADES</kbd>
+        <h1>UTILIDADES</h1>
     </div>
-    <div class="row">
-        <div class="col-6">
+    <div class="row text-center">
+        <div class="col-12">
             <form id="ingredientesForm" action="{{ url_for('utilidad.obtener_ingredientes')}}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
                 {% set valor_seleccionado = receta_seleccionada if receta_seleccionada else '' %}
 
                 {{ macro.select(form.receta, valor_seleccionado) }}                        
-                {{ macro.submit_button(form.submit) }}
+                <!-- {{ macro.submit_button(form.submit) }} -->
 
             </form>
             
         </div>
-        <div class="col-6">
-            <div class="row mb-3 mx-5">
-                
-            </div>
-            <div class="row mb-3 mt-3 mx-5">
-                <div class="row">
-                    {% if titulo_receta %}
-                        <h2>{{titulo_receta}}</h2>
-                    {% endif %}
+        
+    </div>
+    <div class="col-12 text-center my-3">
+        <h1>{{ titulo_receta }}</h1>
+    </div>
+    <div class="row mx-5 my-5">
+        <div class="card p-0">
+            <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead >
+                    <tr>
+                        <th scope="col">INSUMO</th>
+                        <th scope="col">INVENTARIO</th>
+                        <th scope="col">PRECIO X KILO</th>
+                        <th scope="col">CANTIDAD NECESARIA</th>
+                        <th scope="col">PRECIO TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+
+                    {% for ingrediente in ingredientes %}
+                    <tr>
+                        <td>{{ ingrediente.insumo }}</td>
+                        <td>{{ ingrediente.cantidad_total }} KG</td>
+                        <td>{{ ingrediente.promedio_precio }}</td>
+                        <td>{{ ingrediente.cantidad }} KG</td>
+                        <td>$ {{ ingrediente.costo_total }}</td>
+                    {% endfor %}
                     
-                </div>
-                <div class="card p-0">
-                    <div class="card-header text-center">
-                        <h3>Ingredientes</h3>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Ingrediente</th>
-                                    <th>Cantidad</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for ingrediente in ingredientes %}
-                                <tr>
-                                    <td>{{ ingrediente.nombre }}</td>
-                                    <td>{{ ingrediente.cantidad }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                </tbody>
+            </table>
+        </div>
+        </div>
+        
+    </div>
+    
+    <div class="row mx-5">
+        <div class="col-6">
+            <div class="">
+                <label for="txtCosto" class="form-label">Costo de Producción</label>            
+                <input id="txtCosto" type="text" class="form-control" value="{{ costo_total_receta }}" disabled>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="">
+                <label for="txtPrecio" class="form-label">Precio Final</label>            
+                <input id="txtPrecio" type="text" class="form-control">
+                <div id="errorContainer"></div>
             </div>
         </div>
     </div>
+        
 </div>
 {% endblock %} 
 
@@ -69,4 +84,40 @@
     });
 });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Script cargado'); // Log para verificar que el script se carga
+
+        // Obtener los elementos del DOM
+        const txtPrecio = document.getElementById('txtPrecio');
+        const txtCosto = document.getElementById('txtCosto');
+        const errorContainer = document.getElementById('errorContainer');
+
+        // Función para validar el precio final
+        function validarPrecioFinal() {
+            console.log('Validando precio final'); // Log para verificar que se llama a la función
+
+            const precioFinal = parseFloat(txtPrecio.value);
+            const costoProduccion = parseFloat(txtCosto.value);
+
+            // Verificar si el precio final es menor que el costo de producción
+            if (precioFinal < costoProduccion) {
+                // Agregar clase de error al campo de precio final
+                txtPrecio.classList.add('is-invalid');
+
+                // Mostrar mensaje de error
+                errorContainer.innerHTML = '<div class="invalid-feedback" style="display: block">El precio final no puede ser menor que el costo de producción.</div>';
+            } else {
+                // Remover clase de error si el precio es válido
+                txtPrecio.classList.remove('is-invalid');
+                errorContainer.innerHTML = '';
+            }
+        }
+
+        // Escuchar el evento 'input' en el campo de precio final para validar mientras el usuario escribe
+        txtPrecio.addEventListener('input', validarPrecioFinal);
+    });
+</script>
+
 {% endblock %}

@@ -24,7 +24,7 @@ class InsumosReceta(db.Model):
     insumo = db.relationship("Insumo", backref="recetas")
 
     def __str__(self):
-        return f"{self.insumo.nombre} en {self.receta.nombre}"
+        return f"InsumoReceta - idReceta: {self.idReceta}, idInsumo: {self.idReceta},cantidad: {self.cantidad}"
 
 
 class Receta(db.Model):
@@ -43,7 +43,7 @@ class Receta(db.Model):
 
     # Método para obtener solo el nombre
     def __str__(self):
-        return self.nombre
+        return f"Receta: {self.nombre}, Peso Estimado: {self.peso_estimado}, Piezas: {self.piezas}, Utilidad: {self.utilidad}, Descripcion: {self.descripcion}, Imagen: {self.imagen}, Estatus: {self.estatus}, ID: {self.id}, Insumos: {self.insumos}"
 
     def serialize(self):
         return {"id": self.id, "nombre": self.nombre, "imagen": self.imagen}
