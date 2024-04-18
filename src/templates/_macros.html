@@ -43,10 +43,37 @@
         {% endif %}
         
     >
-  <label for="{{ field.name }}">
+  <label id="lb_{{ field.name }}" for="{{ field.name }}">
         {{field.label.text}}
     </label>    
 
+</div>
+
+  {% if field.errors %}
+    <ul class="errors">
+        {% for error in field.errors %}
+        <li style="color: red;">
+            {{ error }}
+        </li>
+        {% endfor %}
+    </ul>
+  {% endif %}
+
+{% endmacro %}
+
+{% macro input(field) %}
+<div class="mb-3 mt-3 mx-5">
+  <input 
+        type="{{ field.type }}" 
+        class="form-control  {{ 'is-invalid' if field.errors else '' }}" 
+        id="{{ field.name }}" 
+        name="{{ field.name }}" 
+        placeholder="{{ field.label.text }}"
+        {% if field.data %}
+            value="{{ field.data }}"
+        {% endif %}
+        
+    >
 </div>
 
   {% if field.errors %}

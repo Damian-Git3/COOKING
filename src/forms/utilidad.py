@@ -1,8 +1,10 @@
 """ FORMULARIOS DE UTILIDADES """
 
+from gc import disable
 from math import cos
 
-from wtforms import FloatField, Form, SelectField, SubmitField, validators
+from sqlalchemy import Integer
+from wtforms import FloatField, Form, IntegerField, SelectField, SubmitField, validators
 
 from database.models import Receta
 
@@ -49,13 +51,14 @@ class GetRecetaForm(Form):
 class UtilidadForm(Form):
     """Formulario para calcular la utilidad de una receta"""
 
-    costo_total = FloatField(
-        "Costo Total",
+    id_receta = IntegerField(
+        "ID Receta",
         [
             validators.DataRequired(message="El Campo es Requerido"),
-            validators.NumberRange(min=1, message="Ingresa un Costo Válido"),
+            validators.NumberRange(min=1, message="Ingresa un ID Válido"),
         ],
     )
+    costo_total = FloatField("Costo Total", render_kw={"disabled": True})
     costo_venta = FloatField(
         "Costo de Venta",
         [

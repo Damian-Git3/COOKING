@@ -57,21 +57,33 @@
         
     </div>
     
-    <div class="row mx-5">
-        <div class="col-6">
-            <div class="">
-                <label for="txtCosto" class="form-label">Costo de Producción</label>            
-                <input id="txtCosto" type="text" class="form-control" value="{{ costo_total_receta }}" disabled>
+    <form action="{{ url_for('utilidad.guardar')}}" method="POST" class="p-0">
+            <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+            <div class="row mx-5">
+                <div class="col-6">
+                    <!-- <div class="">
+                        <label for="txtCosto" class="form-label">Costo de Producción</label>            
+                        <input id="txtCosto" type="text" class="form-control" value="{{ costo_total_receta }}" disabled>
+                    </div> -->
+                    {{ macro.input_float(formUtilidad.costo_total) }}
+                </div>
+                <div class="col-6">
+                    <!-- <div class="">
+                        <label for="txtPrecio" class="form-label">Precio Final</label>            
+                        <input id="txtPrecio" type="text" class="form-control">
+                        
+                    </div> -->
+                    {{ macro.input_float(formUtilidad.costo_venta) }}
+                    <div id="errorContainer"></div>
+                </div>
             </div>
-        </div>
-        <div class="col-6">
-            <div class="">
-                <label for="txtPrecio" class="form-label">Precio Final</label>            
-                <input id="txtPrecio" type="text" class="form-control">
-                <div id="errorContainer"></div>
+            <div class="col-12 my-2">
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
             </div>
-        </div>
-    </div>
+        </form>
+        
         
 </div>
 {% endblock %} 
@@ -82,21 +94,36 @@
     document.querySelector('select[name="receta"]').addEventListener('change', function() {
         document.getElementById('ingredientesForm').submit();
     });
+    document.querySelector('input[name="costo_total"]').disabled = true;
+    document.querySelector('input[name="costo_venta"]').addEventListener('keypress', function(event) {
+        
+        // Obtener el código de la tecla presionada
+        let keyCode = event.keyCode || event.which;
+
+        // Permitir solo números (0-9), el punto (.) y la tecla de retroceso (Backspace)
+        if (!(keyCode >= 48 && keyCode <= 57) && // Números del 0 al 9
+            !(keyCode >= 96 && keyCode <= 105) && // Números numéricos del teclado
+            keyCode !== 190 && // Punto (.)
+            keyCode !== 8) { // Tecla de retroceso (Backspace)
+            // Cancelar el evento si la tecla no es un número o un punto
+            event.preventDefault();
+        }
+    });
+    
+    
 });
 </script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Script cargado'); // Log para verificar que el script se carga
 
         // Obtener los elementos del DOM
-        const txtPrecio = document.getElementById('txtPrecio');
-        const txtCosto = document.getElementById('txtCosto');
+        const txtPrecio = document.getElementById('costo_venta');
+        const txtCosto = document.getElementById('costo_total');
         const errorContainer = document.getElementById('errorContainer');
 
         // Función para validar el precio final
         function validarPrecioFinal() {
-            console.log('Validando precio final'); // Log para verificar que se llama a la función
 
             const precioFinal = parseFloat(txtPrecio.value);
             const costoProduccion = parseFloat(txtCosto.value);
