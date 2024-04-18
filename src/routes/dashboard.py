@@ -2,9 +2,9 @@ from datetime import datetime
 
 from flask import Blueprint, render_template
 from flask_login import login_required
-from sqlalchemy import extract, func
+from sqlalchemy import extract, func, desc
 
-from database.models import DetalleVenta, LoteGalleta, Receta, Venta, db
+from database.models import DetalleVenta, LoteGalleta, Receta, Usuario, Venta, db
 from logger import logger as log
 
 dashboard = Blueprint(
@@ -20,6 +20,8 @@ def index():
     ventas_mes = obtener_ventas_por_mes()
     ventas_totales_mes = obtener_total_ventas_por_mes()
     galletas_tipos = obtener_galletas_vendidas_por_tipo()
+    ventas_vendedor = obtener_ventas_vendedor()
+    numero_ventas_vendedor = obtener_numero_total_ventas_por_vendedor()
 
     return render_template(
         "dashboard/dashboard.html",
@@ -27,6 +29,8 @@ def index():
         ventasMes=ventas_mes,
         ventasTotalesMes=ventas_totales_mes,
         galletasTipos=galletas_tipos,
+        ventasVendedor=ventas_vendedor,
+        numeroVentasVendedor=numero_ventas_vendedor
     )
 
 
@@ -177,3 +181,74 @@ def obtener_galletas_vendidas_por_tipo():
     }
 
     return galletas_vendidas_por_tipo
+
+
+def obtener_ventas_vendedor():
+
+    """
+    Obtiene el total de ventas por cada usuario del año actual.
+    """
+    # Obtener el año actual
+    anio_actual = datetime.now().year
+
+    # Realizar la consulta
+    resultados = (
+        db.session.query(
+            Usuario.nombre,  # Nombre del usuario
+            func.sum(Venta.total_venta).label(
+                "total_ventas"
+            ),  # Sumar el total de ventas
+        )
+        .join(Venta, Venta.idUsuario == Usuario.id)  # Unir las tablas Venta y Usuario
+        .filter(
+            func.extract("year", Venta.fecha_venta)
+            == anio_actual  # Filtrar por el año actual
+        )
+        .group_by(Usuario.nombre)  # Agrupar por el nombre del usuario
+        .order_by(
+            desc("total_ventas")
+        )  # Ordenar por el total de ventas en orden descendente
+        .all()
+    )
+
+    # Convertir los resultados a un diccionario para facilitar su uso
+    ventas_por_vendedor = {
+        resultado.nombre: resultado.total_ventas for resultado in resultados
+    }
+
+    return ventas_por_vendedor
+
+
+def obtener_numero_total_ventas_por_vendedor():
+    """
+    Obtiene el número total de ventas por cada usuario del año actual.
+    """
+    # Obtener el año actual
+    anio_actual = datetime.now().year
+
+    # Realizar la consulta
+    resultados = (
+        db.session.query(
+            Usuario.nombre,  # Nombre del usuario
+            func.count(Venta.id).label(
+                "numero_total_ventas"
+            ),  # Contar el número total de ventas
+        )
+        .join(Venta, Venta.idUsuario == Usuario.id)  # Unir las tablas Venta y Usuario
+        .filter(
+            func.extract("year", Venta.fecha_venta)
+            == anio_actual  # Filtrar por el año actual
+        )
+        .group_by(Usuario.nombre)  # Agrupar por el nombre del usuario
+        .order_by(
+            desc("numero_total_ventas")
+        )  # Ordenar por el número total de ventas en orden descendente
+        .all()
+    )
+
+    # Convertir los resultados a un diccionario para facilitar su uso
+    numero_total_ventas_por_vendedor = {
+        resultado.nombre: resultado.numero_total_ventas for resultado in resultados
+    }
+
+    return numero_total_ventas_por_vendedor
