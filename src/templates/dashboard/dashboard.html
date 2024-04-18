@@ -17,13 +17,14 @@
         </div>
         <div class="row border">
             <div class="col-6 text-center">
-                <kbd>PRODUCTO MAS VENDIDO</kbd>
-                <canvas id="G3" height="400" width="600"></canvas>
+                <kbd>TOTAL DE VENTAS POR MES</kbd>
+                <canvas id="G3"  height="400" width="600"   ></canvas>
             </div>
             <div class="col-6 text-center">
-                <kbd>VENTAS POR MES</kbd>
-                <canvas id="G4"  height="400" width="600"   ></canvas>
+                <kbd>PRODUCTO MAS VENDIDO</kbd>
+                <canvas id="G4" height="400" width="600"></canvas>
             </div>
+            
         </div>
     </div>
 
@@ -31,8 +32,7 @@
 {% endblock %}
 
 {% block jscode %}
-<script>
-    console.log('Hola desde el dashboard');
+<script>    
     const G1 = document.getElementById('G1');
     const G2 = document.getElementById('G2');
     const G3 = document.getElementById('G3');
@@ -59,16 +59,20 @@
         'rgb(201, 203, 207)'
     ];
 
+    console.log({{ galletaVentasMes }})
+
     let galletaVentasMes = {{ galletaVentasMes }};
     let ventasMes = {{ ventasMes }};
-    let galletasVendidas = {{ galletasVendidas }};
+    let ventasTotalesMes = {{ ventasTotalesMes }};
     let galletasTipos = {{ galletasTipos|tojson }};
 
+    console.log(galletasTipos)
 
+    // DASHBOARD DE GALLETAS VENDIDAS POR MES
     const dataGalletaVentasMes = {
         labels: meses,
         datasets: [{
-            label: 'Galletas Vendidas por Mes',
+            label: 'Galletas Vendidas',
             data: galletaVentasMes,
             backgroundColor: colorsBackground,
             borderColor: colorsBorder,
@@ -98,10 +102,13 @@
         },
     };
 
+    new Chart(G1, configGalletaVentasMes);
+
+    // DASHBOARD DE VENTAS POR MES
     const dataVentasMes = {
         labels: meses,
         datasets: [{
-            label: 'Ventas por Mes',
+            label: 'Total de Ventas',
             data: ventasMes,
             backgroundColor: colorsBackground,
             borderColor: colorsBorder,
@@ -112,6 +119,46 @@
     const configVentasMes = {
         type: 'bar',
         data: dataVentasMes,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true, // Comenzar el eje Y en 0
+                    title: {
+                        display: true,
+                        text: 'Total de Ventas'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Mes'
+                    }
+                }
+            },
+
+        },
+    };
+
+    new Chart(G2, configVentasMes);
+
+    //DASHBOARD DE TOTAL DE VENTAS POR MES
+    const dataGalletasVendidas = {
+        labels: meses,
+        datasets: [{
+            label: 'Ventas del Mes',
+            data: ventasTotalesMes,
+            backgroundColor: colorsBackground,
+            borderColor: colorsBorder,
+            borderWidth: 1,
+            hoverOffset: 4,
+            
+        }],
+    
+    };
+
+    const configGalletasVendidas = {
+        type: 'bar',
+        data: dataGalletasVendidas,
         options: {
             scales: {
                 y: {
@@ -130,13 +177,17 @@
             },
 
         },
+
     };
 
-    const dataGalletasVendidas = {
-        labels: galletasTipos,
+    new Chart(G3, configGalletasVendidas);
+    
+    //DASHBOARD DE TOTAL DE VENTAS POR MES
+    const dataProductoMasVendido = {
+        labels: Object.keys(galletasTipos),
         datasets: [{
-            label: 'Galletas Vendidas en el Mes',
-            data: galletasVendidas,
+            label: 'Ventas',
+            data: Object.values(galletasTipos),
             backgroundColor: colorsBackground,
             borderColor: colorsBorder,
             borderWidth: 1,
@@ -146,18 +197,31 @@
     
     };
 
-    const configGalletasVendidas = {
-        type: 'pie',
-        data: dataGalletasVendidas,
-        width: 600, // Ancho personalizado
-        height: 400 // Altura personalizada
+    const configProductoMasVendido = {
+        type: 'bar',
+        data: dataProductoMasVendido,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true, // Comenzar el eje Y en 0
+                    title: {
+                        display: true,
+                        text: 'Total'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Galleta'
+                    }
+                }
+            },
+
+        },
 
     };
-
-    new Chart(G1, configGalletaVentasMes);
-    new Chart(G2, configVentasMes);
-    new Chart(G3, configGalletasVendidas);
-    new Chart(G4, config);
+    
+    new Chart(G4, configProductoMasVendido);
 
 </script>
 {% endblock %}
