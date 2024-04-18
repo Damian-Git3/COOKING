@@ -1,7 +1,8 @@
+from datetime import datetime
+
 from flask import Blueprint, render_template
 from flask_login import login_required
-from sqlalchemy import func, extract
-from datetime import datetime
+from sqlalchemy import extract, func
 
 from database.models import DetalleVenta, LoteGalleta, Receta, Venta, db
 from logger import logger as log
@@ -26,7 +27,6 @@ def index():
         ventasMes=ventas_mes,
         ventasTotalesMes=ventas_totales_mes,
         galletasTipos=galletas_tipos,
-
     )
 
 
