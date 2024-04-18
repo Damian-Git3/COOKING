@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 from sqlalchemy import func
 
@@ -87,20 +87,21 @@ def obtener_ingredientes():
 @utilidad.route("/guardar", methods=["POST"])
 def guardar():
     """Ruta para guardar la utilidad de una receta"""
-    form = utilidad_form.GetRecetaForm(request.form)
-    formUtilidad = utilidad_form.UtilidadForm(request.form)
+    form_utilidad = utilidad_form.UtilidadForm(request.form)
 
-    log.debug(form)
-    id_receta = form.id_receta.data
-    precio = form.costo_venta.data
+    id_receta = form_utilidad.id_receta.data
+    precio = form_utilidad.costo_venta.data
 
     receta_seleccionada = Receta.query.get(id_receta)
     receta_seleccionada.utilidad = precio
     db.session.commit()
 
-    return render_template(
-        "utilidad/utilidad.html", form=form, formUtilidad=formUtilidad
+    flash(
+        "Utilidad Registrada Correctamente",
+        "success",
     )
+
+    return redirect(url_for("utilidad.gestion"))
 
 
 def obtener_cantidad_y_promedio_precio_insumo(id_insumo):
@@ -122,7 +123,8 @@ def obtener_cantidad_y_promedio_precio_insumo(id_insumo):
         .one()
     )
 
-    # Si no hay lotes que cumplan con los criterios, la función devuelve 0 para la cantidad total y None para el promedio del precio
+    # Si no hay lotes que cumplan con los criterios,
+    # la función devuelve 0 para la cantidad total y None para el promedio del precio
     return (
         resultado.cantidad_total if resultado.cantidad_total is not None else 0
     ), resultado.promedio_precio

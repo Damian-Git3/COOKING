@@ -3,6 +3,7 @@
 from gc import disable
 from math import cos
 
+from click import style
 from sqlalchemy import Integer
 from wtforms import FloatField, Form, IntegerField, SelectField, SubmitField, validators
 
@@ -53,7 +54,8 @@ class UtilidadForm(Form):
 
     id_receta = IntegerField(
         "ID Receta",
-        [
+        render_kw={"style": "display: none"},
+        validators=[
             validators.DataRequired(message="El Campo es Requerido"),
             validators.NumberRange(min=1, message="Ingresa un ID Válido"),
         ],

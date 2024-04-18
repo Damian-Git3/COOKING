@@ -59,6 +59,9 @@
     
     <form action="{{ url_for('utilidad.guardar')}}" method="POST" class="p-0">
             <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+            <input id="{{ formUtilidad.id_receta.name }}" type="hidden" name="id_receta" {% if formUtilidad.id_receta.data %}
+                value="{{ formUtilidad.id_receta.data }}"
+            {% endif %}>
             <div class="row mx-5">
                 <div class="col-6">
                     <!-- <div class="">
@@ -79,7 +82,7 @@
             </div>
             <div class="col-12 my-2">
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button id="btnGuardarUtilidad" type="submit" class="btn btn-primary">GUARDAR</button>
                 </div>
             </div>
         </form>
@@ -96,7 +99,7 @@
     });
     document.querySelector('input[name="costo_total"]').disabled = true;
     document.querySelector('input[name="costo_venta"]').addEventListener('keypress', function(event) {
-        
+        console.log("SCRIPT PARA NO PERMITIR LETRAS")
         // Obtener el código de la tecla presionada
         let keyCode = event.keyCode || event.which;
 
@@ -115,6 +118,7 @@
 </script>
 
 <script>
+    document.getElementById('btnGuardarUtilidad').disabled = true;
     document.addEventListener('DOMContentLoaded', function() {
 
         // Obtener los elementos del DOM
@@ -124,7 +128,7 @@
 
         // Función para validar el precio final
         function validarPrecioFinal() {
-
+            console.log("SCRIPT PARA VALIDAR EL PRECIO FINAL")
             const precioFinal = parseFloat(txtPrecio.value);
             const costoProduccion = parseFloat(txtCosto.value);
 
@@ -132,13 +136,14 @@
             if (precioFinal < costoProduccion) {
                 // Agregar clase de error al campo de precio final
                 txtPrecio.classList.add('is-invalid');
-
+                document.getElementById('btnGuardarUtilidad').disabled = true;
                 // Mostrar mensaje de error
                 errorContainer.innerHTML = '<div class="invalid-feedback" style="display: block">El precio final no puede ser menor que el costo de producción.</div>';
             } else {
                 // Remover clase de error si el precio es válido
                 txtPrecio.classList.remove('is-invalid');
                 errorContainer.innerHTML = '';
+                document.getElementById('btnGuardarUtilidad').disabled = false;
             }
         }
 
