@@ -1,0 +1,61 @@
+<!-- ALERTAS -->
+{% with messages = get_flashed_messages(with_categories=true) %} 
+{% for category, message in messages %}
+
+    <script>
+      console.log("{{ message }}");
+    </script>
+
+    {% if category == 'success' %}
+    <script>
+      Toast.fire({
+        icon: "success",
+        title: "{{ message }}",
+      });
+    </script>
+    {% endif %}
+
+    {% if category == 'error' %}
+    <script>
+      Toast.fire({
+        icon: "error",
+        title: "{{ message }}",
+      });
+    </script>
+    {% endif %} 
+    
+    {% if category == 'info' %}
+    <script>
+      Toast.fire({
+        icon: "info",
+        title: "{{ message }}",
+      });
+    </script>
+    {% endif %} 
+    
+    {% if category == 'warning' %}
+    <script>
+      Toast.fire({
+        icon: "warning",
+        title: "{{ message }}",
+      });
+    </script>
+    {% endif %}
+
+    {% if category == 'receta' %}
+      <script>
+        Swal.fire(`{{ message }}`);
+      </script>
+      {% elif category == 'receta' %}
+      <script>Swal.fire(`{{ message }}`);</script>
+    
+      {% else %}
+    
+      <script>
+        console.log("Mensaje diferente: {{ message }}");
+      </script>
+    
+      {% endif %}
+
+    {% endfor %} 
+{% endwith %} 

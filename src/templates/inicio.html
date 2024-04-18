@@ -1,149 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CooKing - {% block title %}{% endblock %}</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/sidebar.css')}}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='libs/bootstrap5/css/bootstrap.min.css')}}"
-    />  
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='libs/fontawesome/css/all.css')}}"
-    />
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans"
-      rel="stylesheet"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="{{ url_for('static', filename='img/cookie_1.png')}}"
-    />
-  
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
-    <script src="{{ url_for('static', filename='libs/bootstrap5/js/bootstrap.bundle.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/jquery.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/jqueryui.js')}}"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-    
-    {% block styles %}
 
-    {% endblock %}
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CooKing - {% block title %}{% endblock %}</title>
 
-  <body>
-    <div class="Menu">
-      <div class="logo-container">
-        <a href="{{url_for('main.menu')}}"
-          ><img
-            src="{{ url_for('static', filename='img/logo.png')}}"
-            alt="Logo de la empresa"
-            class="company-logo"
-        /></a>
-      </div>
-      <span class="HoverTip"></span>
-      <div class="Sidebar">
-        <ul>
-          <div class="HoverBox"></div>
-          {%if current_user.has_role('admin') %}
+  {% include 'librerias/librerias.html' %}
 
-          <a href="/admin">
-            <li class="Active">
-              <i class="fa-solid fa-crown"></i>
-              <span class="tooltip">Administración Avanzada</span>
-            </li>
-          </a>
+  {% block styles %}
 
-          {% endif %} {%if current_user.has_role('vendedor') or
-          current_user.has_role('admin') %}
+  {% endblock %}
+</head>
 
-          <a href="{{url_for('venta.punto_venta')}}">
-            <li>
-              <i class="fa-solid fa-cash-register"></i>
-              <span class="tooltip">Punto de venta</span>
-            </li>
-          </a>
-          <a href="{{url_for('venta.solicitud_produccion')}}">
-            <li>
-              <i class="fa-solid fa-paper-plane"></i>
-              <span class="tooltip">Solicitud de Producción</span>
-            </li>
-          </a>
+<body>
+  <div class="Menu">
+    <div class="logo-container">
+      <a href="{{url_for('main.menu')}}"><img src="{{ url_for('static', filename='img/logo.png')}}"
+          alt="Logo de la empresa" class="company-logo" /></a>
+    </div>
 
-          <a href="{{url_for('venta.compras_ver')}}">
-            <li>
-              <i class="fa-solid fa-shopping-cart"></i>
-              <span class="tooltip">Compras de insumos</span>
-            </li>
-          </a>
+    {% include 'sidebar/sidebar.html' %}
 
-          <a href="{{url_for('venta.lotes_galletas')}}">
-            <li>
-              <i class="fa-solid fa-cookie-bite"></i>
-              <span class="tooltip">Lotes Galletas</span>
-            </li></a
-          >
-
-          {% endif %} {% if current_user.has_role('cocinero') or
-          current_user.has_role('admin') %}
-
-          <a href="{{url_for('cocina.recetas')}}">
-            <li>
-              <i class="fa-solid fa-book"></i>
-              <span class="tooltip">Recetas</span>
-            </li>
-          </a>
-
-          <a href="{{url_for('cocina.cocinar')}}">
-            <li>
-              <i class="fa-solid fa-fire-burner"></i>
-              <span class="tooltip">Producción</span>
-            </li>
-          </a>
-          <a href="{{url_for('cocina.lotes_insumos')}}">
-            <li>
-              <i class="fa-solid fa-boxes-stacked"></i>
-
-              <span class="tooltip">Lotes insumos</span>
-            </li>
-          </a>
-          {% endif %} {% if current_user.has_role('admin') or
-          current_user.has_role('vendedor') or current_user.has_role('cocinero')
-          %}
-          <a href="{{url_for('dashboard.index')}}">
-            <li>
-              <i class="fa-solid fa-chart-line"></i>
-              <span class="tooltip">Dashboard</span>
-            </li>
-          </a>
-          {% endif %}
-          <a href="{{url_for('main.configuracion')}}">
-            <li>
-              <i class="fa-solid fa-gear"></i>
-              <span class="tooltip">Configuración</span>
-            </li>
-          </a>
-
-          <a href="{{url_for('auth.logout')}}">
-            <li>
-              <i class="fa-solid fa-right-from-bracket"></i>
-              <span class="tooltip">Cerrar sesión</span>
-            </li>
-          </a>
-        </ul>
-      </div>
-      <div class="Content">
-        {% block content %}
-        <div
-          style="
+    <div class="Content">
+      {% block content %}
+      <div style="
             display: flex;
             height: 100%;
             width: 100%;
@@ -152,10 +33,8 @@
             background-image: url(../static/img/cookie_17.png);
             background-size: cover;
             overflow: hidden;
-          "
-        >
-          <h1
-            style="
+          ">
+        <h1 style="
               padding: 150px 200px;
               margin: 0 50px;
               background: #00000095;
@@ -164,14 +43,14 @@
               font-size: 5rem;
               text-align: center;
               color: #ffe8bd;
-            "
-          >
-            Bievenido a CooKing
-          </h1>
-        </div>
-        <script>
-          localStorage.setItem("mensaje", "{{mensaje}}");
-        </script>
+            ">
+          Bievenido a CooKing
+        </h1>
+      </div>
+
+      <script>
+        localStorage.setItem("mensaje", "{{mensaje}}");
+      </script>
 
         <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
         <script>
@@ -183,64 +62,13 @@
         {% endblock %}
       </div>
     </div>
+    
     {% block bootstrap_modals %}{% endblock %}
     <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
-    {% with messages = get_flashed_messages(with_categories=true) %} {% for
-    category, message in messages %}
-
-    <script>
-      console.log("{{ message }}");
-    </script>
-
-    {% if category == 'success' %}
-    <script>
-      Toast.fire({
-        icon: "success",
-        title: "{{ message }}",
-      });
-    </script>
-    {% endif %}
-
-    {% if category == 'error' %}
-    <script>
-      Toast.fire({
-        icon: "error",
-        title: "{{ message }}",
-      });
-    </script>
-    {% endif %} 
-    
-    {% if category == 'info' %}
-    <script>
-      Toast.fire({
-        icon: "info",
-        title: "{{ message }}",
-      });
-    </script>
-    {% endif %} 
-    
-    {% if category == 'warning' %}
-    <script>
-      Toast.fire({
-        icon: "warning",
-        title: "{{ message }}",
-      });
-    </script>
-    {% endif %}
-
-    {% if category == 'receta' %}
-      <script>
-        Swal.fire(`{{ message }}`);
-      </script>
-    {% endif %}
-
-    <script>
-      console.log("Mensaje diferente: {{ message }}");
-    </script>
-
-    {% endfor %} {% endwith %} 
     
     <!-- BLOQUE PARA CODIGO -->
     {% block jscode %} {% endblock %}
+    
+    {% include 'alertas/alertas.html' %}
   </body>
 </html>

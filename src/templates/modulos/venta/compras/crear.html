@@ -1,5 +1,5 @@
 {% extends 'inicio.html' %} {% block title %} Compras {% endblock %} {% block
-styles %} {% endblock %} {%from "macros.html" import render_field%} {% block
+styles %} {% endblock %} {%from "_macros.html" import render_field%} {% block
 content %}
 <div style="width: 100%; text-align: center">
   <h1>Nueva compra</h1>
@@ -156,7 +156,7 @@ messages %}
                     <div class="row control-group">
                     <div class="form-group col-xs-12 float-label-form-group controls">
                         
-            <label for="lotes_insumos-${numFormularios}-cantidad">Cantidad</label>
+            <label for="lotes_insumos-${numFormularios}-cantidad">Cantidad (Kilos o Litros)</label>
             <input class="form-control" id="lotes_insumos-${numFormularios}-cantidad" name="lotes_insumos-${numFormularios}-cantidad" required="" type="number" value="">
 
 

@@ -1,69 +1,308 @@
-{% extends 'inicio.html' %} {% block title %}Almacen{% endblock %} {% block
-styles %} {% endblock %} {%from "macros.html" import render_field%} {% block
-content %}
-<div style="width: 100%; text-align: center">
-  <h1>Punto de venta</h1>
-</div>
-{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
-messages %}
-<div class="alert alert-success" style="width: 90%">{{ message }}</div>
-{% endfor %} {% endif %} {% endwith %}
+{% extends 'inicio.html' %} {% block title %}Punto de venta{% endblock %} {%
+block styles %} {% endblock %} {%from "_macros.html" import render_field,
+render_field_nolabel %} {% block content %}
+
 <div
-  class="punto-venta"
-  style="width: 100%; height: 100%; margin: 0; padding: 6px"
+  style="
+    min-height: 100%;
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+  "
 >
-<div class="punto-venta" style="width: 100%; height: 100%; margin: 0; padding: 6px">
-    <!-- Sección de la derecha con la nota de compra en forma de tabla -->
-    <div class="nota-compra" style="width: 50%; float: right;">
-       <table class="table">
-         <thead>
-           <tr>
-             <th>Galleta</th>
-             <th>Cantidad</th>
-             <th>Acciones</th>
-           </tr>
-         </thead>
-         <tbody>
-           <!-- Aquí se agregarán las filas de la nota de compra -->
-         </tbody>
-       </table>
-       <button class="btn btn-danger" style="margin-top: 10px;">Borrar todo</button>
-       <button class="btn btn-success" style="margin-top: 10px;">Confirmar compra</button>
-    </div>
-   
-    <!-- Sección de la izquierda con barra de búsqueda y grid de tarjetas -->
-    <div class="seccion-izquierda" style="width: 50%; float: left; height: 100%; overflow-y: scroll;">
-       <div class="busqueda">
-         <input type="text" class="form-control" placeholder="Buscar galleta">
-         <button class="btn btn-primary">Buscar</button>
-       </div>
-       <div class="grid">
-         <!-- Aquí se cargarán las tarjetas de galleta -->
-         <!-- Ejemplo de tarjeta -->
-         <div class="card" style="width: 18rem;">
-           <img src="ruta/a/imagen/galleta.jpg" class="card-img-top" alt="Imagen de galleta">
-           <div class="card-body">
-             <h5 class="card-title">Nombre de la Galleta</h5>
-             <p class="card-text">Cantidad disponible: 10</p>
-             <input type="number" class="form-control" placeholder="Cantidad">
-             <button class="btn btn-primary">Agregar</button>
-           </div>
-         </div>
-       </div>
-    </div>
-   </div>
-  <!-- seccion de la derecha con la nota de compra en forma de tabla -->
-  <!-- cada columna es una seleccion de galleta que tiene un boton para eliminarla -->
-  <!-- arriba de la tabla hay un boton para borrar todo su contenido -->
-  <!-- abajo de la tabla hay un boton para confirmar la compra -->
+  <div style="width: 100%; height: fit-content; text-align: center">
+    <h1>Punto de venta</h1>
+  </div>
+  {% with messages = get_flashed_messages() %} {% if messages %} {% for message
+  in messages %}
+  <div class="alert alert-success" style="width: 90%; margin: 0 5%">
+    {{ message }}
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
 
-  <!-- en la seccion izquierda cubre todo el alto y tiene overflow scroll -->
-  <!-- en la parte de arriba hay una barra de busqueda y un boton -->
-  <!-- adentro tiene un grid  -->
-  <!-- en el grid se carga una serie de tarjetas que vienen desde el elemnto galletas de jinja -->
-  <!-- cada tarjeta tiene la imagen de la galleta, la cantidad disponible, un cuadro de texto para escribir la cantidad de galletas a agregar y un boton de confirmacion -->
+  <div class="row" style="flex-grow: 1; width: 100%">
+    <div
+      class="col-md-6"
+      style="
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <form action=" {{ url_for('venta.punto_venta_buscar') }} " method="POST">
+        <div
+          class="d-flex justify-content-between"
+          style="width: 100%; margin: 10px"
+        >
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <div class="row control-group">
+            <div class="form-group col-xs-12 float-label-form-group controls">
+              {{render_field_nolabel(form_busqueda.buscar, class="form-control",
+              style="flex-grow: 1; margin-right: 10px")}}
+            </div>
+          </div>
 
-  <!-- genera todo el contenido y decoralo usando bootstrap -->
-  <!-- crea datos de prueba en la tabla y tambien en el grid -->
+          <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+      </form>
+
+      <div
+        class="container-fluid"
+        style="
+          min-height: 300;
+          height: calc(100vh - 166px);
+          width: 100%;
+          overflow: auto;
+        "
+      >
+        <div class="row">
+          <!-- Tarjeta 1 -->
+          {% for galleta in galletas %}
+          <div class="col-12 col-sm-6 col-md-12 col-lg-6 col-xl-4">
+            <div
+              class="card"
+              style="position: relative; overflow: hidden; margin-bottom: 10px"
+            >
+              <div class="card-body">
+                <div
+                  class="d-flex"
+                  style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    padding: 6px;
+                    width: 100%;
+                    background: #e8a935a7;
+                    color: rgb(255, 255, 255);
+                  "
+                >
+                  <h5 style="color: #ffffff; margin-right: 10px">
+                    {{galleta.nombre}}
+                  </h5>
+                  <p>Stock: {{galleta.stock}}</p>
+                </div>
+                <img
+                  src="{{ url_for('static', filename='img/cookies/' + galleta.imagen) }}"
+                  class="card-img-top"
+                  alt="Imagen de galleta"
+                  style="
+                    object-fit: cover;
+                    margin-bottom: 10px;
+                    max-height: 200px;
+                    width: 100%;
+                  "
+                />
+                {% if galleta.stock > 0 %}
+                <form
+                  action="{{ url_for('venta.punto_venta_agregar') }}"
+                  method="POST"
+                >
+                  <input
+                    type="hidden"
+                    id="id"
+                    name="id"
+                    value="{{galleta.id}}"
+                  />
+                  <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{csrf_token()}}"
+                  />
+                  <p
+                    id="receta-peso-{{galleta.id}}"
+                    style="
+                      color: rgb(95, 95, 95);
+                      width: 100%;
+                      text-align: center;
+                    "
+                  >
+                    0 Kg
+                  </p>
+                  <div class="d-flex">
+                    <div class="row control-group">
+                      <div
+                        class="form-group col-xs-12 float-label-form-group controls"
+                      >
+                        {{ render_field_nolabel(form.cantidad,
+                        class="form-control", id="cantidad-" ~ galleta.id,
+                        oninput="peso_Calcular(" ~ galleta.id ~ ", " ~
+                        galleta.peso_estimado ~ ", " ~ galleta.stock ~ ")") }}
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      title="Add to cart"
+                      style="border: none; background: none"
+                    >
+                      <i
+                        class="fa-solid fa-square-plus"
+                        style="font-size: 35px"
+                      ></i>
+                    </button>
+                  </div>
+                  <p
+                    style="color: red"
+                    id="advertencia-peso-{{galleta.id}}"
+                  ></p>
+                </form>
+                <script>
+                  function peso_Calcular(id, peso, stock) {
+                    var advertencia = document.getElementById(
+                      "advertencia-peso-" + id
+                    );
+                    var input = document.getElementById(`cantidad-${id}`);
+                    var kilos = document.getElementById("receta-peso-" + id);
+                    var cantidad = input.value;
+                    var peso_total = (cantidad * peso).toFixed(3);
+                    if (cantidad > stock) {
+                      advertencia.innerHTML =
+                        "La cantidad no puede exceder el stock";
+                      input.value = stock;
+                      kilos.innerHTML = (peso * stock).toFixed(3) + " Kg";
+                    } else {
+                      advertencia.innerHTML = "";
+                      kilos.innerHTML = peso_total + " Kg";
+                    }
+                  }
+                </script>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+          <!-- Puedes agregar más tarjetas siguiendo el mismo patrón -->
+        </div>
+      </div>
+    </div>
+    <div
+      class="col-md-6"
+      style="
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        style="
+          min-height: 300;
+          height: calc(100vh - 166px);
+          width: 100%;
+          overflow: auto;
+          border: solid 2px;
+          border-radius: 10px;
+        "
+      >
+        <table class="table table-hover table-striped-columns table-bordered">
+          <thead style="color: white; background-color: black">
+            <tr style="color: white; background-color: black">
+              <th style="color: white; background-color: black" scope="col">
+                Galleta
+              </th>
+              <th style="color: white; background-color: black" scope="col">
+                Cantidad
+              </th>
+              <th style="color: white; background-color: black" scope="col">
+                Precio Unidad
+              </th>
+              <th style="color: white; background-color: black" scope="col">
+                Subtotal
+              </th>
+              <th
+                style="color: white; background-color: black"
+                scope="col"
+              ></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for producto in carrito %}
+            <tr>
+              <td scope="row">{{ producto.nombre }}</td>
+              <td>{{ producto.cantidad }}</td>
+              <td>{{ producto.precio_unidad | round(2) }}</td>
+              <td>{{ producto.subtotal | round(2) }}</td>
+              <td>
+                <form
+                  action="{{ url_for('venta.punto_venta_eliminar', id=producto.idCarrito) }}"
+                  method="POST"
+                  id="deleteProductForm-{{ producto.idCarrito }}"
+                >
+                  <input
+                    type="hidden"
+                    name="id"
+                    value="{{ producto.idCarrito }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{csrf_token()}}"
+                  />
+                  <button
+                    onclick="event.preventDefault(); confirmDelete({{ producto.idCarrito }});"
+                    title="Delete record"
+                    style="border: none; background: none"
+                  >
+                    <span class="fa-solid fa-trash"></span>
+                  </button>
+                </form>
+                <script>
+                  function confirmDelete(id) {
+                    Swal.fire({
+                      title: "¿Confirmar eliminación?",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonColor: "#3085d6",
+                      cancelButtonColor: "#d33",
+                      confirmButtonText: "Eliminar",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        document
+                          .getElementById("deleteProductForm-" + id)
+                          .submit();
+                      }
+                    });
+                  }
+                </script>
+              </td>
+              {% endfor %}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-around" style="width: 100%">
+        <form
+          action=" {{ url_for('venta.punto_venta_confirmar') }}"
+          method="POST"
+        >
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <button type="submit" class="btn btn-success" style="margin: 10px">
+            Confirmar compra
+          </button>
+        </form>
+        <div
+          style="display: flex; justify-content: center; align-items: center"
+        >
+          Total: {{ total | round(2) }}
+        </div>
+        <form
+          action=" {{ url_for('venta.punto_venta_cancelar') }}"
+          method="POST"
+        >
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <button type="submit" class="btn btn-danger" style="margin: 10px">
+            Borrar todo
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

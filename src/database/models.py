@@ -3,6 +3,7 @@ from datetime import datetime
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, func
+from sqlalchemy.schema import Index
 
 db = SQLAlchemy()
 
@@ -23,7 +24,7 @@ class InsumosReceta(db.Model):
     insumo = db.relationship("Insumo", backref="recetas")
 
     def __str__(self):
-        return f"{self.insumo.nombre} en {self.receta.nombre}"
+        return f"InsumoReceta - idReceta: {self.idReceta}, idInsumo: {self.idReceta},cantidad: {self.cantidad}"
 
 
 class Receta(db.Model):
@@ -38,9 +39,11 @@ class Receta(db.Model):
     imagen = db.Column(db.String(2550))
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
+    __table_args__ = (Index("idx_nombre_receta", "nombre"),)
+
     # Método para obtener solo el nombre
     def __str__(self):
-        return self.nombre
+        return f"Receta: {self.nombre}, Peso Estimado: {self.peso_estimado}, Piezas: {self.piezas}, Utilidad: {self.utilidad}, Descripcion: {self.descripcion}, Imagen: {self.imagen}, Estatus: {self.estatus}, ID: {self.id}, Insumos: {self.insumos}"
 
     def serialize(self):
         return {"id": self.id, "nombre": self.nombre, "imagen": self.imagen}
@@ -58,6 +61,8 @@ class Insumo(db.Model):
     merma = db.Column(db.Float, nullable=False)
     estatus = db.Column(db.Boolean, nullable=False, default=True)
 
+    __table_args__ = (Index("idx_nombre_insumo", "nombre"),)
+
     def __str__(self):
         return self.nombre + " (" + self.unidad_medida + ")"
 
@@ -71,6 +76,8 @@ class Rol(db.Model):
     usuarios = db.relationship(
         "Usuario", secondary=asignacion_rol_usuario, back_populates="roles"
     )
+
+    __table_args__ = (Index("idx_nombre_rol", "nombre"),)
 
     # Método para obtener solo el nombre
     def __str__(self):
@@ -101,6 +108,8 @@ class Usuario(UserMixin, db.Model):
         "Rol", secondary=asignacion_rol_usuario, back_populates="usuarios"
     )
 
+    __table_args__ = (Index("idx_nombre_usuario", "nombre"),)
+
     # Método para obtener solo el nombre
     def __str__(self):
         return self.nombre
@@ -126,11 +135,13 @@ class Proveedor(db.Model):
     __tablename__ = "proveedores"
 
     id = db.Column(db.Integer, primary_key=True)
-    empresa = db.Column(db.String(45), nullable=False)
+    empresa = db.Column(db.String(45), nullable=False, unique=True)
     direccion = db.Column(db.String(45), nullable=False)
     nombre_contacto = db.Column(db.String(45), nullable=False)
     contacto = db.Column(db.String(45), nullable=True)
     estatus = db.Column(db.Boolean, nullable=False, default=True)
+
+    __table_args__ = (Index("idx_empresa_proveedor", "empresa"),)
 
     # Método para obtener solo el nombre
     def __str__(self):
@@ -167,18 +178,21 @@ class Compra(db.Model):
         back_populates="compra",
     )
 
+    __table_args__ = (Index("idx_fecha_compra", "fecha_compra"),)
+
 
 class Venta(db.Model):
     __tablename__ = "ventas"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     fecha_venta = db.Column(db.DateTime, nullable=False)
     total_venta = db.Column(db.Float, nullable=False)
 
-    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
-    idProveedores = db.Column(
-        db.Integer, db.ForeignKey("proveedores.id"), primary_key=True
+    idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
+    idTransaccionCaja = db.Column(
+        db.Integer, db.ForeignKey("transacciones_caja.id"), nullable=False
     )
+    __table_args__ = (Index("idx_fecha_venta", "fecha_venta"),)
 
 
 class CorteCaja(db.Model):
@@ -192,14 +206,13 @@ class CorteCaja(db.Model):
 
 class DetalleVenta(db.Model):
     __tablename__ = "detalles_venta"
+    id = db.Column(db.Integer, primary_key=True)
 
     precio = db.Column(db.Float, nullable=False)
     cantidad = db.Column(db.Integer)
 
-    idVenta = db.Column(db.Integer, db.ForeignKey("ventas.id"), primary_key=True)
-    idStock = db.Column(
-        db.Integer, db.ForeignKey("lotes_galletas.id"), primary_key=True
-    )
+    idVenta = db.Column(db.Integer, db.ForeignKey("ventas.id"))
+    idStock = db.Column(db.Integer, db.ForeignKey("lotes_galletas.id"))
 
 
 class LogAccion(db.Model):
