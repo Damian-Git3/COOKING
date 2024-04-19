@@ -189,11 +189,12 @@
       {% endif %}
 
       {% if solicitudProduccion.estatus == 2 %}
-      <form action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
-        id="formFinalizarSolicitud{{solicitudProduccion.id}}">
+      <form action="{{ url_for('cocina.finalizarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+        id="formFinalizarSolicitud{{solicitudProduccion.id}}" method="POST">
         <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-        <input type="hidden" name="mensaje" id="cantidadMerma{{solicitudProduccion.id}}" />
-        <button type="button" class="boton btn-aceptar" onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')">
+        <input type="hidden" name="mermaGalleta" id="mermaGalleta{{solicitudProduccion.id}}" />
+        <button type="button" class="boton btn-aceptar"
+          onclick="finalizarSolicitud('{{ solicitudProduccion.id }}', '{{ solicitudProduccion.tandas * solicitudProduccion.receta.piezas}}')">
           Finalizar producción
         </button>
       </form>
@@ -278,7 +279,7 @@
     });
   }
 
-  function finalizarSolicitud(id) {
+  function finalizarSolicitud(id, cantidadMaxima) {
     Swal.fire({
       title: "¿Estás seguro de finalizar la producción?",
       showCancelButton: true,
@@ -288,25 +289,40 @@
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
-          title: 'Merma producción',
-          input: 'number',
-          inputLabel: 'Indica la cantidad de merma en galletas:',
-          inputPlaceholder: 'Cantidad merma galletas...',
+          title: 'Merma en producción',
+          text: '¿Tuviste merma en esta producción? Coloca las piezas de merma.',
+          input: 'number', // Permite al usuario introducir un número
+          inputPlaceholder: 'Número de piezas de merma',
+          inputValidator: (value) => {
+            // Validación opcional, puedes personalizar el mensaje de error
+            if (!value) {
+              return 'Debes ingresar un número de piezas de merma';
+            }
+
+            if (parseInt(value) > parseInt(cantidadMaxima)) {
+              return 'La merma no puede ser mayor que las piezas producidas ' + cantidadMaxima;
+            }
+
+            if (parseInt(value) < 0) {
+              return 'La merma no puede ser menor que 0 piezas';
+            }
+          },
           showCancelButton: true,
-          confirmButtonText: 'Enviar',
-          cancelButtonText: 'Cancelar',
-          showLoaderOnConfirm: true,
-          preConfirm: (cantidadMerma) => {
-            document.getElementById('cantidadMerma' + id).value = cantidadMerma;
+          confirmButtonText: 'Aceptar',
+          cancelButtonText: 'Cancelar'
+        }).then((mermaResult) => {
+          if (mermaResult.isConfirmed) {
+            document.getElementById('mermaGalleta' + id).value = mermaResult.value
 
             let formFinalizarSolicitud = document.getElementById("formFinalizarSolicitud" + id);
+
             formFinalizarSolicitud.submit();
-          },
-          allowOutsideClick: () => !Swal.isLoading()
+          }
         });
       }
     });
   }
+
 
   function posponerSolicitud(id) {
     Swal.fire({

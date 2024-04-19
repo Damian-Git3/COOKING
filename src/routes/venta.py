@@ -5,6 +5,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from sqlalchemy import asc, desc, func
 from sqlalchemy.orm import joinedload
+from datetime import date
 
 from database.models import (
     Compra,
@@ -59,7 +60,8 @@ def solicitud_produccion():
 @requires_role("vendedor")
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
-    form.receta.choices = [(receta.id, receta.nombre) for receta in Receta.query.all()]
+    form.receta.choices = [(receta.id, receta.nombre)
+                           for receta in Receta.query.all()]
     recetas = [
         (receta.id, receta.imagen, receta.piezas) for receta in Receta.query.all()
     ]
@@ -120,15 +122,18 @@ def solicitud_produccion_nuevo():
                 mensajeInsumosCantidadesFaltantes = ""
 
                 for insumoReceta in insumosReceta:
-                    lotesInsumosCumplenCantidad = True
-
                     cantidadNecesaria = insumoReceta.cantidad * form.tandas.data
 
                     lotesInsumosReceta = (
-                        LoteInsumo.query.filter_by(idInsumo=insumoReceta.idInsumo)
+                        LoteInsumo.query
+                        .filter_by(idInsumo=insumoReceta.idInsumo)
+                        .filter(LoteInsumo.fecha_caducidad > date.today())
                         .order_by(asc(LoteInsumo.fecha_caducidad))
                         .all()
                     )
+
+                    print("------------------")
+                    print("que más pues")
 
                     if len(lotesInsumosReceta) > 0:
                         for loteInsumo in lotesInsumosReceta:
@@ -200,10 +205,9 @@ def solicitud_produccion_nuevo():
                         mensajeInsumosCantidadesFaltantes += f"No cuentas con {cantidadFormateada} {unidadMedida} del insumo {insumoReceta.insumo.nombre}\n"
 
                 if not recetaSePuedeProcesar:
-                    flash(
-                        f"La receta no se puede procesar debido a los siguientes productos faltantes: \n\n{mensajeInsumosCantidadesFaltantes}",
-                        "error",
-                    )
+                    print("hola desde no se puede procesar")
+
+                    flash(f"La receta no se puede procesar debido a los siguientes productos faltantes: \n\n{mensajeInsumosCantidadesFaltantes}", 'receta-error')
                     return redirect(url_for("venta.solicitud_produccion_nuevo"))
 
                 # Termina FOR DE INSUMOS
@@ -235,7 +239,8 @@ def aceptar_solicitud_produccion(id):
         idReceta=solicitud.idReceta,
         fecha_entrada=datetime.now(),
         tipo_venta=1,
-        cantidad=solicitud.tandas * Receta.query.get(solicitud.idReceta).piezas,
+        cantidad=solicitud.tandas *
+        Receta.query.get(solicitud.idReceta).piezas,
         idProduccion=solicitud.id,
         idUsuarios=current_user.id,
     )
@@ -254,13 +259,12 @@ def aceptar_solicitud_produccion(id):
 @requires_role("vendedor")
 def reintentar_solicitud_produccion(id):
     solicitud = SolicitudProduccion.query.get(id)
-
-    solicitud = SolicitudProduccion.query.get(id)
+    
     solicitud.estatus = 1
     solicitud.fecha_solicitud = datetime.now()
     db.session.commit()
 
-    flash("El lote se agrego al almacén", "success")
+    flash("Se volvio a enviar la solicitud", "success")
 
     return redirect(url_for("venta.solicitud_produccion"))
 
@@ -280,7 +284,8 @@ def delete_solicitud_produccion():
         mensajeDevolver = "Se devolvieron las siguientes cantidades al inventario: \n\n"
 
         for recetaLoteInsumoDevolver in recetaLotesInsumosDevolver:
-            lote_insumo = LoteInsumo.query.get(recetaLoteInsumoDevolver.idLoteInsumo)
+            lote_insumo = LoteInsumo.query.get(
+                recetaLoteInsumoDevolver.idLoteInsumo)
             lote_insumo.cantidad += recetaLoteInsumoDevolver.cantidad
 
             if lote_insumo.insumo.unidad_medida == "Kilos":
@@ -556,7 +561,8 @@ def compras_ver():
                 .all()
             )
 
-            compra.insumos = ", ".join([lote.nombre for loteInsumo, lote in lotes])
+            compra.insumos = ", ".join(
+                [lote.nombre for loteInsumo, lote in lotes])
             compra.caja = True if compra.idTransaccionCaja else False
 
         return render_template(
@@ -648,7 +654,8 @@ def compras_crear():
         (proveedor.id, proveedor.empresa) for proveedor in Proveedor.query.all()
     ]
 
-    insumos_choices = [(insumo.id, insumo.nombre) for insumo in Insumo.query.all()]
+    insumos_choices = [(insumo.id, insumo.nombre)
+                       for insumo in Insumo.query.all()]
 
     for lote_insumo_form in form.lotes_insumos:
         lote_insumo_form.insumos.choices = insumos_choices
@@ -659,7 +666,8 @@ def compras_crear():
             idUsuario=current_user.id,
             idProveedores=form.proveedores.data,
             fecha_compra=datetime.now(),
-            pago_proveedor=sum([lote.costo_lote.data for lote in form.lotes_insumos]),
+            pago_proveedor=sum(
+                [lote.costo_lote.data for lote in form.lotes_insumos]),
         )
         if form.caja.data:
             transaccion = TransaccionCaja(
@@ -1021,7 +1029,8 @@ def punto_venta_confirmar():
 
         galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
 
-    corte_de_hoy = CorteCaja.query.filter_by(fecha_corte=datetime.now().date()).first()
+    corte_de_hoy = CorteCaja.query.filter_by(
+        fecha_corte=datetime.now().date()).first()
 
     transaccion = TransaccionCaja(
         monto_ingreso=total,
