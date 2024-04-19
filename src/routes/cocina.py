@@ -1,19 +1,21 @@
 from datetime import datetime, timedelta
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import login_required
 
 from database.models import (
     Compra,
     Insumo,
     InsumosReceta,
     LoteInsumo,
+    Proveedor,
     Receta,
     SolicitudProduccion,
     Usuario,
     db,
 )
 from forms import forms
+from logger import logger as log
 
 cocina = Blueprint("cocina", __name__, url_prefix="/cocina")
 
@@ -175,6 +177,7 @@ def lotes_insumos():
                 .join(Insumo, LoteInsumo.idInsumo == Insumo.id)
                 .join(Compra, LoteInsumo.idCompra == Compra.id)
                 .join(Usuario, Compra.idUsuario == Usuario.id)
+                .join(Proveedor, Compra.id == Proveedor.id)
                 .filter(
                     LoteInsumo.cantidad > 0,
                     LoteInsumo.fecha_caducidad >= fecha_inicio,
@@ -189,6 +192,7 @@ def lotes_insumos():
                 .join(Insumo, LoteInsumo.idInsumo == Insumo.id)
                 .join(Compra, LoteInsumo.idCompra == Compra.id)
                 .join(Usuario, Compra.idUsuario == Usuario.id)
+                .join(Proveedor, Compra.id == Proveedor.id)
                 .filter(
                     LoteInsumo.cantidad > 0,
                     LoteInsumo.fecha_caducidad >= fecha_inicio,
@@ -204,10 +208,11 @@ def lotes_insumos():
         )
 
     lotes = (
-        db.session.query(LoteInsumo, Insumo, Usuario.nombre)
+        db.session.query(LoteInsumo, Insumo, Usuario.nombre, Proveedor.empresa)
         .join(Insumo, LoteInsumo.idInsumo == Insumo.id)
         .join(Compra, LoteInsumo.idCompra == Compra.id)
         .join(Usuario, Compra.idUsuario == Usuario.id)
+        .join(Proveedor, Compra.id == Proveedor.id)
         .filter(
             LoteInsumo.cantidad > 0,
             LoteInsumo.fecha_caducidad >= datetime.now(),
@@ -216,6 +221,7 @@ def lotes_insumos():
         .all()
     )
 
+    log.info(lotes)
     return render_template(
         "modulos/cocina/insumos.html", form=form, lotes=lotes, lista=True
     )

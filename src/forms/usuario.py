@@ -1,14 +1,6 @@
 """Clase que define el formulario de usuario"""
 
-from numpy import place
-from wtforms import (
-    EmailField,
-    Form,
-    PasswordField,
-    StringField,
-    SubmitField,
-    validators,
-)
+from wtforms import EmailField, Form, PasswordField, SubmitField, validators
 
 
 class UsuarioForm(Form):
