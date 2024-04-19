@@ -9,12 +9,13 @@ from sqlalchemy import func
 from database.models import Insumo, InsumosReceta, LoteInsumo, Receta, db
 from forms import utilidad as utilidad_form
 from logger import logger as log
+from routes.auth import requires_role
 
 utilidad = Blueprint("utilidad", __name__, url_prefix="/utilidad")
 
 
 @utilidad.route("/")
-@login_required
+@requires_role("admin")
 def gestion():
     """Ruta para la página de inicio de la sección de utilidad"""
     form = utilidad_form.GetRecetaForm(request.form)
@@ -26,6 +27,7 @@ def gestion():
 
 
 @utilidad.route("/obtener-ingredientes", methods=["POST"])
+@requires_role("admin")
 def obtener_ingredientes():
     """Ruta para obtener los ingredientes de una receta"""
     form = utilidad_form.GetRecetaForm(request.form)
@@ -90,6 +92,7 @@ def obtener_ingredientes():
 
 
 @utilidad.route("/guardar", methods=["POST"])
+@requires_role("admin")
 def guardar():
     """Ruta para guardar la utilidad de una receta"""
     form_utilidad = utilidad_form.UtilidadForm(request.form)

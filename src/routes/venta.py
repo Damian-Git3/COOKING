@@ -363,6 +363,7 @@ def lotes_galletas():
 
 
 @venta.route("/galletas", methods=["GET"])
+@requires_role("vendedor")
 def lotes_galletas_agrupados():
 
     galletas = Receta.query.all()
