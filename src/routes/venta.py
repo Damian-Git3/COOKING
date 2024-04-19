@@ -40,11 +40,15 @@ def compras():
 @venta.route("/solicitud_produccion")
 @requires_role("vendedor")
 def solicitud_produccion():
-    solicitudes = SolicitudProduccion.query.options(
-        joinedload(SolicitudProduccion.receta),
-        joinedload(SolicitudProduccion.usuarioSolicitud),
-        joinedload(SolicitudProduccion.usuarioProduccion),
-    ).all()
+    solicitudes = (
+        SolicitudProduccion.query.filter(SolicitudProduccion.estatus != 4)
+        .options(
+            joinedload(SolicitudProduccion.receta),
+            joinedload(SolicitudProduccion.usuarioSolicitud),
+            joinedload(SolicitudProduccion.usuarioProduccion),
+        )
+        .all()
+    )
 
     return render_template(
         "modulos/venta/solicitudes-produccion.html", solicitudes=solicitudes
@@ -220,26 +224,45 @@ def solicitud_produccion_nuevo():
             return redirect(url_for("venta.solicitud_produccion_nuevo"))
 
 
-@venta.route("/solicitud_produccion/edit/<int:id>", methods=["GET", "POST"])
+@venta.route("/solicitud_produccion/aceptar/<int:id>", methods=["POST"])
 @requires_role("vendedor")
-def edit_solicitud_produccion(id):
+def aceptar_solicitud_produccion(id):
     solicitud = SolicitudProduccion.query.get(id)
 
-    form = forms.ModificarSolicitudProduccionForm(request.form)
+    # agregar el lotes de galletas
 
-    if request.method == "POST" and form.validate():
-        solicitud = SolicitudProduccion.query.get(id)
-        solicitud.tandas = form.tandas.data
-        solicitud.fecha_solicitud = form.fecha_solicitud.data
-        db.session.commit()
-
-        flash("Solicitud de producción modificada correctamente", "success")
-
-        return redirect(url_for("venta.solicitud_produccion"))
-
-    return render_template(
-        "modulos/venta/solicitudesProduccion/edit.html", form=form, solicitud=solicitud
+    lote = LoteGalleta(
+        idReceta=solicitud.idReceta,
+        fecha_entrada=datetime.now(),
+        tipo_venta=1,
+        cantidad=solicitud.tandas * Receta.query.get(solicitud.idReceta).piezas,
+        idProduccion=solicitud.id,
+        idUsuarios=current_user.id,
     )
+    db.session.add(lote)
+
+    solicitud = SolicitudProduccion.query.get(id)
+    solicitud.estatus = 4
+    db.session.commit()
+
+    flash("El lote se agrego al almacén", "success")
+
+    return redirect(url_for("venta.solicitud_produccion"))
+
+
+@venta.route("/solicitud_produccion/reintentar/<int:id>", methods=["POST"])
+@requires_role("vendedor")
+def reintentar_solicitud_produccion(id):
+    solicitud = SolicitudProduccion.query.get(id)
+
+    solicitud = SolicitudProduccion.query.get(id)
+    solicitud.estatus = 1
+    solicitud.fecha_solicitud = datetime.now()
+    db.session.commit()
+
+    flash("El lote se agrego al almacén", "success")
+
+    return redirect(url_for("venta.solicitud_produccion"))
 
 
 @venta.route("/solicitud_produccion/delete", methods=["POST"])
@@ -249,7 +272,7 @@ def delete_solicitud_produccion():
 
     solicitud = SolicitudProduccion.query.get_or_404(id)
 
-    if solicitud.estatus == 1:
+    if solicitud.estatus == 1 or solicitud.estatus == 5:
         recetaLotesInsumosDevolver = RecetaLoteInsumo.query.filter_by(
             idSolicitud=solicitud.id
         ).all()
@@ -269,7 +292,7 @@ def delete_solicitud_produccion():
                     cantidadFormateada = recetaLoteInsumoDevolver.cantidad * 1000
             elif lote_insumo.insumo.unidad_medida == "Litros":
                 if recetaLoteInsumoDevolver.cantidad >= 1:
-                    unidadMedida = "l"
+                    unidadMedida = "litros"
                     cantidadFormateada = recetaLoteInsumoDevolver.cantidad
                 else:
                     unidadMedida = "ml"
@@ -291,8 +314,8 @@ def delete_solicitud_produccion():
         return redirect(url_for("venta.solicitud_produccion"))
     else:
         flash(
-            "La solicitud se encuentra en un status diferente a realizada, solicita al cocinero que descienda los status para poder eliminarla",
-            "error",
+            "La solicitud se encuentra en un status diferente a realizada o rechazada, solicita al cocinero que devuelva la solicitud",
+            "info",
         )
 
         return redirect(url_for("venta.solicitud_produccion"))

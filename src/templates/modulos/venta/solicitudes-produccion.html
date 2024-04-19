@@ -7,24 +7,51 @@ block content %}
 
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
-    <a href="{{ url_for('venta.solicitud_produccion') }}" style="text-decoration: none; color: black"><button
-        class="nav-link {%if not nuevo %}active{%endif%}" id="nav-home-tab" data-bs-toggle="tab"
-        data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
-        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}">
+    <a
+      href="{{ url_for('venta.solicitud_produccion') }}"
+      style="text-decoration: none; color: black"
+      ><button
+        class="nav-link {%if not nuevo %}active{%endif%}"
+        id="nav-home-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-home"
+        type="button"
+        role="tab"
+        aria-controls="nav-home"
+        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}"
+      >
         Pendientes
       </button>
     </a>
-    <a href="{{ url_for('venta.solicitud_produccion_nuevo') }}" style="text-decoration: none; color: black">
-      <button class="nav-link {%if nuevo %}active{%endif%}" id="nav-profile-tab" data-bs-toggle="tab"
-        data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
-        aria-selected="{%if nuevo %}true{%else%}false{%endif%}">
+    <a
+      href="{{ url_for('venta.solicitud_produccion_nuevo') }}"
+      style="text-decoration: none; color: black"
+    >
+      <button
+        class="nav-link {%if nuevo %}active{%endif%}"
+        id="nav-profile-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-profile"
+        type="button"
+        role="tab"
+        aria-controls="nav-profile"
+        aria-selected="{%if nuevo %}true{%else%}false{%endif%}"
+      >
         Nueva
       </button>
     </a>
 
     {% if editar %}
-    <button class="nav-link" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab"
-      aria-controls="nav-edit" aria-selected="false">
+    <button
+      class="nav-link"
+      id="nav-edit-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-edit"
+      type="button"
+      role="tab"
+      aria-controls="nav-edit"
+      aria-selected="false"
+    >
       Editar
     </button>
     {% endif %}
@@ -32,8 +59,12 @@ block content %}
 </nav>
 
 <div class="tab-content">
-  <div class="tab-pane fade {%if not nuevo %}show active{% endif %}" id="nav-home" role="tabpanel"
-    aria-labelledby="nav-home-tab">
+  <div
+    class="tab-pane fade {%if not nuevo %}show active{% endif %}"
+    id="nav-home"
+    role="tabpanel"
+    aria-labelledby="nav-home-tab"
+  >
     <table class="table table-bordered" id="tabla-principal">
       <thead>
         <tr>
@@ -43,28 +74,43 @@ block content %}
           <th>Número de Tandas</th>
           <th>Fecha de Solicitud</th>
           <th>Estatus</th>
+          <th></th>
           <th>Solicitante</th>
           <th>Cocinero Responsable</th>
+          <th>Mensaje</th>
         </tr>
       </thead>
       <tbody>
         {% for solicitud in solicitudes %}
         <tr>
-          <td class="list-buttons-column" style="display: flex; justify-content: space-around; border: none">
-            <!-- <a class="icon" href="/venta/solicitud_produccion/edit/{{ solicitud.id }}" title="Editar Registro"
-              style="text-decoration: none; color: black">
-              <span class="fa fa-pencil glyphicon glyphicon-pencil"></span>
-            </a> -->
-
-            <form id="deleteForm{{ solicitud.id }}" method="POST" action="/venta/solicitud_produccion/delete">
-              <input id="id" name="id" required="" type="hidden" value="{{solicitud.id}}" />
+          <td
+            class="list-buttons-column"
+            style="display: flex; justify-content: space-around; border: none"
+          >
+            {% if solicitud.estatus == 1 or solicitud.estatus ==5 %}
+            <form
+              id="deleteForm{{ solicitud.id }}"
+              method="POST"
+              action="/venta/solicitud_produccion/delete"
+            >
+              <input
+                id="id"
+                name="id"
+                required=""
+                type="hidden"
+                value="{{solicitud.id}}"
+              />
               <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
 
-              <button onclick="event.preventDefault(); confirmDelete('{{ solicitud.id }}');" title="Delete record"
-                style="border: none; background: none">
+              <button
+                onclick="event.preventDefault(); confirmDelete('{{ solicitud.id }}');"
+                title="Delete record"
+                style="border: none; background: none"
+              >
                 <span class="fa-solid fa-trash"></span>
               </button>
             </form>
+            {% endif %}
 
             <script>
               function confirmDelete(id) {
@@ -85,27 +131,104 @@ block content %}
             </script>
           </td>
           <td>
-            <img src="{{ url_for('static', filename='img/cookies/' + solicitud.receta.imagen) }}"
-              style="max-width: 80px; max-height: 80px; border-radius: 10px" />
+            <div
+              style="
+                overflow: hidden;
+                width: 80px;
+                max-height: 60px;
+                border-radius: 10px;
+              "
+            >
+              <img
+                src="{{ url_for('static', filename='img/cookies/' + solicitud.receta.imagen) }}"
+                style="max-width: 80px; max-height: 80px"
+              />
+            </div>
           </td>
           <td>{{ solicitud.receta.nombre }}</td>
           <td>{{ solicitud.tandas }}</td>
           <td>{{ solicitud.fecha_solicitud }}</td>
           <td>
             {% if solicitud.estatus == 1 %}
-            Solicitud realizada
+            <div style="display: flex; align-items: center">
+              <span>Solicitud realizada</span>
+            </div>
             {% elif solicitud.estatus == 2 %}
-            En preparación
+            <div style="display: flex; align-items: center">
+              <span>En preparación</span>
+            </div>
             {% elif solicitud.estatus == 3 %}
-            Listo para entrega
+            <div style="display: flex; align-items: center">
+              <span>Listo para recoger</span>
+            </div>
             {% elif solicitud.estatus == 4 %}
-            Producción entregada
+            <div style="display: flex; align-items: center">
+              <span>Producción entregada </span>
+            </div>
             {% elif solicitud.estatus == 5 %}
-            Solicitud rechazada
+            <div style="display: flex; align-items: center">
+              <span>Solicitud rechazada</span>
+            </div>
+            {% elif solicitud.estatus == 6 %}
+            <div style="display: flex; align-items: center">
+              <span>Producción pospuesta</span>
+            </div>
+            {% endif %}
+          </td>
+          <td>
+            {% if solicitud.estatus == 3 %}
+            <form
+              action="{{url_for('venta.aceptar_solicitud_produccion', 
+            id= solicitud.id)}}"
+              method="POST"
+            >
+              <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+              <input type="hidden" name="id" value="{{ solicitud.id }}" />
+              <button type="submit" value="Reintentar" class="btn btn-success">
+                <i class="fa-solid fa-box"></i>
+              </button>
+            </form>
+            {% elif solicitud.estatus == 5 %}
+            <div style="display: flex; align-items: center">
+              <form
+                action="{{url_for('venta.reintentar_solicitud_produccion', id= solicitud.id) }}"
+                style="margin-left: auto"
+                method="POST"
+              >
+                <input
+                  type="hidden"
+                  name="csrf_token"
+                  value="{{csrf_token()}}"
+                />
+                <input type="hidden" name="id" value="{{ solicitud.id }}" />
+                <button
+                  type="submit"
+                  value="Reintentar"
+                  class="btn btn-primary"
+                >
+                  <i class="fa-solid fa-rotate"></i>
+                </button>
+              </form>
+            </div>
+            {% elif solicitud.estatus == 6 %}
+            <form
+              action="{{url_for('venta.reintentar_solicitud_produccion', id= solicitud.id) }}"
+              method="POST"
+            >
+              <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+              <input type="hidden" name="id" value="{{ solicitud.id }}" />
+              <button type="submit" value="Reintentar" class="btn btn-primary">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+              </button>
+            </form>
             {% endif %}
           </td>
           <td>{{ solicitud.usuarioSolicitud.nombre }}</td>
           <td>{{ solicitud.usuarioProduccion.nombre }}</td>
+          <td>
+            {{ solicitud.mensaje if solicitud.mensaje is not none else "Ninguno"
+            }}
+          </td>
         </tr>
         {% endfor %}
       </tbody>
