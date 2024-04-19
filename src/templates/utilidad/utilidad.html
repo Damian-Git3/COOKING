@@ -44,9 +44,9 @@
                     {% for ingrediente in ingredientes %}
                     <tr>
                         <td>{{ ingrediente.insumo }}</td>
-                        <td>{{ ingrediente.inventario }} KG</td>
-                        <td>{{ ingrediente.precio_total }}</td>
-                        <td>{{ ingrediente.cantidad }} KG</td>
+                        <td>{{ ingrediente.inventario }} {{ ingrediente.unidad }}</td>
+                        <td>$ {{ ingrediente.precio_total }}</td>
+                        <td>{{ ingrediente.cantidad }} {{ ingrediente.unidad }}</td>
                         <td>$ {{ ingrediente.costo_total }}</td>
                     {% endfor %}
                     
