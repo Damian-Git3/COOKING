@@ -7,7 +7,7 @@ ol {
   list-style: none;
 }
 
-.solicitudes-vacias{
+.solicitudes-vacias {
   width: 100%;
   display: flex;
   align-items: center;
@@ -173,7 +173,7 @@ ol {
   }
 }
 
-.order-card .c-media .details{
+.order-card .c-media .details {
   width: 100%;
 }
 
@@ -214,7 +214,7 @@ ol {
   background: linear-gradient(-45deg, #b7b4be, #817e7e, #afacac, #d9d7d4);
 }
 
-.c-body{
+.c-body {
   margin-top: 10px;
 }
 
@@ -222,6 +222,7 @@ ol {
   background-size: 800% 400%;
   padding: 5px 10px;
   width: 100%;
+  height: 100%;
   border: none;
   border-radius: $border-radius;
   font-size: 17px;
@@ -235,8 +236,12 @@ ol {
   -o-border-radius: $border-radius;
 }
 
-.botones-solicitud form:last-child {
-  grid-column: 1 / span 2; /* Ocupa dos columnas empezando desde la primera */
+.botones-solicitud form:nth-last-child(n + 3) {
+  grid-column: 1 / span 2;
+}
+
+.botones-solicitud form:only-child {
+  grid-column: 1 / span 2;
 }
 
 .boton:hover {

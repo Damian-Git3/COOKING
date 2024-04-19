@@ -86,7 +86,7 @@ def solicitud_produccion_nuevo():
             insumosReceta = InsumosReceta.query.filter_by(
                 idReceta=form.receta.data
             ).all()
-            
+
             usuario_cocinero = 0
             rol_cocinero = Rol.query.filter_by(nombre="cocinero").first()
 
@@ -114,14 +114,14 @@ def solicitud_produccion_nuevo():
                     usuario_cocinero = usuario_cocinero.id
                 else:
                     usuario_cocinero = current_user.id
-            
+
             solicitud = SolicitudProduccion(
-                    idReceta=form.receta.data,
-                    idUsuarioSolicitud=current_user.id,
-                    idUsuarioProduccion=usuario_cocinero,
-                    tandas=form.tandas.data,
-                    estatus=1,
-                )
+                idReceta=form.receta.data,
+                idUsuarioSolicitud=current_user.id,
+                idUsuarioProduccion=usuario_cocinero,
+                tandas=form.tandas.data,
+                estatus=1,
+            )
 
             db.session.add(solicitud)
 
@@ -134,13 +134,6 @@ def solicitud_produccion_nuevo():
 
                     cantidadNecesaria = insumoReceta.cantidad * form.tandas.data
 
-                    print("----------------------")
-                    print(f"Insumo: {insumoReceta.insumo.nombre}")
-                    print(
-                        f"Insumo cantidad en receta: {insumoReceta.cantidad}")
-                    print(f"Tandas: {form.tandas.data}")
-                    print(f"Cantidad necesaria: {cantidadNecesaria}")
-
                     lotesInsumosReceta = (
                         LoteInsumo.query.filter_by(
                             idInsumo=insumoReceta.idInsumo)
@@ -148,35 +141,32 @@ def solicitud_produccion_nuevo():
                         .all()
                     )
 
-                    print(
-                        f"Cantidad de lotes insumos para este insumo: {len(lotesInsumosReceta)}")
-
                     if len(lotesInsumosReceta) > 0:
                         for loteInsumo in lotesInsumosReceta:
                             if loteInsumo.cantidad >= cantidadNecesaria:
                                 recetaLoteInsumo = RecetaLoteInsumo(
-                                    idSolicitud = solicitud.id,
+                                    idSolicitud=solicitud.id,
                                     idReceta=form.receta.data,
                                     idLoteInsumo=loteInsumo.id,
-                                    cantidad = cantidadNecesaria
+                                    cantidad=cantidadNecesaria
                                 )
-                                
+
                                 db.session.add(recetaLoteInsumo)
-                                
+
                                 loteInsumo.cantidad -= cantidadNecesaria
                                 cantidadNecesaria = 0
 
                                 break
                             else:
                                 recetaLoteInsumo = RecetaLoteInsumo(
-                                    idSolicitud = solicitud.id,
+                                    idSolicitud=solicitud.id,
                                     idReceta=form.receta.data,
                                     idLoteInsumo=loteInsumo.id,
-                                    cantidad = loteInsumo.cantidad
+                                    cantidad=loteInsumo.cantidad
                                 )
-                                
+
                                 db.session.add(recetaLoteInsumo)
-                                
+
                                 cantidadNecesaria -= loteInsumo.cantidad
                                 loteInsumo.cantidad = 0
 
@@ -271,12 +261,45 @@ def edit_solicitud_produccion(id):
 @requires_role("vendedor")
 def delete_solicitud_produccion():
     id = request.form.get("id")
+    
     solicitud = SolicitudProduccion.query.get_or_404(id)
 
     if solicitud.estatus == 1:
+        recetaLotesInsumosDevolver = RecetaLoteInsumo.query.filter_by(
+            idSolicitud=solicitud.id).all()
+
+        mensajeDevolver = "Se devolvieron las siguientes cantidades al inventario: \n\n"
+
+        for recetaLoteInsumoDevolver in recetaLotesInsumosDevolver:
+            lote_insumo = LoteInsumo.query.get(
+                recetaLoteInsumoDevolver.idLoteInsumo)
+            lote_insumo.cantidad += recetaLoteInsumoDevolver.cantidad
+            
+            if lote_insumo.insumo.unidad_medida == "Kilos":
+                if recetaLoteInsumoDevolver.cantidad >= 1:
+                    unidadMedida = "kg"
+                    cantidadFormateada = recetaLoteInsumoDevolver.cantidad
+                else:
+                    unidadMedida = "g"
+                    cantidadFormateada = recetaLoteInsumoDevolver.cantidad * 1000
+            elif lote_insumo.insumo.unidad_medida == "Litros":
+                if recetaLoteInsumoDevolver.cantidad >= 1:
+                    unidadMedida = "l"
+                    cantidadFormateada = recetaLoteInsumoDevolver.cantidad
+                else:
+                    unidadMedida = "ml"
+                    cantidadFormateada = recetaLoteInsumoDevolver.cantidad * 1000
+
+            mensajeDevolver += f"{cantidadFormateada} {unidadMedida} al insumo {lote_insumo.insumo.nombre}\n"
+
+            db.session.delete(recetaLoteInsumoDevolver)
+
         db.session.delete(solicitud)
+
         db.session.commit()
-        flash("Solicitud de producción eliminada correctamente", "success")
+
+        flash(
+            f"Solicitud de producción eliminada correctamente \n{mensajeDevolver}", "receta")
 
         return redirect(url_for("venta.solicitud_produccion"))
     else:
