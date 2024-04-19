@@ -25,7 +25,7 @@ def cocinar():
     print(solicitudesProduccion)
 
     return render_template(
-        "modulos/cocina/cocinar.html", solicitudesProduccion=solicitudesProduccion
+        "modulos/cocina/cocinar.html", solicitudesProduccion=solicitudesProduccion, current_datetime=datetime.now()
     )
 
 
@@ -38,7 +38,7 @@ def recetas():
 @cocina.route("/aceptar-solicitud/<int:idSolicitud>")
 @login_required
 def aceptarSolicitud(idSolicitud):
-    solicitudProduccion = SolicitudProduccion.query.get(idSolicitud)
+    solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
 
     if solicitudProduccion:
         solicitudProduccion.estatus = 2
@@ -47,13 +47,13 @@ def aceptarSolicitud(idSolicitud):
             idReceta=solicitudProduccion.idReceta
         ).all()
 
-        receta = Receta.query.get(solicitudProduccion.idReceta)
+        receta = Receta.query.get_or_404(solicitudProduccion.idReceta)
 
         mensajeReceta = f"Descripción receta: \n{receta.descripcion}\n\n"
         mensajeReceta += "Los ingredientes para esta receta son:\n"
 
         for insumoReceta in insumosReceta:
-            insumo = Insumo.query.get(insumoReceta.idInsumo)
+            insumo = Insumo.query.get_or_404(insumoReceta.idInsumo)
             mensajeReceta += f"{insumo.nombre}: {insumoReceta.cantidad * solicitudProduccion.tandas:.2f} {insumo.unidad_medida}\n"
 
         db.session.commit()
@@ -72,22 +72,53 @@ def aceptarSolicitud(idSolicitud):
 @cocina.route("/finalizar-produccion/<int:idSolicitud>")
 @login_required
 def finalizarProduccion(idSolicitud):
-    print("Finalizando producción")
+    solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
 
-    solicitudProduccion = SolicitudProduccion.query.get(idSolicitud)
-    insumosRecetaProduccion = InsumosReceta.query.filter_by(
-        idReceta=solicitudProduccion.idReceta
-    ).all()
+    if solicitudProduccion.estatus == 2:
+        solicitudProduccion.estatus = 3
 
-    print(insumosRecetaProduccion)
+        db.session.commit()
 
-    if solicitudProduccion:
+        flash("Solicitud finalizada correctamente", 'success')
         return redirect(url_for("cocina.cocinar"))
     else:
-        flash(
-            "No se encontro la solicitud de producción con los datos proporcionados",
-            "info",
-        )
+        flash("La solicitud se encuentra en un status diferente a solicitud en preparación, no se puede finalizar", 'error')
+        return redirect(url_for("cocina.cocinar"))
+
+
+@cocina.route("/rechazar-solicitud/<int:idSolicitud>", methods=["POST"])
+@login_required
+def rechazarSolicitud(idSolicitud):
+    solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
+
+    if solicitudProduccion.estatus == 1:
+        solicitudProduccion.mensaje = request.form.get('mensaje')
+        solicitudProduccion.estatus = 5
+
+        db.session.commit()
+
+        flash("Solicitud rechazada correctamente", 'success')
+        return redirect(url_for("cocina.cocinar"))
+    else:
+        flash("La solicitud se encuentra en un status diferente a solicitud realizada, no se puede rechazar", 'error')
+        return redirect(url_for("cocina.cocinar"))
+
+
+@cocina.route("/posponer-solicitud/<int:idSolicitud>", methods=["POST"])
+@login_required
+def posponerSolicitud(idSolicitud):
+    solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
+
+    if solicitudProduccion.estatus == 1:
+        solicitudProduccion.mensaje = request.form.get('mensaje')
+        solicitudProduccion.estatus = 6
+
+        db.session.commit()
+
+        flash("Solicitud pospuesta correctamente", 'success')
+        return redirect(url_for("cocina.cocinar"))
+    else:
+        flash("La solicitud se encuentra en un status diferente a solicitud realizada, no se puede posponer", 'error')
         return redirect(url_for("cocina.cocinar"))
 
 
@@ -162,11 +193,11 @@ def merma_insumos(id):
     form = forms.MermaInsumoForm(request.form)
     form.lot_id.data = id
 
-    lote = LoteInsumo.query.get(id)
+    lote = LoteInsumo.query.get_or_404(id)
 
     cantidad_maxima = lote.cantidad
 
-    insumo = Insumo.query.get(lote.idInsumo)
+    insumo = Insumo.query.get_or_404(lote.idInsumo)
 
     tipo_medida = insumo.unidad_medida
 
@@ -190,6 +221,7 @@ def merma_insumos(id):
         lote.cantidad -= float(cantidad)
         lote.merma += float(cantidad)
         db.session.commit()
+
         flash("Merma registrada correctamente", "success")
         return redirect(url_for("cocina.lotes_insumos"))
 
