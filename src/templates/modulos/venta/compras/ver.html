@@ -21,7 +21,7 @@ messages %}
         aria-controls="nav-1"
         aria-selected="true"
       >
-        Buscar Lotes de Galletas
+        Lista
       </button>
     </a>
 
@@ -36,14 +36,18 @@ messages %}
         aria-controls="nav-2"
         aria-selected="false"
       >
-        Nuevo Lote
+        Nueva compra
       </button>
     </a>
   </div>
 </nav>
 
 <div class="container">
-  <form method="POST" class="form-inline mt-3">
+  <form
+    method="POST"
+    action="{{url_for('venta.compras_ver')}}"
+    class="form-inline mt-3"
+  >
     <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
     <div class="row">
       <div class="col-md-3">

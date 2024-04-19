@@ -1,7 +1,6 @@
-""" Este archivo contiene las clases de los formularios que se utilizan en la aplicación. """
+from datetime import datetime
 
-from datetime import date
-
+from flask import flash
 from wtforms import (
     BooleanField,
     DateField,
@@ -17,6 +16,9 @@ from wtforms import (
     TextAreaField,
     validators,
 )
+from wtforms.validators import DataRequired
+
+from database.models import CorteCaja, db
 
 
 class SignupForm(Form):
@@ -59,7 +61,7 @@ class SolicitudProduccionForm(Form):
         ],
     )
     fecha_solicitud = DateField(
-        "Fecha de Solicitud", default=date.today(), format="%Y-%m-%d"
+        "Fecha de Solicitud", default=datetime.today(), format="%Y-%m-%d"
     )
 
 
@@ -75,7 +77,7 @@ class ModificarSolicitudProduccionForm(Form):
         ],
     )
     fecha_solicitud = DateField(
-        "Fecha de Solicitud", default=date.today(), format="%Y-%m-%d"
+        "Fecha de Solicitud", default=datetime.today(), format="%Y-%m-%d"
     )
     mensaje = TextAreaField("Mensaje")
 
@@ -141,49 +143,22 @@ class BusquedaCompra(Form):
     fecha_inicio = DateField(
         "Fecha de Inicio",
         format="%Y-%m-%d",
-        validators=[
-            validators.DataRequired(message="Este campo no puede estar vacío.")
-        ],
     )
     fecha_fin = DateField(
         "Fecha de Fin",
         format="%Y-%m-%d",
-        validators=[
-            validators.DataRequired(message="Este campo no puede estar vacío.")
-        ],
     )
     usa_dinero_caja = BooleanField("Usó dinero de caja")
     insumo = SelectField(
         "Insumo",
         choices=[],
-        validators=[
-            validators.DataRequired(message="Este campo no puede estar vacío.")
-        ],
     )
 
 
 class BusquedaLoteInsumoForm(Form):
-    fecha_inicio = DateField(
-        "Fecha de Inicio",
-        format="%Y-%m-%d",
-        validators=[
-            validators.DataRequired(message="Este campo no puede estar vacío.")
-        ],
-    )
-    fecha_fin = DateField(
-        "Fecha de Fin",
-        format="%Y-%m-%d",
-        validators=[
-            validators.DataRequired(message="Este campo no puede estar vacío.")
-        ],
-    )
-    insumo = SelectField(
-        "Insumo",
-        choices=[],
-        validators=[
-            validators.DataRequired(message="Este campo no puede estar vacìo.")
-        ],
-    )
+    fecha_inicio = DateField("Fecha de Inicio", format="%Y-%m-%d")
+    fecha_fin = DateField("Fecha de Fin", format="%Y-%m-%d")
+    insumo = SelectField("Insumo", choices=[])
 
 
 class LoteInsumoForm(Form):
@@ -194,7 +169,7 @@ class LoteInsumoForm(Form):
             validators.DataRequired(message="Este campo no puede estar vacìo.")
         ],
     )
-    cantidad = IntegerField(
+    cantidad = DecimalField(
         "Cantidad (Kilos o Litros)",
         validators=[
             validators.DataRequired(message="Este campo no puede estar vacìo.")
@@ -226,6 +201,30 @@ class NuevaCompraForm(Form):
     caja = BooleanField("¿Retirar dinero de la caja?", default=True)
     lotes_insumos = FieldList(FormField(LoteInsumoForm), min_entries=1)
 
+    def validate(self):
+        # Primero, realiza la validación estándar del formulario
+        if not super().validate():
+            return False
+
+        if self.caja.data:
+            # Luego, verifica si hay suficiente dinero en la caja
+            caja = (
+                db.session.query(CorteCaja)
+                .filter(CorteCaja.fecha_corte == datetime.now().date())
+                .first()
+            )
+
+            if not caja or caja.monto_final < sum(
+                [lote.costo_lote.data for lote in self.lotes_insumos]
+            ):
+                flash(
+                    "No hay suficiente dinero en la caja para realizar la compra",
+                    "danger",
+                )
+                return False
+
+        return True
+
 
 class busquedaRecetaPuntoVenta(Form):
     buscar = StringField(
@@ -241,3 +240,32 @@ class agregarProductoPuntoVenta(Form):
         [validators.DataRequired(message="Ingresa un valor")],
         render_kw={"placeholder": "Cantidad"},
     )
+
+
+class devolucionForm(Form):
+    cantidad = DecimalField(
+        "Cantidad",
+        [validators.DataRequired(message="Ingresa un valor")],
+        render_kw={"placeholder": "Escribir cantidad de devolución..."},
+    )
+
+    def validate(self):
+        # Primero, realiza la validación estándar del formulario
+        if not super().validate():
+            return False
+
+        # Luego, verifica si hay suficiente dinero en la caja
+        caja = (
+            db.session.query(CorteCaja)
+            .filter(CorteCaja.fecha_corte == datetime.now().date())
+            .first()
+        )
+
+        if not caja or caja.monto_final < self.cantidad.data:
+            flash(
+                "No hay suficiente dinero en la caja para realizar el retiro",
+                "danger",
+            )
+            return False
+
+        return True

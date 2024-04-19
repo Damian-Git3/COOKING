@@ -2,7 +2,7 @@
 styles %} {% endblock %} {%from "_macros.html" import render_field%} {% block
 content %}
 <div style="width: 100%; text-align: center">
-  <h1>Almacén</h1>
+  <h1>Lotes de galletas</h1>
 </div>
 {% with messages = get_flashed_messages() %} {% if messages %} {% for message in
 messages %}
@@ -10,6 +10,20 @@ messages %}
 {% endfor %} {% endif %} {% endwith %}
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a href="{{url_for('venta.lotes_galletas_agrupados')}}" style="text-decoration: none">
+      <button
+        class="nav-link"
+        id="nav-lote1-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-lote1"
+        type="button"
+        role="tab"
+        aria-controls="nav-lote1"
+        aria-selected="false"
+      >
+        Galletas
+      </button>
+    </a>
     <a href="{{url_for('venta.lotes_galletas')}}" style="text-decoration: none">
       <button
         class="nav-link {% if lista %}active{% endif %}"
@@ -21,7 +35,7 @@ messages %}
         aria-controls="nav-lote1"
         aria-selected="{% if lista %}true{% else %}false{% endif %}"
       >
-        Inventario Lotes de Galletas
+        Lotes de Galletas
       </button>
     </a>
     {% if not lista %}
@@ -126,6 +140,10 @@ messages %}
       <p>
         Máximo {{ cantidad_maxima }} piezas o {{
         "%.3f"|format(cantidad_maxima*peso_pieza) }} Kilos
+      </p>
+      <p>
+        Cada galleta pesa {{ (peso_pieza*1000)|int }} gramos. Les mermas con una
+        fracción del gramaje restan una pieza completa.
       </p>
       <br />
       <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />

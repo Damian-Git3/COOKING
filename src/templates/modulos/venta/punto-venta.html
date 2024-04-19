@@ -2,6 +2,10 @@
 block styles %} {% endblock %} {%from "_macros.html" import render_field,
 render_field_nolabel %} {% block content %}
 
+<script type="text/javascript" src="../../../static/js/jsPDF.js"></script>
+<script type="text/javascript" src="../../../static/js/autotable.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.3/html2canvas.min.js"></script>
+
 <div
   style="
     min-height: 100%;
@@ -13,14 +17,30 @@ render_field_nolabel %} {% block content %}
     align-items: center;
   "
 >
-  <div style="width: 100%; height: fit-content; text-align: center">
-    <h1>Punto de venta</h1>
+  <div style="width: 100%; height: fit-content" style="position: relative">
+    <h1 style="width: 50%" class="text-center">Punto de venta</h1>
+    <div
+      style="
+        border-radius: 10px;
+        background-color: #e6b252;
+        display: flex;
+        justify-content: center;
+        width: 50%;
+        align-items: center;
+        position: absolute;
+        top: 8px;
+        right: 0px;
+        padding: 5px 10px;
+        color: #ffffff;
+      "
+    >
+      <h5 style="margin: auto">Caja: ${{ efectivo_caja|round(2) }}</h5>
+      <div><i class="fa-solid fa-outdent"></i></div>
+    </div>
   </div>
-  {% with messages = get_flashed_messages() %} {% if messages %} {% for message
-  in messages %}
-  <div class="alert alert-success" style="width: 90%; margin: 0 5%">
-    {{ message }}
-  </div>
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div class="alert alert-{{ category }}" style="width: 90%">{{ message }}</div>
   {% endfor %} {% endif %} {% endwith %}
 
   <div class="row" style="flex-grow: 1; width: 100%">
@@ -191,17 +211,72 @@ render_field_nolabel %} {% block content %}
         align-items: center;
       "
     >
+      <div class="d-flex justify-content-around" style="width: 100%">
+        <form
+          id="form-devolucion"
+          action=" {{ url_for('venta.punto_venta_devolucion') }} "
+          method="POST"
+          style="width: 100%"
+        >
+          <div
+            class="d-flex justify-content-between"
+            style="width: 100%; margin: 10px"
+          >
+            <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+            <div
+              class="row control-group"
+              style="flex-grow: 1; margin-right: 10px"
+            >
+              <div class="form-group col-xs-12 float-label-form-group controls">
+                {{render_field_nolabel(form_devolucion.cantidad,
+                class="form-control", style="flex-grow: 1; margin-right:
+                10px")}}
+              </div>
+            </div>
+
+            <button type="submit" id="btn-devolucion" class="btn btn-primary">
+              Generar devolución
+            </button>
+          </div>
+        </form>
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            var form = document.getElementById("form-devolucion"); // Asegúrate de seleccionar el formulario correcto
+
+            form.addEventListener("submit", function (event) {
+              event.preventDefault(); // Previene el envío del formulario por defecto
+
+              Swal.fire({
+                title: "Confirmar devolución",
+                showCancelButton: true,
+                confirmButtonText: "Si",
+                cancelButtonText: "Cancelar",
+              }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                  form.submit();
+                } else if (result.isDenied) {
+                  Swal.fire("Se canceló la venta", "", "info");
+                }
+              });
+            });
+          });
+        </script>
+      </div>
       <div
         style="
           min-height: 300;
-          height: calc(100vh - 166px);
+          height: calc(100vh - 223px);
           width: 100%;
           overflow: auto;
           border: solid 2px;
           border-radius: 10px;
         "
       >
-        <table class="table table-hover table-striped-columns table-bordered">
+        <table
+          class="table table-hover table-striped-columns table-bordered"
+          id="tabla_venta"
+        >
           <thead style="color: white; background-color: black">
             <tr style="color: white; background-color: black">
               <th style="color: white; background-color: black" scope="col">
@@ -227,8 +302,8 @@ render_field_nolabel %} {% block content %}
             <tr>
               <td scope="row">{{ producto.nombre }}</td>
               <td>{{ producto.cantidad }}</td>
-              <td>{{ producto.precio_unidad | round(2) }}</td>
-              <td>{{ producto.subtotal | round(2) }}</td>
+              <td>$ {{ producto.precio_unidad | round(2) }}</td>
+              <td>$ {{ producto.subtotal | round(2) }}</td>
               <td>
                 <form
                   action="{{ url_for('venta.punto_venta_eliminar', id=producto.idCarrito) }}"
@@ -262,6 +337,7 @@ render_field_nolabel %} {% block content %}
                       confirmButtonColor: "#3085d6",
                       cancelButtonColor: "#d33",
                       confirmButtonText: "Eliminar",
+                      cancelButtonText: "Cancelar",
                     }).then((result) => {
                       if (result.isConfirmed) {
                         document
@@ -279,28 +355,169 @@ render_field_nolabel %} {% block content %}
       </div>
       <div class="d-flex justify-content-around" style="width: 100%">
         <form
+          id="form-confirmar"
           action=" {{ url_for('venta.punto_venta_confirmar') }}"
           method="POST"
         >
           <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-          <button type="submit" class="btn btn-success" style="margin: 10px">
+          <button
+            type="submit"
+            id="btn-confirmar"
+            class="btn btn-success"
+            style="margin: 10px"
+          >
             Confirmar compra
           </button>
         </form>
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            var form = document.getElementById("form-confirmar"); // Asegúrate de seleccionar el formulario correcto
+
+            form.addEventListener("submit", function (event) {
+              event.preventDefault(); // Previene el envío del formulario por defecto
+
+              Swal.fire({
+                title: "Confirmar venta",
+                showCancelButton: true,
+                confirmButtonText: "Si",
+                cancelButtonText: "Cancelar",
+                footer:
+                  '<a href="#" id="btn-ticket" onClick="generarPDF()">Ticket</a>',
+              }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                  form.submit();
+                } else if (result.isDenied) {
+                  Swal.fire("Se canceló la venta", "", "info");
+                }
+              });
+            });
+          });
+          function generarPDF() {
+            // Crear una nueva instancia de jsPDF
+            customFormat = [7, 17.7];
+
+            const doc = new jsPDF({
+              unit: "cm",
+              format: customFormat,
+            });
+
+            // Función para convertir la imagen a base64
+            function convertImageToBase64(url, callback) {
+              const img = new Image();
+              img.crossOrigin = "Anonymous";
+              img.onload = function () {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                canvas.height = this.naturalHeight;
+                canvas.width = this.naturalWidth;
+                ctx.drawImage(this, 0, 0);
+                const dataURL = canvas.toDataURL("image/png");
+                callback(dataURL);
+              };
+              img.src = url;
+            }
+
+            // Obtener la imagen y convertirla a base64
+            const imgUrl = "{{ url_for('static', filename='img/logo.png') }}";
+            convertImageToBase64(imgUrl, function (base64Img) {
+              // Agregar la imagen de la empresa
+              doc.addImage(base64Img, "PNG", 2.5, 0.2, 2, 2); // Ajusta las coordenadas y el tamaño según sea necesario
+
+              doc.setFontSize(8);
+
+              // Agregar la fecha de hoy
+              const fecha = new Date();
+              const dia = fecha.getDate();
+              const mes = fecha.getMonth() + 1; // Los meses en JavaScript empiezan en 0
+              const año = fecha.getFullYear();
+              doc.text(`Fecha: ${dia}/${mes}/${año}`, 4.3, 2.7);
+
+              // Obtener los datos de la tabla
+              const tablaVenta = document.getElementById("tabla_venta");
+              const filas = Array.from(tablaVenta.rows).map((fila) =>
+                Array.from(fila.cells).map((celda) => celda.innerText)
+              );
+              doc.setFontSize(6);
+              // Ajustar el texto de la primera columna para que salte de línea cada 7 caracteres
+              filas.forEach((fila) => {
+                fila[0] = fila[0].replace(/(.{10})/g, "$1\n");
+              });
+
+              // Agregar la tabla al PDF
+              let y = 4; // Posición inicial en el eje Y para la tabla
+              filas.forEach((fila) => {
+                fila.forEach((texto, index) => {
+                  doc.text(texto, 0.3 + index * 1.8, y); // Ajusta el espaciado entre columnas según sea necesario
+                });
+                y += 0.8; // Ajusta el espaciado entre filas según sea necesario
+
+                if (y > 17) {
+                  doc.addPage([7, 17.7]); // Añade una nueva página con el mismo formato
+                  y = 0.5; // Reinicia la posición Y para la nueva página
+                }
+              });
+              doc.setFontSize(8);
+              // Agregar el total
+              const total = document.getElementById("total").innerText;
+              doc.text(`Total: $${total}`, 4.7, y + 0.8);
+
+              // Guardar el PDF
+              // Obtiene el PDF como un Blob
+              const pdfBlob = doc.output("blob");
+
+              // Crea un objeto URL a partir del Blob
+              const pdfURL = URL.createObjectURL(pdfBlob);
+
+              // Abre el PDF en una nueva ventana
+              window.open(pdfURL, "_blank");
+            });
+          }
+        </script>
         <div
           style="display: flex; justify-content: center; align-items: center"
         >
-          Total: {{ total | round(2) }}
+          Total: $ {{ total | round(2) }}
+          <p id="total" style="display: none">{{ total | round(2) }}</p>
         </div>
         <form
+          id="form-borrar-todo"
           action=" {{ url_for('venta.punto_venta_cancelar') }}"
           method="POST"
         >
           <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-          <button type="submit" class="btn btn-danger" style="margin: 10px">
+          <button
+            type="submit"
+            id="btn-borrar-todo"
+            class="btn btn-danger"
+            style="margin: 10px"
+          >
             Borrar todo
           </button>
         </form>
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            var form = document.getElementById("form-borrar-todo"); // Asegúrate de seleccionar el formulario correcto
+
+            form.addEventListener("submit", function (event) {
+              event.preventDefault(); // Previene el envío del formulario por defecto
+
+              Swal.fire({
+                title: "¿Estás seguro de borrar los datos de la venta?",
+                showCancelButton: true,
+                confirmButtonText: "Si",
+                cancelButtonText: "Cancelar",
+              }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                  form.submit();
+                } else if (result.isDenied) {
+                  Swal.fire("Se canceló el envío", "", "info");
+                }
+              });
+            });
+          });
+        </script>
       </div>
     </div>
   </div>

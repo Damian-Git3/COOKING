@@ -4,9 +4,9 @@ content %}
 <div style="width: 100%; text-align: center">
   <h1>Nueva compra</h1>
 </div>
-{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
-messages %}
-<div class="alert alert-success" style="width: 90%">{{ message }}</div>
+{% with messages = get_flashed_messages(with_categories=true) %} {% if messages
+%} {% for category, message in messages %}
+<div class="alert alert-{{ category }}" style="width: 90%">{{ message }}</div>
 {% endfor %} {% endif %} {% endwith %}
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -21,7 +21,7 @@ messages %}
         aria-controls="nav-1"
         aria-selected="false"
       >
-        Buscar Lotes de Galletas
+        Lista
       </button>
     </a>
 
@@ -36,7 +36,7 @@ messages %}
         aria-controls="nav-2"
         aria-selected="true"
       >
-        Nuevo Lote
+        Nueva compra
       </button>
     </a>
   </div>
@@ -55,6 +55,7 @@ messages %}
     {% if current_user.has_role('admin') %}
 
     <div class="row control-group">
+      <h4>La caja cuenta con $ {{ efectivo_caja|round(2) }}</h4>
       <div class="form-group col-xs-12 float-label-form-group controls">
         <label for="{{ form.caja.id }}">¿Retirar dinero de la caja?</label>
         {{ form.caja(class="form-check-input") }}

@@ -6,7 +6,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import forms.forms as forms
-from database.models import CorteCaja, LogLogin, Usuario, db
+from database.models import CorteCaja, LogLogin, LoteGalleta, LoteInsumo, Usuario, db
 
 auth = Blueprint("auth", __name__)
 
@@ -17,10 +17,29 @@ def login():
     corte_de_hoy = CorteCaja.query.filter_by(fecha_corte=datetime.now().date()).first()
 
     if not corte_de_hoy:
-        nuevo_corte = CorteCaja(fecha_corte=datetime.now().date(), monto_inicial=1000)
+        nuevo_corte = CorteCaja(
+            fecha_corte=datetime.now().date(), monto_inicial=1000, monto_final=1000
+        )
         db.session.add(nuevo_corte)
         # Guarda los cambios en la base de datos
         db.session.commit()
+
+        # mandar a merma toda la cantidad de los lotes de insumos cuya fecha de caducidad sea menor a la fecha actual
+        lotes_insumo = LoteInsumo.query.filter(
+            LoteInsumo.fecha_caducidad < datetime.now().date()
+        ).all()
+        for lote in lotes_insumo:
+            lote.merma += lote.cantidad
+            lote.cantidad = 0
+            db.session.commit()
+        # mandar a merma toda la cantidad de los lotes de galletas cuya fecha de entrada sea menor a la fecha de hace 15 dias
+        lotes_galleta = LoteGalleta.query.filter(
+            LoteGalleta.fecha_entrada < datetime.now().date() - timedelta(days=15)
+        ).all()
+        for lote in lotes_galleta:
+            lote.merma += lote.cantidad
+            lote.cantidad = 0
+            db.session.commit()
 
     if current_user.is_authenticated:
 

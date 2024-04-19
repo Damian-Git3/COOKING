@@ -10,6 +10,23 @@ messages %}
 {% endfor %} {% endif %} {% endwith %}
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a
+      href="{{url_for('cocina.lotes_insumos_agrupados')}}"
+      style="text-decoration: none"
+    >
+      <button
+        class="nav-link"
+        id="nav-lote1-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-lote1"
+        type="button"
+        role="tab"
+        aria-controls="nav-lote1"
+        aria-selected="false"
+      >
+        Insumos
+      </button>
+    </a>
     <a href="{{url_for('cocina.lotes_insumos')}}" style="text-decoration: none">
       <button
         class="nav-link {% if lista %}active{% endif %}"
@@ -85,6 +102,7 @@ messages %}
         <th scope="col">Fecha de Compra</th>
         <th scope="col">Fecha de Caducidad</th>
         <th scope="col">Cantidad Disponible</th>
+        <th scope="col">Precio Unidad</th>
         <th scope="col">Merma</th>
         <th scope="col">Comprado por</th>
       </tr>
@@ -97,6 +115,7 @@ messages %}
         <td>{{ lot.fecha_compra }}</td>
         <td>{{ lot.fecha_caducidad }}</td>
         <td>{{ lot.cantidad }} {{insumo.unidad_medida}}</td>
+        <td>$ {{ lot.precio_unidad|round(2) }}</td>
         <td>
           <a href="{{ url_for('cocina.merma_insumos', id=lot.id) }}"
             ><i class="fa-solid fa-fire"></i></a

@@ -42,7 +42,7 @@
       </li>
     </a>
 
-    <a href="{{url_for('venta.lotes_galletas')}}">
+    <a href="{{url_for('venta.lotes_galletas_agrupados')}}">
       <li>
         <i class="fa-solid fa-cookie-bite"></i>
         <span class="tooltip">Lotes de Galletas</span>
@@ -52,13 +52,6 @@
     {% endif %} {% if current_user.has_role('cocinero') or
     current_user.has_role('admin') %}
 
-    <a href="{{url_for('cocina.recetas')}}">
-      <li>
-        <i class="fa-solid fa-book"></i>
-        <span class="tooltip">Recetas</span>
-      </li>
-    </a>
-
     <a href="{{url_for('cocina.cocinar')}}">
       <li>
         <i class="fa-solid fa-fire-burner"></i>
@@ -66,11 +59,10 @@
       </li>
     </a>
 
-    <a href="{{url_for('cocina.lotes_insumos')}}">
+    <a href="{{url_for('cocina.lotes_insumos_agrupados')}}">
       <li>
         <i class="fa-solid fa-boxes-stacked"></i>
-
-        <span class="tooltip">Lotes de Insumos</span>
+        <span class="tooltip">Inventario insumos</span>
       </li>
     </a>
 
