@@ -12,6 +12,6 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    DEBUG = False
     # encriptar esta madre
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")

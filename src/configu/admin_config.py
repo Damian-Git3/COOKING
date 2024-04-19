@@ -82,6 +82,9 @@ def setup_admin(app, db):
             if is_created:
                 Usuario.contrasenia = generate_password_hash("1234")
                 flash(f"La contraseña automatica para {Usuario.nombre} es 1234")
+            else:
+                if Usuario.id == 1:
+                    raise ValueError('No está permitido editar la información del usuario administrador')
 
     class RecetaImagenValidationError(Exception):
         """Excepción personalizada para errores de validación."""
