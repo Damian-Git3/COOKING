@@ -5,6 +5,7 @@
 {% block content %}
 
     <div class="col-12 my-5">
+        {%if current_user.has_role('admin') or current_user.has_role('cocinero') %}
         <div class="row border mx-4">
             <div class="col-6 text-center">
                 <kbd>GALLETAS VENDIDAS POR MES</kbd>
@@ -13,9 +14,12 @@
             
             <div class="col-6 text-center">
                 <kbd>GALLETA MAS VENDIDA</kbd>
-                <canvas id="G4" height="400" width="600"></canvas>
+                <canvas id="G2" height="400" width="600"></canvas>
             </div>
         </div>
+        {%endif%}
+
+        {%if current_user.has_role('admin')  or current_user.has_role('vendedor')%}
         <div class="row border mx-4">
             <div class="col-6 text-center">
                 <kbd>TOTAL DE VENTAS POR MES</kbd>
@@ -23,10 +27,13 @@
             </div>
             <div class="col-6 text-center">
                 <kbd>VENTAS POR MES</kbd>
-                <canvas id="G2"  height="400" width="600"></canvas>
+                <canvas id="G4"  height="400" width="600"></canvas>
             </div>
             
         </div>
+        {%endif%}
+
+        {%if current_user.has_role('admin')%}
         <div class="row border mx-4">
             <div class="col-6 text-center">
                 <kbd>VENTAS POR VENDEDOR</kbd>
@@ -38,6 +45,7 @@
             </div>
             
         </div>
+        {%endif%}
     </div>
 
 
@@ -45,15 +53,8 @@
 
 {% block jscode %}
 <script>    
-    const G1 = document.getElementById('G1');
-    const G2 = document.getElementById('G2');
-    const G3 = document.getElementById('G3');
-    const G4 = document.getElementById('G4');
-    const G5 = document.getElementById('G5');
-    const G6 = document.getElementById('G6');
-
-    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    const colorsBackground = [
+    meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    colorsBackground = [
         'rgba(255, 99, 132, 0.2)',
         'rgba(255, 159, 64, 0.2)',
         'rgba(255, 205, 86, 0.2)',
@@ -62,8 +63,7 @@
         'rgba(153, 102, 255, 0.2)',
         'rgba(201, 203, 207, 0.2)'
     ];
-
-    const colorsBorder = [
+    colorsBorder = [
         'rgb(255, 99, 132)',
         'rgb(255, 159, 64)',
         'rgb(255, 205, 86)',
@@ -73,249 +73,278 @@
         'rgb(201, 203, 207)'
     ];
 
-    let galletaVentasMes = {{ galletaVentasMes }};
-    let ventasMes = {{ ventasMes }};
-    let ventasTotalesMes = {{ ventasTotalesMes }};
-    let galletasTipos = {{ galletasTipos|tojson }};
-    let ventasVendedor = {{ ventasVendedor|tojson }};
-    let numeroVentasVendedor = {{ numeroVentasVendedor|tojson }};
-
-    // DASHBOARD DE GALLETAS VENDIDAS POR MES
-    const dataGalletaVentasMes = {
-        labels: meses,
-        datasets: [{
-            label: 'Galletas Vendidas',
-            data: galletaVentasMes,
-            backgroundColor: colorsBackground,
-            borderColor: colorsBorder,
-            borderWidth: 1
-        }]
-    };
-
-    const configGalletaVentasMes = {
-        type: 'bar',
-        data: dataGalletaVentasMes,
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true, // Comenzar el eje Y en 0
-                    title: {
-                        display: true,
-                        text: 'Número de Galletas Vendidas'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Mes'
-                    }
-                }
-            }
-        },
-    };
-
-    new Chart(G1, configGalletaVentasMes);
-
-    // DASHBOARD DE VENTAS POR MES
-    const dataVentasMes = {
-        labels: meses,
-        datasets: [{
-            label: 'Total de Ventas',
-            data: ventasMes,
-            backgroundColor: colorsBackground,
-            borderColor: colorsBorder,
-            borderWidth: 1
-        }]
-    };
-
-    const configVentasMes = {
-        type: 'bar',
-        data: dataVentasMes,
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true, // Comenzar el eje Y en 0
-                    title: {
-                        display: true,
-                        text: 'Total de Ventas'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Mes'
-                    }
-                }
-            },
-
-        },
-    };
-
-    new Chart(G2, configVentasMes);
-
-    //DASHBOARD DE TOTAL DE VENTAS POR MES
-    const dataGalletasVendidas = {
-        labels: meses,
-        datasets: [{
-            label: 'Ventas del Mes',
-            data: ventasTotalesMes,
-            backgroundColor: colorsBackground,
-            borderColor: colorsBorder,
-            borderWidth: 1,
-            hoverOffset: 4,
-            
-        }],
-    
-    };
-
-    const configGalletasVendidas = {
-        type: 'bar',
-        data: dataGalletasVendidas,
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true, // Comenzar el eje Y en 0
-                    title: {
-                        display: true,
-                        text: 'Número de Ventas'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Mes'
-                    }
-                }
-            },
-
-        },
-
-    };
-
-    new Chart(G3, configGalletasVendidas);
-    
-    //DASHBOARD DE TOTAL DE VENTAS POR MES
-    const dataProductoMasVendido = {
-        labels: Object.keys(galletasTipos),
-        datasets: [{
-            label: 'Ventas',
-            data: Object.values(galletasTipos),
-            backgroundColor: colorsBackground,
-            borderColor: colorsBorder,
-            borderWidth: 1,
-            hoverOffset: 4,
-            
-        }],
-    
-    };
-
-    const configProductoMasVendido = {
-        type: 'bar',
-        data: dataProductoMasVendido,
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true, // Comenzar el eje Y en 0
-                    title: {
-                        display: true,
-                        text: 'Total'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Galleta'
-                    }
-                }
-            },
-
-        },
-
-    };
-    
-    new Chart(G4, configProductoMasVendido);
-
-    //DASHBOARD DE VENTAS POR VENDEDOR
-    const dataVentasVendedor = {
-        labels: Object.keys(ventasVendedor),
-        datasets: [{
-            label: 'Ventas',
-            data: Object.values(ventasVendedor),
-            backgroundColor: colorsBackground,
-            borderColor: colorsBorder,
-            borderWidth: 1,
-            hoverOffset: 4,
-            
-        }],
-    
-    };
-
-    const configVentasVendedor = {
-        type: 'bar',
-        data: dataVentasVendedor,
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true, // Comenzar el eje Y en 0
-                    title: {
-                        display: true,
-                        text: 'Total'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Galleta'
-                    }
-                }
-            },
-
-        },
-
-    };
-    
-    new Chart(G5, configVentasVendedor);
-
-    //DASHBOARD DE VENTAS TOTALES POR VENDEDOR
-    const dataNumeroVentasVendedor = {
-        labels: Object.keys(numeroVentasVendedor),
-        datasets: [{
-            label: 'Ventas',
-            data: Object.values(numeroVentasVendedor),
-            backgroundColor: colorsBackground,
-            borderColor: colorsBorder,
-            borderWidth: 1,
-            hoverOffset: 4,
-            
-        }],
-    
-    };
-
-    const configNumeroVentasVendedor = {
-        type: 'bar',
-        data: dataNumeroVentasVendedor,
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true, // Comenzar el eje Y en 0
-                    title: {
-                        display: true,
-                        text: 'Total'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Usuario'
-                    }
-                }
-            },
-
-        },
-
-    };
-    
-    new Chart(G6, configNumeroVentasVendedor);
-
 </script>
+
+    {% if current_user.has_role('admin') or current_user.has_role('cocinero')%}
+        <script>
+            let galletaVentasMes = {{ galletaVentasMes }};
+            let galletasTipos = {{ galletasTipos|tojson }};
+            const G1 = document.getElementById('G1');
+            const G2 = document.getElementById('G2');
+
+            console.log(galletaVentasMes);
+            console.log(galletasTipos);
+
+            // DASHBOARD DE GALLETAS VENDIDAS POR MES
+            const dataGalletaVentasMes = {
+                labels: meses,
+                datasets: [{
+                    label: 'Galletas Vendidas',
+                    data: galletaVentasMes,
+                    backgroundColor: colorsBackground,
+                    borderColor: colorsBorder,
+                    borderWidth: 1
+                }]
+            };
+
+            const configGalletaVentasMes = {
+                type: 'bar',
+                data: dataGalletaVentasMes,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true, // Comenzar el eje Y en 0
+                            title: {
+                                display: true,
+                                text: 'Número de Galletas Vendidas'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mes'
+                            }
+                        }
+                    }
+                },
+            };
+
+            new Chart(G1, configGalletaVentasMes);
+
+            // DASHBOARD DE VENTAS POR MES
+            const dataVentasMes = {
+                labels: Object.keys(galletasTipos),
+                datasets: [{
+                    label: 'Total de Ventas',
+                    data: Object.values(galletasTipos),
+                    backgroundColor: colorsBackground,
+                    borderColor: colorsBorder,
+                    borderWidth: 1
+                }]
+            };
+
+            const configVentasMes = {
+                type: 'bar',
+                data: dataVentasMes,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true, // Comenzar el eje Y en 0
+                            title: {
+                                display: true,
+                                text: 'Total de Ventas'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mes'
+                            }
+                        }
+                    },
+
+                },
+            };
+
+            new Chart(G2, configVentasMes);
+
+        </script>
+    {% endif %}
+
+    {% if current_user.has_role('admin') or current_user.has_role('vendedor')%}
+        <script>
+            let ventasMes = {{ ventasMes }};
+            let ventasTotalesMes = {{ ventasTotalesMes }};
+            const G3 = document.getElementById('G3');
+            const G4 = document.getElementById('G4');
+
+            console.log(ventasMes);
+            console.log(ventasTotalesMes);
+
+            //DASHBOARD DE TOTAL DE VENTAS POR MES
+            const dataGalletasVendidas = {
+                labels: meses,
+                datasets: [{
+                    label: 'Ventas del Mes',
+                    data: ventasMes,
+                    backgroundColor: colorsBackground,
+                    borderColor: colorsBorder,
+                    borderWidth: 1,
+                    hoverOffset: 4,
+                    
+                }],
+            
+            };
+
+            const configGalletasVendidas = {
+                type: 'bar',
+                data: dataGalletasVendidas,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true, // Comenzar el eje Y en 0
+                            title: {
+                                display: true,
+                                text: 'Número de Ventas'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mes'
+                            }
+                        }
+                    },
+
+                },
+
+            };
+
+            new Chart(G3, configGalletasVendidas);
+            
+            //DASHBOARD DE TOTAL DE VENTAS POR MES
+            const dataProductoMasVendido = {
+                labels: meses,
+                datasets: [{
+                    label: 'Ventas',
+                    data: ventasTotalesMes,
+                    backgroundColor: colorsBackground,
+                    borderColor: colorsBorder,
+                    borderWidth: 1,
+                    hoverOffset: 4,
+                    
+                }],
+            
+            };
+
+            const configProductoMasVendido = {
+                type: 'bar',
+                data: dataProductoMasVendido,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true, // Comenzar el eje Y en 0
+                            title: {
+                                display: true,
+                                text: 'Total'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Galleta'
+                            }
+                        }
+                    },
+
+                },
+
+            };
+            
+            new Chart(G4, configProductoMasVendido);
+        </script>
+    {% endif %}
+
+    {% if current_user.has_role('admin')%}
+        <script>
+            let ventasVendedor = {{ ventasVendedor|tojson }};
+            let numeroVentasVendedor = {{ numeroVentasVendedor|tojson }};
+            const G5 = document.getElementById('G5');
+            const G6 = document.getElementById('G6');
+
+            console.log(ventasVendedor);
+            console.log(numeroVentasVendedor);
+            //DASHBOARD DE VENTAS POR VENDEDOR
+            const dataVentasVendedor = {
+                labels: Object.keys(ventasVendedor),
+                datasets: [{
+                    label: 'Ventas',
+                    data: Object.values(ventasVendedor),
+                    backgroundColor: colorsBackground,
+                    borderColor: colorsBorder,
+                    borderWidth: 1,
+                    hoverOffset: 4,
+                    
+                }],
+            
+            };
+
+            const configVentasVendedor = {
+                type: 'bar',
+                data: dataVentasVendedor,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true, // Comenzar el eje Y en 0
+                            title: {
+                                display: true,
+                                text: 'Total'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Galleta'
+                            }
+                        }
+                    },
+
+                },
+
+            };
+            
+            new Chart(G5, configVentasVendedor);
+
+            //DASHBOARD DE VENTAS TOTALES POR VENDEDOR
+            const dataNumeroVentasVendedor = {
+                labels: Object.keys(numeroVentasVendedor),
+                datasets: [{
+                    label: 'Ventas',
+                    data: Object.values(numeroVentasVendedor),
+                    backgroundColor: colorsBackground,
+                    borderColor: colorsBorder,
+                    borderWidth: 1,
+                    hoverOffset: 4,
+                    
+                }],
+            
+            };
+
+            const configNumeroVentasVendedor = {
+                type: 'bar',
+                data: dataNumeroVentasVendedor,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true, // Comenzar el eje Y en 0
+                            title: {
+                                display: true,
+                                text: 'Total'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Usuario'
+                            }
+                        }
+                    },
+
+                },
+
+            };
+            
+            new Chart(G6, configNumeroVentasVendedor);
+        </script>
+    {% endif %}
 {% endblock %}

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import Blueprint, render_template
 from flask_login import login_required
-from sqlalchemy import extract, func, desc
+from sqlalchemy import desc, extract, func
 
 from database.models import DetalleVenta, LoteGalleta, Receta, Usuario, Venta, db
 from logger import logger as log
@@ -30,7 +30,7 @@ def index():
         ventasTotalesMes=ventas_totales_mes,
         galletasTipos=galletas_tipos,
         ventasVendedor=ventas_vendedor,
-        numeroVentasVendedor=numero_ventas_vendedor
+        numeroVentasVendedor=numero_ventas_vendedor,
     )
 
 
@@ -184,7 +184,6 @@ def obtener_galletas_vendidas_por_tipo():
 
 
 def obtener_ventas_vendedor():
-
     """
     Obtiene el total de ventas por cada usuario del año actual.
     """
