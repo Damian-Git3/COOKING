@@ -99,25 +99,25 @@ body {
   scroll-behavior: smooth;
 }
 
-.Sidebar > ul::-webkit-scrollbar {
+::-webkit-scrollbar {
   width: 8px; /* Ancho del scrollbar */
   height: 8px; /* Alto del scrollbar */
 }
 
 /* Estilo para el pulgar (la parte que se desplaza) */
-.Sidebar > ul::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: #e9cb94; /* Color de fondo del pulgar */
   border-radius: 10px; /* Bordes redondeados */
 }
 
 /* Estilo para el track (la parte sobre la que se desplaza el pulgar) */
-.Sidebar > ul::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: #f1f1f1; /* Color de fondo del track */
   border-radius: 10px; /* Bordes redondeados */
 }
 
 /* Cambiar el estilo del pulgar al pasar el cursor */
-.Sidebar > ul::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: #e6b252; /* Color de fondo del pulgar al pasar el cursor */
 }
 
