@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from importlib.metadata import requires
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
@@ -16,12 +17,13 @@ from database.models import (
 )
 from forms import forms
 from logger import logger as log
+from routes.auth import requires_role
 
 cocina = Blueprint("cocina", __name__, url_prefix="/cocina")
 
 
 @cocina.route("/cocinar")
-@login_required
+@requires_role("cocinero")
 def cocinar():
     solicitudesProduccion = SolicitudProduccion.query.all()
     print(solicitudesProduccion)
@@ -228,6 +230,7 @@ def lotes_insumos():
 
 
 @cocina.route("/insumos", methods=["GET"])
+@requires_role("cocinero")
 def lotes_insumos_agrupados():
 
     insumos = Insumo.query.all()
