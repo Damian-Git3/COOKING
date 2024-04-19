@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -99,10 +99,32 @@ def lotes_insumos():
         (insumo.id, insumo.nombre) for insumo in Insumo.query.all()
     ]
 
-    if request.method == "POST" and form.validate():
-        fecha_inicio = form.fecha_inicio.data
-        fecha_fin = form.fecha_fin.data
-        insumo = form.insumo.data
+    if request.method == "POST":
+        fecha_inicio_default = datetime.now().date()
+        fecha_fin_default = datetime.now().date() + timedelta(
+            days=365 * 1000
+        )  # Ajusta el valor según sea necesario
+        insumo_default = 0
+
+        # Validación y asignación de valores
+        try:
+            fecha_inicio = (
+                form.fecha_inicio.data
+                if form.fecha_inicio.data
+                else fecha_inicio_default
+            )
+
+        except ValueError:
+            fecha_inicio = fecha_inicio_default
+
+        try:
+            fecha_fin = (
+                form.fecha_fin.data if form.fecha_fin.data else fecha_fin_default
+            )
+        except ValueError:
+            fecha_fin = fecha_fin_default
+
+        insumo = form.insumo.data if form.insumo.data else insumo_default
         lotes = []
 
         if insumo == "0":
@@ -155,6 +177,49 @@ def lotes_insumos():
     return render_template(
         "modulos/cocina/insumos.html", form=form, lotes=lotes, lista=True
     )
+
+
+@cocina.route("/insumos", methods=["GET"])
+def lotes_insumos_agrupados():
+
+    insumos = Insumo.query.all()
+
+    for insumo in insumos:
+        lotes = (
+            LoteInsumo.query.filter(
+                LoteInsumo.idInsumo == insumo.id,
+                LoteInsumo.fecha_caducidad >= datetime.now().date(),
+                LoteInsumo.cantidad > 0,
+            )
+            .order_by(LoteInsumo.fecha_caducidad)
+            .all()
+        )
+        insumo.num_lotes = len(lotes)
+        insumo.proxima_caducidad = lotes[0].fecha_caducidad if lotes else "No hay lotes"
+        insumo.cantidad = sum(lote.cantidad for lote in lotes)
+        insumo.coste_promedio = (
+            sum(lote.precio_unidad * lote.cantidad for lote in lotes) / insumo.cantidad
+            if insumo.cantidad
+            else 1
+        )
+        # agregar flash para los insumos que estan por agotarse
+        if insumo.cantidad < insumo.cantidad_minima:
+            flash(f"(Escacez) El insumo {insumo.nombre} esta por agotarse", "warning")
+        # agregar flash para los insumos que sobrepasan la capacidad de almacenamiento
+        if insumo.cantidad > insumo.cantidad_maxima:
+            flash(
+                f"(Exceso) El insumo {insumo.nombre} sobrepasa la capacidad de almacenamiento",
+                "info",
+            )
+        # agregar flash par los lotes del insumo que estan por caducar en los proximos 3 dias
+        for lote in lotes:
+            if lote.fecha_caducidad <= datetime.now().date() + timedelta(days=3):
+                flash(
+                    f"(Caducidad) El lote {lote.id} del insumo {insumo.nombre} esta por caducar",
+                    "danger",
+                )
+
+    return render_template("modulos/cocina/insumo_individual.html", insumos=insumos)
 
 
 @cocina.route("/merma/insumos/<int:id>", methods=["GET", "POST"])
