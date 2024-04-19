@@ -25,7 +25,9 @@ def cocinar():
     print(solicitudesProduccion)
 
     return render_template(
-        "modulos/cocina/cocinar.html", solicitudesProduccion=solicitudesProduccion, current_datetime=datetime.now()
+        "modulos/cocina/cocinar.html",
+        solicitudesProduccion=solicitudesProduccion,
+        current_datetime=datetime.now(),
     )
 
 
@@ -79,10 +81,13 @@ def finalizarProduccion(idSolicitud):
 
         db.session.commit()
 
-        flash("Solicitud finalizada correctamente", 'success')
+        flash("Solicitud finalizada correctamente", "success")
         return redirect(url_for("cocina.cocinar"))
     else:
-        flash("La solicitud se encuentra en un status diferente a solicitud en preparación, no se puede finalizar", 'error')
+        flash(
+            "La solicitud se encuentra en un status diferente a solicitud en preparación, no se puede finalizar",
+            "error",
+        )
         return redirect(url_for("cocina.cocinar"))
 
 
@@ -92,15 +97,18 @@ def rechazarSolicitud(idSolicitud):
     solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
 
     if solicitudProduccion.estatus == 1:
-        solicitudProduccion.mensaje = request.form.get('mensaje')
+        solicitudProduccion.mensaje = request.form.get("mensaje")
         solicitudProduccion.estatus = 5
 
         db.session.commit()
 
-        flash("Solicitud rechazada correctamente", 'success')
+        flash("Solicitud rechazada correctamente", "success")
         return redirect(url_for("cocina.cocinar"))
     else:
-        flash("La solicitud se encuentra en un status diferente a solicitud realizada, no se puede rechazar", 'error')
+        flash(
+            "La solicitud se encuentra en un status diferente a solicitud realizada, no se puede rechazar",
+            "error",
+        )
         return redirect(url_for("cocina.cocinar"))
 
 
@@ -110,15 +118,18 @@ def posponerSolicitud(idSolicitud):
     solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
 
     if solicitudProduccion.estatus == 1:
-        solicitudProduccion.mensaje = request.form.get('mensaje')
+        solicitudProduccion.mensaje = request.form.get("mensaje")
         solicitudProduccion.estatus = 6
 
         db.session.commit()
 
-        flash("Solicitud pospuesta correctamente", 'success')
+        flash("Solicitud pospuesta correctamente", "success")
         return redirect(url_for("cocina.cocinar"))
     else:
-        flash("La solicitud se encuentra en un status diferente a solicitud realizada, no se puede posponer", 'error')
+        flash(
+            "La solicitud se encuentra en un status diferente a solicitud realizada, no se puede posponer",
+            "error",
+        )
         return redirect(url_for("cocina.cocinar"))
 
 
