@@ -81,6 +81,7 @@ def finalizarProduccion(idSolicitud):
     solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
 
     if solicitudProduccion.estatus == 2:
+        solicitudProduccion.merma = request.form.get('cantidadMerma')
         solicitudProduccion.estatus = 3
 
         db.session.commit()
