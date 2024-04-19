@@ -218,9 +218,9 @@ class CorteCaja(db.Model):
     __tablename__ = "cortes_caja"
 
     id = db.Column(db.Integer, primary_key=True)
-    monto_final = db.Column(db.Float)
-    monto_inicial = db.Column(db.Float)
-    fecha_corte = db.Column(db.Date)
+    monto_final = db.Column(db.Float, nullable=False, default=1000)
+    monto_inicial = db.Column(db.Float, default=1000, nullable=False)
+    fecha_corte = db.Column(db.Date, nullable=False, default=datetime.now().date())
 
     def __str__(self):
         return f"Corte Caja: {self.id}, Monto Final: {self.monto_final}, Monto Inicial: {self.monto_inicial}, Fecha Corte: {self.fecha_corte}"
