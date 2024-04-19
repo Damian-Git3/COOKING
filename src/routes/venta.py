@@ -29,13 +29,13 @@ from database.models import (
     LoteInsumo,
     Proveedor,
     Receta,
+    RecetaLoteInsumo,
     Rol,
     SolicitudProduccion,
     TransaccionCaja,
     Usuario,
     Venta,
     asignacion_rol_usuario,
-    RecetaLoteInsumo,
     db,
 )
 from forms import forms
@@ -68,8 +68,7 @@ def solicitud_produccion():
 @requires_role("vendedor")
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
-    form.receta.choices = [(receta.id, receta.nombre)
-                           for receta in Receta.query.all()]
+    form.receta.choices = [(receta.id, receta.nombre) for receta in Receta.query.all()]
     recetas = [
         (receta.id, receta.imagen, receta.piezas) for receta in Receta.query.all()
     ]
@@ -135,8 +134,7 @@ def solicitud_produccion_nuevo():
                     cantidadNecesaria = insumoReceta.cantidad * form.tandas.data
 
                     lotesInsumosReceta = (
-                        LoteInsumo.query.filter_by(
-                            idInsumo=insumoReceta.idInsumo)
+                        LoteInsumo.query.filter_by(idInsumo=insumoReceta.idInsumo)
                         .order_by(asc(LoteInsumo.fecha_caducidad))
                         .all()
                     )
@@ -148,7 +146,7 @@ def solicitud_produccion_nuevo():
                                     idSolicitud=solicitud.id,
                                     idReceta=form.receta.data,
                                     idLoteInsumo=loteInsumo.id,
-                                    cantidad=cantidadNecesaria
+                                    cantidad=cantidadNecesaria,
                                 )
 
                                 db.session.add(recetaLoteInsumo)
@@ -162,7 +160,7 @@ def solicitud_produccion_nuevo():
                                     idSolicitud=solicitud.id,
                                     idReceta=form.receta.data,
                                     idLoteInsumo=loteInsumo.id,
-                                    cantidad=loteInsumo.cantidad
+                                    cantidad=loteInsumo.cantidad,
                                 )
 
                                 db.session.add(recetaLoteInsumo)
@@ -261,20 +259,20 @@ def edit_solicitud_produccion(id):
 @requires_role("vendedor")
 def delete_solicitud_produccion():
     id = request.form.get("id")
-    
+
     solicitud = SolicitudProduccion.query.get_or_404(id)
 
     if solicitud.estatus == 1:
         recetaLotesInsumosDevolver = RecetaLoteInsumo.query.filter_by(
-            idSolicitud=solicitud.id).all()
+            idSolicitud=solicitud.id
+        ).all()
 
         mensajeDevolver = "Se devolvieron las siguientes cantidades al inventario: \n\n"
 
         for recetaLoteInsumoDevolver in recetaLotesInsumosDevolver:
-            lote_insumo = LoteInsumo.query.get(
-                recetaLoteInsumoDevolver.idLoteInsumo)
+            lote_insumo = LoteInsumo.query.get(recetaLoteInsumoDevolver.idLoteInsumo)
             lote_insumo.cantidad += recetaLoteInsumoDevolver.cantidad
-            
+
             if lote_insumo.insumo.unidad_medida == "Kilos":
                 if recetaLoteInsumoDevolver.cantidad >= 1:
                     unidadMedida = "kg"
@@ -299,11 +297,16 @@ def delete_solicitud_produccion():
         db.session.commit()
 
         flash(
-            f"Solicitud de producción eliminada correctamente \n{mensajeDevolver}", "receta")
+            f"Solicitud de producción eliminada correctamente \n{mensajeDevolver}",
+            "receta",
+        )
 
         return redirect(url_for("venta.solicitud_produccion"))
     else:
-        flash("La solicitud se encuentra en un status diferente a realizada, solicita al cocinero que descienda los status para poder eliminarla", "error")
+        flash(
+            "La solicitud se encuentra en un status diferente a realizada, solicita al cocinero que descienda los status para poder eliminarla",
+            "error",
+        )
 
         return redirect(url_for("venta.solicitud_produccion"))
 
@@ -474,8 +477,7 @@ def compras_ver():
                 .all()
             )
 
-            compra.insumos = ", ".join(
-                [lote.nombre for loteInsumo, lote in lotes])
+            compra.insumos = ", ".join([lote.nombre for loteInsumo, lote in lotes])
             compra.caja = True if compra.idTransaccionCaja else False
 
         return render_template(
@@ -554,8 +556,7 @@ def compras_crear():
         (proveedor.id, proveedor.empresa) for proveedor in Proveedor.query.all()
     ]
 
-    insumos_choices = [(insumo.id, insumo.nombre)
-                       for insumo in Insumo.query.all()]
+    insumos_choices = [(insumo.id, insumo.nombre) for insumo in Insumo.query.all()]
 
     for lote_insumo_form in form.lotes_insumos:
         lote_insumo_form.insumos.choices = insumos_choices
@@ -566,8 +567,7 @@ def compras_crear():
             idUsuario=current_user.id,
             idProveedores=form.proveedores.data,
             fecha_compra=datetime.now(),
-            pago_proveedor=sum(
-                [lote.costo_lote.data for lote in form.lotes_insumos]),
+            pago_proveedor=sum([lote.costo_lote.data for lote in form.lotes_insumos]),
         )
         if form.caja.data:
             compra.idTransaccionCaja = form.caja.data
@@ -822,8 +822,7 @@ def punto_venta_confirmar():
 
         galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
 
-    corte_de_hoy = CorteCaja.query.filter_by(
-        fecha_corte=datetime.now().date()).first()
+    corte_de_hoy = CorteCaja.query.filter_by(fecha_corte=datetime.now().date()).first()
 
     transaccion = TransaccionCaja(
         monto_ingreso=total,

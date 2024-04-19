@@ -54,9 +54,9 @@ def obtener_ingredientes():
                     "cantidad_total"
                 ],
                 "unidad": unidad_medida,
-                "precio_total": calcular_precio_total(insumo_receta.idInsumo)[
-                    "precio_total"
-                ],
+                "precio_total": round(
+                    calcular_precio_total(insumo_receta.idInsumo)["precio_total"], 2
+                ),
                 "cantidad": insumo_receta.cantidad,
                 "costo_total": round(
                     insumo_receta.cantidad
@@ -69,11 +69,12 @@ def obtener_ingredientes():
     log.debug(ingredientes_con_nombres)
     receta_seleccionada = Receta.query.get(id_receta)
     titulo_receta = receta_seleccionada.nombre if receta_seleccionada else None
-
+    utilidad_receta = receta_seleccionada.utilidad if receta_seleccionada else None
     form_utilidad.id_receta.data = id_receta
     form_utilidad.costo_total.data = round(
         sum(ingrediente["costo_total"] for ingrediente in ingredientes_con_nombres), 2
     )
+    form_utilidad.costo_venta.data = utilidad_receta
 
     return render_template(
         "utilidad/utilidad.html",
@@ -82,6 +83,7 @@ def obtener_ingredientes():
         ingredientes=ingredientes_con_nombres,
         titulo_receta=titulo_receta,
         receta_seleccionada=id_receta,
+        utilidad_receta=utilidad_receta,
     )
 
 

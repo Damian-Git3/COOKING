@@ -77,7 +77,7 @@
                         
                     </div> -->
                     {{ macro.input_float(formUtilidad.costo_venta) }}
-                    <div id="errorContainer"></div>
+                    <div id="errorContainer" class="mx-5"></div>
                 </div>
             </div>
             <div class="col-12 my-2">
@@ -133,7 +133,7 @@
             const costoProduccion = parseFloat(txtCosto.value);
 
             // Verificar si el precio final es menor que el costo de producción
-            if (precioFinal < costoProduccion) {
+            if (precioFinal < costoProduccion || isNaN(precioFinal)) {
                 // Agregar clase de error al campo de precio final
                 txtPrecio.classList.add('is-invalid');
                 document.getElementById('btnGuardarUtilidad').disabled = true;
@@ -149,7 +149,12 @@
 
         // Escuchar el evento 'input' en el campo de precio final para validar mientras el usuario escribe
         txtPrecio.addEventListener('input', validarPrecioFinal);
+
+        txtPrecio.focus();
+        validarPrecioFinal();
     });
+
+        
 </script>
 
 {% endblock %}
