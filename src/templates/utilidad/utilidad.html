@@ -36,7 +36,7 @@
                         <th scope="col">INVENTARIO</th>
                         <th scope="col">PRECIO X KILO</th>
                         <th scope="col">CANTIDAD NECESARIA</th>
-                        <th scope="col">PRECIO TOTAL</th>
+                        <th scope="col">COSTO TOTAL</th>
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
@@ -44,9 +44,9 @@
                     {% for ingrediente in ingredientes %}
                     <tr>
                         <td>{{ ingrediente.insumo }}</td>
-                        <td>{{ ingrediente.cantidad_total }} KG</td>
-                        <td>{{ ingrediente.promedio_precio }}</td>
-                        <td>{{ ingrediente.cantidad }} KG</td>
+                        <td>{{ ingrediente.inventario }} {{ ingrediente.unidad }}</td>
+                        <td>$ {{ ingrediente.precio_total }}</td>
+                        <td>{{ ingrediente.cantidad }} {{ ingrediente.unidad }}</td>
                         <td>$ {{ ingrediente.costo_total }}</td>
                     {% endfor %}
                     

@@ -189,6 +189,7 @@ ol {
   background-size: 800% 400%;
   padding: 5px 10px;
   width: 100%;
+  height: 100%;
   border: none;
   border-radius: 10px;
   font-size: 17px;
@@ -201,9 +202,11 @@ ol {
   -ms-border-radius: 10px;
   -o-border-radius: 10px; }
 
-.botones-solicitud form:last-child {
-  grid-column: 1 / span 2;
-  /* Ocupa dos columnas empezando desde la primera */ }
+.botones-solicitud form:nth-last-child(n + 3) {
+  grid-column: 1 / span 2; }
+
+.botones-solicitud form:only-child {
+  grid-column: 1 / span 2; }
 
 .boton:hover {
   animation: gradient 3s infinite;

@@ -1,5 +1,6 @@
 """ Archivo principal de la aplicación, aquí se inicializan las configuraciones de la aplicación y se registran las rutas y los manejadores de errores. """
 
+import wtforms
 from flask import Flask, render_template
 from flask_cors import CORS
 from flask_login import LoginManager
@@ -114,6 +115,15 @@ if __name__ == "__main__":
         arguments = rule.arguments if rule.arguments is not None else ()
         return len(defaults) >= len(arguments)
 
+    def get_field_type(field):
+        if isinstance(field, wtforms.PasswordField):
+            return "password"
+        elif isinstance(field, wtforms.IntegerField):
+            return "number"
+        # Agrega más condiciones aquí para otros tipos de campos si es necesario
+        else:
+            return "text"  # Valor predeterminado para campos de texto
+
     @app.route("/site-map")
     def site_map():
         """Muestra el mapa del sitio"""
@@ -123,5 +133,7 @@ if __name__ == "__main__":
             print(rule)
 
         return str(links)
+
+    app.jinja_env.globals.update(get_field_type=get_field_type)
 
     app.run(port=4000)

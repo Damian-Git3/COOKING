@@ -18,19 +18,38 @@
     <div class="c-body">
       <div class="top">
         <ul class="progress-line">
-          {% if solicitudProduccion.estatus >= 1 %}
-          <li class="green">{% else %}</li>
+          {% if solicitudProduccion.estatus >= 1 and solicitudProduccion.estatus != 5 and solicitudProduccion.estatus !=
+          6%}
+          <li class="green">
+            {% elif solicitudProduccion.estatus == 5 or solicitudProduccion.estatus == 6 %}
+          <li class="red">
+            {% else %}
+          </li>
 
           <li>
             {% endif %}
+            {% if solicitudProduccion.estatus >= 1 and solicitudProduccion.estatus != 5 and solicitudProduccion.estatus
+            != 6%}
             <span>Solicitud realizada</span>
             <div class="icon">
               <i class="fa-solid fa-check"></i>
-            </div>
+              {% elif solicitudProduccion.estatus == 5 %}
+              <span>Solicitud rechazada</span>
+              <div class="icon">
+                <i class="fa-solid fa-xmark"></i>
+                {% elif solicitudProduccion.estatus == 6 %}
+                <span>Solicitud pospuesta</span>
+                <div class="icon">
+                  <i class="fa-solid fa-xmark"></i>
+                  {% endif %}
+                </div>
           </li>
 
-          {% if solicitudProduccion.estatus >= 2 %}
-          <li class="green">{% else %}</li>
+          {% if solicitudProduccion.estatus >= 2 and solicitudProduccion.estatus != 5 and solicitudProduccion.estatus !=
+          6%}
+          <li class="green">
+            {% else %}
+          </li>
 
           <li>
             {% endif %}
@@ -40,7 +59,8 @@
             </div>
           </li>
 
-          {% if solicitudProduccion.estatus >= 3 %}
+          {% if solicitudProduccion.estatus >= 3 and solicitudProduccion.estatus != 5 and solicitudProduccion.estatus !=
+          6%}
           <li class="green">{% else %}</li>
 
           <li>
@@ -51,7 +71,8 @@
             </div>
           </li>
 
-          {% if solicitudProduccion.estatus >= 4 %}
+          {% if solicitudProduccion.estatus >= 4 and solicitudProduccion.estatus != 5 and solicitudProduccion.estatus
+          !=6%}
           <li class="green">{% else %}</li>
 
           <li>
@@ -125,40 +146,90 @@
               </div>
             </div>
           </div>
+
+          {% if solicitudProduccion.estatus == 5 %}
+          <div class="c-media b-border contenedor-detalles">
+            <div class="icono">
+              <i class="fa-regular fa-comment"></i>
+            </div>
+            <div class="details">
+              <div class="titulo-detalle">Mensaje rechazo</div>
+              <div class="contenido-detalle">
+                {{ solicitudProduccion.mensaje }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          {% if solicitudProduccion.estatus == 6 %}
+          <div class="c-media b-border contenedor-detalles">
+            <div class="icono">
+              <i class="fa-regular fa-comment"></i>
+            </div>
+            <div class="details">
+              <div class="titulo-detalle">Mensaje pospuesto</div>
+              <div class="contenido-detalle">
+                {{ solicitudProduccion.mensaje }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
 
     <div class="botones-solicitud">
-      {% if solicitudProduccion.estatus == 1 %}
+      {% if solicitudProduccion.estatus == 1 or solicitudProduccion.estatus == 6%}
       <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
         id="formAceptarSolicitud{{solicitudProduccion.id}}">
         <button type="button" class="boton btn-aceptar" onclick="aceptarSolicitud('{{ solicitudProduccion.id }}')">
           Aceptar
         </button>
       </form>
-      {% endif %} {% if solicitudProduccion.estatus == 2 %}
+      {% endif %}
+
+      {% if solicitudProduccion.estatus == 2 %}
       <form action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
         id="formFinalizarProduccion{{solicitudProduccion.id}}">
         <button type="button" class="boton btn-aceptar" onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')">
           Finalizar producción
         </button>
       </form>
-      {% endif %} {% if solicitudProduccion.estatus == 1 %}
-      <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
-        id="formAceptarSolicitud{{solicitudProduccion.id}}">
-        <button type="button" class="boton btn-posponer" onclick="posponerSolicitud('{{ solicitudProduccion.id }}')">
-          Posponer
-        </button>
-      </form>
-      {% endif %} {% if solicitudProduccion.estatus == 1 %}
-      <form action="{{ url_for('cocina.aceptarSolicitud', idSolicitud = solicitudProduccion.id) }}"
-        id="formAceptarSolicitud{{solicitudProduccion.id}}">
-        <button type="button" class="boton btn-cancelar" onclick="cancelarSolicitud('{{ solicitudProduccion.id }}')">
-          Cancelar
-        </button>
-      </form>
       {% endif %}
+
+      {% if (solicitudProduccion.estatus == 2 and (current_datetime -
+      solicitudProduccion.fecha_solicitud).total_seconds() / 60 <= 10) %} <form
+        action="{{ url_for('cocina.rechazarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+        id="formRechazarSolicitud{{solicitudProduccion.id}}">
+        <button type="button" class="boton btn-cancelar" onclick="rechazarSolicitud('{{ solicitudProduccion.id }}')">
+          Regresar status
+        </button>
+        </form>
+        {% endif %}
+
+
+        {% if solicitudProduccion.estatus == 1 %}
+        <form action="{{ url_for('cocina.posponerSolicitud', idSolicitud = solicitudProduccion.id) }}"
+          id="formPosponerSolicitud{{solicitudProduccion.id}}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <input type="hidden" name="mensaje" id="mensajePosponer{{solicitudProduccion.id}}" />
+          <button type="button" class="boton btn-posponer" onclick="posponerSolicitud('{{ solicitudProduccion.id }}')">
+            Posponer
+          </button>
+        </form>
+        {% endif %}
+
+        {% if solicitudProduccion.estatus == 1 %}
+        <form action="{{ url_for('cocina.rechazarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+          id="formRechazarSolicitud{{solicitudProduccion.id}}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <input type="hidden" name="mensaje" id="mensajeRechazo{{solicitudProduccion.id}}" />
+          <button type="button" class="boton btn-cancelar" onclick="rechazarSolicitud('{{ solicitudProduccion.id }}')">
+            Rechazar
+          </button>
+        </form>
+        {% endif %}
+
     </div>
   </div>
   {% else %}
@@ -228,26 +299,58 @@
       cancelButtonText: "Cancelar",
       icon: "question",
     }).then((result) => {
-      let formFinalizarProduccion = document.getElementById(
-        "formFinalizarProduccion" + id
-      );
-      formFinalizarProduccion.submit();
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Motivo para posponer',
+          input: 'textarea',
+          inputLabel: 'Por favor, proporciona el motivo para posponer:',
+          inputPlaceholder: 'Escribe aquí...',
+          showCancelButton: true,
+          confirmButtonText: 'Enviar',
+          cancelButtonText: 'Cancelar',
+          showLoaderOnConfirm: true,
+          preConfirm: (motivo) => {
+            document.getElementById('mensajePosponer' + id).value = motivo;
+
+            let formRechazarSolicitud = document.getElementById("formPosponerSolicitud" + id);
+            formRechazarSolicitud.submit();
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+        });
+      }
     });
   }
 
-  function cancelarSolicitud(id) {
+  function rechazarSolicitud(id) {
     Swal.fire({
-      title: "¿Estás seguro de cancelar la solicitud?",
+      title: "¿Estás seguro de rechazar la solicitud?",
       showCancelButton: true,
       confirmButtonText: "Sí",
       cancelButtonText: "Cancelar",
       icon: "question",
     }).then((result) => {
-      let formFinalizarProduccion = document.getElementById(
-        "formFinalizarProduccion" + id
-      );
-      formFinalizarProduccion.submit();
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Motivo de rechazo',
+          input: 'textarea',
+          inputLabel: 'Por favor, proporciona el motivo de rechazo:',
+          inputPlaceholder: 'Escribe aquí...',
+          showCancelButton: true,
+          confirmButtonText: 'Enviar',
+          cancelButtonText: 'Cancelar',
+          showLoaderOnConfirm: true,
+          preConfirm: (motivo) => {
+            document.getElementById('mensajeRechazo' + id).value = motivo;
+
+            let formRechazarSolicitud = document.getElementById("formRechazarSolicitud" + id);
+            formRechazarSolicitud.submit();
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+        });
+      }
     });
   }
+
+
 </script>
 {% endblock %}

@@ -33,7 +33,7 @@
 {% macro input_float(field) %}
 <div class="form-floating mb-3 mt-3 mx-5">
   <input 
-        type="{{ field.type }}" 
+         type="{{ get_field_type(field) }}" 
         class="form-control {{ 'is-invalid' if field.errors else '' }}" 
         id="{{ field.name }}" 
         name="{{ field.name }}" 
