@@ -190,7 +190,9 @@
 
       {% if solicitudProduccion.estatus == 2 %}
       <form action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
-        id="formFinalizarProduccion{{solicitudProduccion.id}}">
+        id="formFinalizarSolicitud{{solicitudProduccion.id}}">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+        <input type="hidden" name="mensaje" id="cantidadMerma{{solicitudProduccion.id}}" />
         <button type="button" class="boton btn-aceptar" onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')">
           Finalizar producción
         </button>
@@ -284,10 +286,25 @@
       cancelButtonText: "Cancelar",
       icon: "question",
     }).then((result) => {
-      let formFinalizarProduccion = document.getElementById(
-        "formFinalizarProduccion" + id
-      );
-      formFinalizarProduccion.submit();
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Merma producción',
+          input: 'number',
+          inputLabel: 'Indica la cantidad de merma en galletas:',
+          inputPlaceholder: 'Cantidad merma galletas...',
+          showCancelButton: true,
+          confirmButtonText: 'Enviar',
+          cancelButtonText: 'Cancelar',
+          showLoaderOnConfirm: true,
+          preConfirm: (cantidadMerma) => {
+            document.getElementById('cantidadMerma' + id).value = cantidadMerma;
+
+            let formFinalizarSolicitud = document.getElementById("formFinalizarSolicitud" + id);
+            formFinalizarSolicitud.submit();
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+        });
+      }
     });
   }
 
