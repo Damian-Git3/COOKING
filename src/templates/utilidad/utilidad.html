@@ -44,9 +44,9 @@
                     {% for ingrediente in ingredientes %}
                     <tr>
                         <td>{{ ingrediente.insumo }}</td>
-                        <td>{{ ingrediente.inventario }} KG</td>
-                        <td>{{ ingrediente.precio_total }}</td>
-                        <td>{{ ingrediente.cantidad }} KG</td>
+                        <td>{{ ingrediente.inventario }} {{ ingrediente.unidad }}</td>
+                        <td>$ {{ ingrediente.precio_total }}</td>
+                        <td>{{ ingrediente.cantidad }} {{ ingrediente.unidad }}</td>
                         <td>$ {{ ingrediente.costo_total }}</td>
                     {% endfor %}
                     
@@ -56,28 +56,28 @@
         </div>
         
     </div>
-    
+
     <form action="{{ url_for('utilidad.guardar')}}" method="POST" class="p-0">
             <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
             <input id="{{ formUtilidad.id_receta.name }}" type="hidden" name="id_receta" {% if formUtilidad.id_receta.data %}
                 value="{{ formUtilidad.id_receta.data }}"
             {% endif %}>
             <div class="row mx-5">
-                <div class="col-6">
-                    <!-- <div class="">
-                        <label for="txtCosto" class="form-label">Costo de Producción</label>            
-                        <input id="txtCosto" type="text" class="form-control" value="{{ costo_total_receta }}" disabled>
-                    </div> -->
+                <div class="col-6">                
+                    {{ macro.input_float(formUtilidad.costo_unitario) }}
+                </div>
+                <div class="col-6">            
+                    {{ macro.input_float(formUtilidad.cantidad_galletas) }}                
+                </div>
+            </div>
+                        
+            <div class="row mx-5">
+                <div class="col-6">                    
                     {{ macro.input_float(formUtilidad.costo_total) }}
                 </div>
-                <div class="col-6">
-                    <!-- <div class="">
-                        <label for="txtPrecio" class="form-label">Precio Final</label>            
-                        <input id="txtPrecio" type="text" class="form-control">
-                        
-                    </div> -->
+                <div class="col-6">                    
                     {{ macro.input_float(formUtilidad.costo_venta) }}
-                    <div id="errorContainer"></div>
+                    <div id="errorContainer" class="mx-5"></div>
                 </div>
             </div>
             <div class="col-12 my-2">
@@ -98,6 +98,8 @@
         document.getElementById('ingredientesForm').submit();
     });
     document.querySelector('input[name="costo_total"]').disabled = true;
+    document.querySelector('input[name="costo_unitario"]').disabled = true;
+    document.querySelector('input[name="cantidad_galletas"]').disabled = true;
     document.querySelector('input[name="costo_venta"]').addEventListener('keypress', function(event) {
         console.log("SCRIPT PARA NO PERMITIR LETRAS")
         // Obtener el código de la tecla presionada
@@ -123,7 +125,7 @@
 
         // Obtener los elementos del DOM
         const txtPrecio = document.getElementById('costo_venta');
-        const txtCosto = document.getElementById('costo_total');
+        const txtCosto = document.getElementById('costo_unitario');
         const errorContainer = document.getElementById('errorContainer');
 
         // Función para validar el precio final
@@ -133,12 +135,12 @@
             const costoProduccion = parseFloat(txtCosto.value);
 
             // Verificar si el precio final es menor que el costo de producción
-            if (precioFinal < costoProduccion) {
+            if (precioFinal < costoProduccion || isNaN(precioFinal)) {
                 // Agregar clase de error al campo de precio final
                 txtPrecio.classList.add('is-invalid');
                 document.getElementById('btnGuardarUtilidad').disabled = true;
                 // Mostrar mensaje de error
-                errorContainer.innerHTML = '<div class="invalid-feedback" style="display: block">El precio final no puede ser menor que el costo de producción.</div>';
+                errorContainer.innerHTML = '<div class="invalid-feedback text-uppercase" style="display: block">El precio final no puede ser menor que el costo unitario.</div>';
             } else {
                 // Remover clase de error si el precio es válido
                 txtPrecio.classList.remove('is-invalid');
@@ -149,7 +151,12 @@
 
         // Escuchar el evento 'input' en el campo de precio final para validar mientras el usuario escribe
         txtPrecio.addEventListener('input', validarPrecioFinal);
+
+        txtPrecio.focus();
+        validarPrecioFinal();
     });
+
+        
 </script>
 
 {% endblock %}

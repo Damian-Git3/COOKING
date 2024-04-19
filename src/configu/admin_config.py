@@ -130,7 +130,7 @@ def setup_admin(app, db):
             return f"{model.peso_estimado * 1000:.0f} gr"
 
         def utilidad_formatter(view, context, model, name):
-            return f"{model.utilidad * 1:.2f}%"
+            return f"${model.utilidad * 1:.2f}"
 
         # Asigna el formateador personalizado a la columna peso_estimado
         column_formatters = {
@@ -215,7 +215,7 @@ def setup_admin(app, db):
     class ProveedorView(BaseModelConfiguration):
         can_create = True
         can_delete = False
-        form_excluded_columns = ["compras"]
+        form_excluded_columns = ["compras_proveedor"]
 
     babel = Babel(app)
 

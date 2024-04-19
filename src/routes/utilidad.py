@@ -9,12 +9,13 @@ from sqlalchemy import func
 from database.models import Insumo, InsumosReceta, LoteInsumo, Receta, db
 from forms import utilidad as utilidad_form
 from logger import logger as log
+from routes.auth import requires_role
 
 utilidad = Blueprint("utilidad", __name__, url_prefix="/utilidad")
 
 
 @utilidad.route("/")
-@login_required
+@requires_role("admin")
 def gestion():
     """Ruta para la página de inicio de la sección de utilidad"""
     form = utilidad_form.GetRecetaForm(request.form)
@@ -26,34 +27,36 @@ def gestion():
 
 
 @utilidad.route("/obtener-ingredientes", methods=["POST"])
+@requires_role("admin")
 def obtener_ingredientes():
     """Ruta para obtener los ingredientes de una receta"""
     form = utilidad_form.GetRecetaForm(request.form)
     form_utilidad = utilidad_form.UtilidadForm(request.form)
-    log.debug(form)
+
     id_receta = form.receta.data
 
     ingredientes_receta = (
-        db.session.query(InsumosReceta, Insumo.nombre)  # Añadir Insumo.nombre aquí
+        db.session.query(
+            InsumosReceta, Insumo.nombre, Insumo.unidad_medida
+        )  # Añadir Insumo.nombre aquí
         .join(Insumo, InsumosReceta.idInsumo == Insumo.id)  # Unir las tablas
         .filter(InsumosReceta.idReceta == id_receta)
         .all()
     )
 
-    log.debug(ingredientes_receta)
-
     ingredientes_con_nombres = []
 
-    for insumo_receta, nombre_insumo in ingredientes_receta:
+    for insumo_receta, nombre_insumo, unidad_medida in ingredientes_receta:
         ingredientes_con_nombres.append(
             {
                 "insumo": nombre_insumo,
                 "inventario": calcular_precio_total(insumo_receta.idInsumo)[
                     "cantidad_total"
                 ],
-                "precio_total": calcular_precio_total(insumo_receta.idInsumo)[
-                    "precio_total"
-                ],
+                "unidad": unidad_medida,
+                "precio_total": round(
+                    calcular_precio_total(insumo_receta.idInsumo)["precio_total"], 2
+                ),
                 "cantidad": insumo_receta.cantidad,
                 "costo_total": round(
                     insumo_receta.cantidad
@@ -63,14 +66,20 @@ def obtener_ingredientes():
             }
         )
 
-    log.debug(ingredientes_con_nombres)
     receta_seleccionada = Receta.query.get(id_receta)
     titulo_receta = receta_seleccionada.nombre if receta_seleccionada else None
+    utilidad_receta = receta_seleccionada.utilidad if receta_seleccionada else None
+    cantidad_galletas = receta_seleccionada.piezas if receta_seleccionada else None
 
     form_utilidad.id_receta.data = id_receta
     form_utilidad.costo_total.data = round(
         sum(ingrediente["costo_total"] for ingrediente in ingredientes_con_nombres), 2
     )
+    form_utilidad.costo_venta.data = utilidad_receta
+    form_utilidad.costo_unitario.data = round(
+        form_utilidad.costo_total.data / cantidad_galletas, 2
+    )
+    form_utilidad.cantidad_galletas.data = cantidad_galletas
 
     return render_template(
         "utilidad/utilidad.html",
@@ -83,6 +92,7 @@ def obtener_ingredientes():
 
 
 @utilidad.route("/guardar", methods=["POST"])
+@requires_role("admin")
 def guardar():
     """Ruta para guardar la utilidad de una receta"""
     form_utilidad = utilidad_form.UtilidadForm(request.form)

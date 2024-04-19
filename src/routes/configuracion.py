@@ -22,7 +22,6 @@ def guardar_informacion_usuario():
     usuario_actual = Usuario.query.get(current_user.id)
 
     if request.method == "POST" and form_usuario.validate():
-        nombre = form_usuario.nombre.data
         correo = form_usuario.correo.data
         contrasenia = form_usuario.contrasenia.data
         confirmacion = form_usuario.confirmacion.data
@@ -39,8 +38,7 @@ def guardar_informacion_usuario():
             return render_template(
                 "configuracion/configuracion.html", formUsuario=form_usuario
             )
-        if nombre:
-            usuario_actual.nombre = nombre
+
         if correo:
             usuario_actual.correo = correo
         if contrasenia and confirmacion and contrasenia == confirmacion:

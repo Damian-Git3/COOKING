@@ -1,24 +1,11 @@
 import math
 from datetime import datetime, timedelta
 
-from flask import (
-    Blueprint,
-    Flask,
-    Response,
-    flash,
-    g,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
-from flask_login import current_user, login_required
-from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import asc, desc, extract, func, text
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user
+from sqlalchemy import asc, desc, func
 from sqlalchemy.orm import joinedload
 
-from configu.config import DevelopmentConfig
 from database.models import (
     Compra,
     CorteCaja,
@@ -29,13 +16,13 @@ from database.models import (
     LoteInsumo,
     Proveedor,
     Receta,
+    RecetaLoteInsumo,
     Rol,
     SolicitudProduccion,
     TransaccionCaja,
     Usuario,
     Venta,
     asignacion_rol_usuario,
-    RecetaLoteInsumo,
     db,
 )
 from forms import forms
@@ -53,11 +40,15 @@ def compras():
 @venta.route("/solicitud_produccion")
 @requires_role("vendedor")
 def solicitud_produccion():
-    solicitudes = SolicitudProduccion.query.options(
-        joinedload(SolicitudProduccion.receta),
-        joinedload(SolicitudProduccion.usuarioSolicitud),
-        joinedload(SolicitudProduccion.usuarioProduccion),
-    ).all()
+    solicitudes = (
+        SolicitudProduccion.query.filter(SolicitudProduccion.estatus != 4)
+        .options(
+            joinedload(SolicitudProduccion.receta),
+            joinedload(SolicitudProduccion.usuarioSolicitud),
+            joinedload(SolicitudProduccion.usuarioProduccion),
+        )
+        .all()
+    )
 
     return render_template(
         "modulos/venta/solicitudes-produccion.html", solicitudes=solicitudes
@@ -68,8 +59,7 @@ def solicitud_produccion():
 @requires_role("vendedor")
 def solicitud_produccion_nuevo():
     form = forms.SolicitudProduccionForm(request.form)
-    form.receta.choices = [(receta.id, receta.nombre)
-                           for receta in Receta.query.all()]
+    form.receta.choices = [(receta.id, receta.nombre) for receta in Receta.query.all()]
     recetas = [
         (receta.id, receta.imagen, receta.piezas) for receta in Receta.query.all()
     ]
@@ -135,8 +125,7 @@ def solicitud_produccion_nuevo():
                     cantidadNecesaria = insumoReceta.cantidad * form.tandas.data
 
                     lotesInsumosReceta = (
-                        LoteInsumo.query.filter_by(
-                            idInsumo=insumoReceta.idInsumo)
+                        LoteInsumo.query.filter_by(idInsumo=insumoReceta.idInsumo)
                         .order_by(asc(LoteInsumo.fecha_caducidad))
                         .all()
                     )
@@ -148,7 +137,7 @@ def solicitud_produccion_nuevo():
                                     idSolicitud=solicitud.id,
                                     idReceta=form.receta.data,
                                     idLoteInsumo=loteInsumo.id,
-                                    cantidad=cantidadNecesaria
+                                    cantidad=cantidadNecesaria,
                                 )
 
                                 db.session.add(recetaLoteInsumo)
@@ -162,7 +151,7 @@ def solicitud_produccion_nuevo():
                                     idSolicitud=solicitud.id,
                                     idReceta=form.receta.data,
                                     idLoteInsumo=loteInsumo.id,
-                                    cantidad=loteInsumo.cantidad
+                                    cantidad=loteInsumo.cantidad,
                                 )
 
                                 db.session.add(recetaLoteInsumo)
@@ -213,7 +202,7 @@ def solicitud_produccion_nuevo():
                 if not recetaSePuedeProcesar:
                     flash(
                         f"La receta no se puede procesar debido a los siguientes productos faltantes: \n\n{mensajeInsumosCantidadesFaltantes}",
-                        "receta-error",
+                        "error",
                     )
                     return redirect(url_for("venta.solicitud_produccion_nuevo"))
 
@@ -235,46 +224,65 @@ def solicitud_produccion_nuevo():
             return redirect(url_for("venta.solicitud_produccion_nuevo"))
 
 
-@venta.route("/solicitud_produccion/edit/<int:id>", methods=["GET", "POST"])
+@venta.route("/solicitud_produccion/aceptar/<int:id>", methods=["POST"])
 @requires_role("vendedor")
-def edit_solicitud_produccion(id):
+def aceptar_solicitud_produccion(id):
     solicitud = SolicitudProduccion.query.get(id)
 
-    form = forms.ModificarSolicitudProduccionForm(request.form)
+    # agregar el lotes de galletas
 
-    if request.method == "POST" and form.validate():
-        solicitud = SolicitudProduccion.query.get(id)
-        solicitud.tandas = form.tandas.data
-        solicitud.fecha_solicitud = form.fecha_solicitud.data
-        db.session.commit()
-
-        flash("Solicitud de producción modificada correctamente", "success")
-
-        return redirect(url_for("venta.solicitud_produccion"))
-
-    return render_template(
-        "modulos/venta/solicitudesProduccion/edit.html", form=form, solicitud=solicitud
+    lote = LoteGalleta(
+        idReceta=solicitud.idReceta,
+        fecha_entrada=datetime.now(),
+        tipo_venta=1,
+        cantidad=solicitud.tandas * Receta.query.get(solicitud.idReceta).piezas,
+        idProduccion=solicitud.id,
+        idUsuarios=current_user.id,
     )
+    db.session.add(lote)
+
+    solicitud = SolicitudProduccion.query.get(id)
+    solicitud.estatus = 4
+    db.session.commit()
+
+    flash("El lote se agrego al almacén", "success")
+
+    return redirect(url_for("venta.solicitud_produccion"))
+
+
+@venta.route("/solicitud_produccion/reintentar/<int:id>", methods=["POST"])
+@requires_role("vendedor")
+def reintentar_solicitud_produccion(id):
+    solicitud = SolicitudProduccion.query.get(id)
+
+    solicitud = SolicitudProduccion.query.get(id)
+    solicitud.estatus = 1
+    solicitud.fecha_solicitud = datetime.now()
+    db.session.commit()
+
+    flash("El lote se agrego al almacén", "success")
+
+    return redirect(url_for("venta.solicitud_produccion"))
 
 
 @venta.route("/solicitud_produccion/delete", methods=["POST"])
 @requires_role("vendedor")
 def delete_solicitud_produccion():
     id = request.form.get("id")
-    
+
     solicitud = SolicitudProduccion.query.get_or_404(id)
 
-    if solicitud.estatus == 1:
+    if solicitud.estatus == 1 or solicitud.estatus == 5:
         recetaLotesInsumosDevolver = RecetaLoteInsumo.query.filter_by(
-            idSolicitud=solicitud.id).all()
+            idSolicitud=solicitud.id
+        ).all()
 
         mensajeDevolver = "Se devolvieron las siguientes cantidades al inventario: \n\n"
 
         for recetaLoteInsumoDevolver in recetaLotesInsumosDevolver:
-            lote_insumo = LoteInsumo.query.get(
-                recetaLoteInsumoDevolver.idLoteInsumo)
+            lote_insumo = LoteInsumo.query.get(recetaLoteInsumoDevolver.idLoteInsumo)
             lote_insumo.cantidad += recetaLoteInsumoDevolver.cantidad
-            
+
             if lote_insumo.insumo.unidad_medida == "Kilos":
                 if recetaLoteInsumoDevolver.cantidad >= 1:
                     unidadMedida = "kg"
@@ -284,7 +292,7 @@ def delete_solicitud_produccion():
                     cantidadFormateada = recetaLoteInsumoDevolver.cantidad * 1000
             elif lote_insumo.insumo.unidad_medida == "Litros":
                 if recetaLoteInsumoDevolver.cantidad >= 1:
-                    unidadMedida = "l"
+                    unidadMedida = "litros"
                     cantidadFormateada = recetaLoteInsumoDevolver.cantidad
                 else:
                     unidadMedida = "ml"
@@ -299,16 +307,21 @@ def delete_solicitud_produccion():
         db.session.commit()
 
         flash(
-            f"Solicitud de producción eliminada correctamente \n{mensajeDevolver}", "receta")
+            f"Solicitud de producción eliminada correctamente \n{mensajeDevolver}",
+            "receta",
+        )
 
         return redirect(url_for("venta.solicitud_produccion"))
     else:
-        flash("La solicitud se encuentra en un status diferente a realizada, solicita al cocinero que descienda los status para poder eliminarla", "error")
+        flash(
+            "La solicitud se encuentra en un status diferente a realizada o rechazada, solicita al cocinero que devuelva la solicitud",
+            "info",
+        )
 
         return redirect(url_for("venta.solicitud_produccion"))
 
 
-@venta.route("/almacen/galletas", methods=["GET", "POST"])
+@venta.route("/lotes/galletas", methods=["GET", "POST"])
 @requires_role("vendedor")
 def lotes_galletas():
     form = forms.BusquedaLoteGalletaForm(request.form)
@@ -372,6 +385,48 @@ def lotes_galletas():
     )
 
 
+@venta.route("/galletas", methods=["GET"])
+@requires_role("vendedor")
+def lotes_galletas_agrupados():
+
+    galletas = Receta.query.all()
+
+    for galleta in galletas:
+        lotes = (
+            LoteGalleta.query.filter(
+                LoteGalleta.idReceta == galleta.id,
+                LoteGalleta.fecha_entrada >= datetime.now().date() - timedelta(days=15),
+                LoteGalleta.cantidad > 0,
+            )
+            .order_by(LoteGalleta.fecha_entrada)
+            .all()
+        )
+        galleta.num_lotes = len(lotes)
+        galleta.proxima_caducidad = lotes[0].fecha_entrada if lotes else "No hay lotes"
+        galleta.cantidad = sum(lote.cantidad for lote in lotes)
+
+        # agregar flash para los galletas que estan por agotarse
+        if galleta.cantidad < 50:
+            flash(
+                f"(Escacez) Quedan menos de 50 unidades de {galleta.nombre}", "warning"
+            )
+        # agregar flash para los galletas que sobrepasan la capacidad de almacenamiento
+        if galleta.cantidad > 400:
+            flash(
+                f"(Exceso) Hay más de 400 unidades de {galleta.nombre}",
+                "info",
+            )
+        # agregar flash par los lotes del galleta que estan por caducar en los proximos 3 dias
+        for lote in lotes:
+            if lote.fecha_entrada <= datetime.now().date() - timedelta(days=12):
+                flash(
+                    f"(Caducidad) El lote {lote.id} de {galleta.nombre} esta por caducar",
+                    "danger",
+                )
+
+    return render_template("modulos/venta/galleta_individual.html", galletas=galletas)
+
+
 @venta.route("/merma/galletas/<int:id>", methods=["GET", "POST"])
 @requires_role("vendedor")
 def merma_galletas(id):
@@ -430,10 +485,37 @@ def compras_ver():
         (insumo.id, insumo.nombre) for insumo in Insumo.query.all()
     ]
 
-    if request.method == "POST" and form.validate():
-        fecha_inicio = form.fecha_inicio.data
-        fecha_fin = form.fecha_fin.data
-        insumo = form.insumo.data
+    if request.method == "POST":
+
+        fecha_inicio_default = datetime.now().date() - timedelta(
+            days=365
+        )  # Ajusta el valor según sea necesario
+        fecha_fin_default = datetime.now().date() + timedelta(
+            days=365 * 1000
+        )  # Ajusta el valor según sea necesario
+        insumo_default = 0
+
+        # Validación y asignación de valores
+        try:
+            fecha_inicio = (
+                form.fecha_inicio.data
+                if form.fecha_inicio.data
+                else fecha_inicio_default
+            )
+
+        except ValueError:
+            fecha_inicio = fecha_inicio_default
+
+        try:
+            fecha_fin = (
+                form.fecha_fin.data if form.fecha_fin.data else fecha_fin_default
+            )
+
+        except ValueError:
+            fecha_fin = fecha_fin_default
+
+        insumo = form.insumo.data if form.insumo.data else insumo_default
+
         lotes = []
 
         if insumo == "0":
@@ -474,8 +556,7 @@ def compras_ver():
                 .all()
             )
 
-            compra.insumos = ", ".join(
-                [lote.nombre for loteInsumo, lote in lotes])
+            compra.insumos = ", ".join([lote.nombre for loteInsumo, lote in lotes])
             compra.caja = True if compra.idTransaccionCaja else False
 
         return render_template(
@@ -550,12 +631,24 @@ def compras_ver_detalle(id):
 @requires_role("vendedor")
 def compras_crear():
     form = forms.NuevaCompraForm(request.form)
+    efectivo_caja = (
+        db.session.query(CorteCaja.monto_final)
+        .filter(CorteCaja.fecha_corte == datetime.now().date())
+        .first()
+    )
+    efectivo_caja = efectivo_caja[0] if efectivo_caja else 0
+
+    caja = (
+        db.session.query(CorteCaja)
+        .filter(CorteCaja.fecha_corte == datetime.now().date())
+        .first()
+    )
+
     form.proveedores.choices = [
         (proveedor.id, proveedor.empresa) for proveedor in Proveedor.query.all()
     ]
 
-    insumos_choices = [(insumo.id, insumo.nombre)
-                       for insumo in Insumo.query.all()]
+    insumos_choices = [(insumo.id, insumo.nombre) for insumo in Insumo.query.all()]
 
     for lote_insumo_form in form.lotes_insumos:
         lote_insumo_form.insumos.choices = insumos_choices
@@ -566,11 +659,20 @@ def compras_crear():
             idUsuario=current_user.id,
             idProveedores=form.proveedores.data,
             fecha_compra=datetime.now(),
-            pago_proveedor=sum(
-                [lote.costo_lote.data for lote in form.lotes_insumos]),
+            pago_proveedor=sum([lote.costo_lote.data for lote in form.lotes_insumos]),
         )
         if form.caja.data:
-            compra.idTransaccionCaja = form.caja.data
+            transaccion = TransaccionCaja(
+                monto_egreso=-compra.pago_proveedor,
+                fecha_transaccion=datetime.now(),
+                idCorteCaja=caja.id,
+            )
+            db.session.add(transaccion)
+            db.session.commit()
+
+            caja.monto_final -= float(compra.pago_proveedor)
+
+            compra.idTransaccionCaja = transaccion.id
 
         db.session.add(compra)
         db.session.commit()
@@ -593,7 +695,10 @@ def compras_crear():
         return redirect(url_for("venta.compras_ver"))
 
     return render_template(
-        "modulos/venta/compras/crear.html", form=form, insumos=insumos_choices
+        "modulos/venta/compras/crear.html",
+        form=form,
+        insumos=insumos_choices,
+        efectivo_caja=efectivo_caja,
     )
 
 
@@ -605,8 +710,17 @@ carrito = []
 def punto_venta():
     form = forms.busquedaRecetaPuntoVenta(request.form)
     form2 = forms.agregarProductoPuntoVenta(request.form)
+    form_devolucion = forms.devolucionForm(request.form)
     # galletas debe contener elnombre de la receta, id, cantidad de stock, imagen
     galletas = db.session.query(Receta).filter(Receta.estatus == 1).all()
+
+    # saber el efectivo en caja en corte caja
+    efectivo_caja = (
+        db.session.query(CorteCaja.monto_final)
+        .filter(CorteCaja.fecha_corte == datetime.now().date())
+        .first()
+    )
+    efectivo_caja = efectivo_caja[0] if efectivo_caja else 0
 
     for galleta in galletas:
         galleta.stock = (
@@ -627,14 +741,42 @@ def punto_venta():
         form=form2,
         carrito=carrito,
         total=total,
+        form_devolucion=form_devolucion,
+        efectivo_caja=efectivo_caja,
     )
+
+
+@venta.route("/punto_venta/caja", methods=["GET", "POST"])
+@requires_role("vendedor")
+def punto_venta_devolucion():
+    form_devolucion = forms.devolucionForm(request.form)
+    # saber el efectivo en caja en corte caja
+    if form_devolucion.validate():
+        caja = (
+            db.session.query(CorteCaja)
+            .filter(CorteCaja.fecha_corte == datetime.now().date())
+            .first()
+        )
+        caja.monto_final -= float(form_devolucion.cantidad.data)
+
+        db.session.commit()
+
+    return redirect(url_for("venta.punto_venta"))
 
 
 @venta.route("/punto_venta/buscar", methods=["POST"])
 @requires_role("vendedor")
 def punto_venta_buscar():
+    form_devolucion = forms.devolucionForm(request.form)
     form = forms.busquedaRecetaPuntoVenta(request.form)
     form2 = forms.agregarProductoPuntoVenta(request.form)
+
+    efectivo_caja = (
+        db.session.query(CorteCaja.monto_final)
+        .filter(CorteCaja.fecha_corte == datetime.now().date())
+        .first()
+    )
+    efectivo_caja = efectivo_caja[0] if efectivo_caja else 0
 
     if form.validate():
         galletas = (
@@ -652,14 +794,17 @@ def punto_venta_buscar():
                 galleta.stock = 0
             galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
 
-            total = sum([item["subtotal"] for item in carrito])
+        total = sum([item["subtotal"] for item in carrito])
 
         return render_template(
             "modulos/venta/punto-venta.html",
             galletas=galletas,
             form_busqueda=form,
             form=form2,
+            total=total,
             carrito=carrito,
+            efectivo_caja=efectivo_caja,
+            form_devolucion=form_devolucion,
         )
 
     total = sum([item["subtotal"] for item in carrito])
@@ -682,6 +827,8 @@ def punto_venta_buscar():
         form_busqueda=form,
         form=form2,
         carrito=carrito,
+        efectivo_caja=efectivo_caja,
+        form_devolucion=form_devolucion,
     )
 
 
@@ -690,28 +837,15 @@ def punto_venta_buscar():
 def punto_venta_agregar():
     form = forms.busquedaRecetaPuntoVenta(request.form)
     form2 = forms.agregarProductoPuntoVenta(request.form)
+    form_devolucion = forms.devolucionForm()
     # galletas debe contener elnombre de la receta, id, cantidad de stock, imagen
 
-    if form2.validate():
-        idReceta = form2.id.data
-        cantidad = form2.cantidad.data
-
-        receta = Receta.query.get(idReceta)
-
-        carrito.append(
-            {
-                "idCarrito": len(carrito) + 1,
-                "idReceta": idReceta,
-                "nombre": receta.nombre,
-                "cantidad": cantidad,
-                "precio_unidad": receta.utilidad,
-                "subtotal": receta.utilidad * cantidad,
-            }
-        )
-        # Restablecer el formulario después de procesarlo
-        form2 = forms.agregarProductoPuntoVenta()
-
-    total = sum([item["subtotal"] for item in carrito])
+    efectivo_caja = (
+        db.session.query(CorteCaja.monto_final)
+        .filter(CorteCaja.fecha_corte == datetime.now().date())
+        .first()
+    )
+    efectivo_caja = efectivo_caja[0] if efectivo_caja else 0
 
     galletas = db.session.query(Receta).filter(Receta.estatus == 1).all()
     for galleta in galletas:
@@ -720,9 +854,54 @@ def punto_venta_agregar():
             .filter(LoteGalleta.cantidad > 0, LoteGalleta.idReceta == galleta.id)
             .scalar()
         )
+
         if not galleta.stock:
             galleta.stock = 0
+
         galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
+
+    if form2.validate():
+        idReceta = form2.id.data
+        cantidad = form2.cantidad.data
+
+        receta = Receta.query.get(idReceta)
+
+        # Sumar las cantidades de la receta en el carrito
+        cantidad_en_carrito = sum(
+            item["cantidad"] for item in carrito if item["idReceta"] == idReceta
+        )
+        # Buscar la receta específica en la lista de galletas para obtener su stock
+        galleta_en_carrito = next(
+            (
+                item
+                for item in galletas
+                if item.id == int(idReceta) and item.stock is not None
+            ),
+            0,
+        )
+        if (
+            galleta_en_carrito
+            and cantidad_en_carrito + cantidad <= galleta_en_carrito.stock
+        ):
+            carrito.append(
+                {
+                    "idCarrito": len(carrito) + 1,
+                    "idReceta": idReceta,
+                    "nombre": receta.nombre,
+                    "cantidad": cantidad,
+                    "precio_unidad": receta.utilidad,
+                    "subtotal": receta.utilidad * cantidad,
+                }
+            )
+            # Aquí puedes manejar el caso de éxito, por ejemplo, redirigiendo al usuario o mostrando un mensaje
+        else:
+            flash(
+                f"La cantidad solicitada de {receta.nombre} excede la cantidad disponible en stock.",
+                "info",
+            )
+        form2 = forms.agregarProductoPuntoVenta()
+
+    total = sum([item["subtotal"] for item in carrito])
 
     return render_template(
         "modulos/venta/punto-venta.html",
@@ -731,6 +910,8 @@ def punto_venta_agregar():
         form=form2,
         carrito=carrito,
         total=total,
+        efectivo_caja=efectivo_caja,
+        form_devolucion=form_devolucion,
     )
 
 
@@ -739,8 +920,19 @@ def punto_venta_agregar():
 def punto_venta_eliminar(id):
     form = forms.busquedaRecetaPuntoVenta(request.form)
     form2 = forms.agregarProductoPuntoVenta(request.form)
+    form_devolucion = forms.devolucionForm(request.form)
+
+    efectivo_caja = (
+        db.session.query(CorteCaja.monto_final)
+        .filter(CorteCaja.fecha_corte == datetime.now().date())
+        .first()
+    )
+    efectivo_caja = efectivo_caja[0] if efectivo_caja else 0
     # galletas debe contener elnombre de la receta, id, cantidad de stock, imagen
     galletas = db.session.query(Receta).filter(Receta.estatus == 1).all()
+    global carrito
+    carrito = [item for item in carrito if item["idCarrito"] != id]
+
     for galleta in galletas:
         galleta.stock = (
             db.session.query(func.sum(LoteGalleta.cantidad))
@@ -751,10 +943,6 @@ def punto_venta_eliminar(id):
             galleta.stock = 0
 
         galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
-
-    print(id)
-    global carrito
-    carrito = [item for item in carrito if item["idCarrito"] != id]
 
     total = sum([item["subtotal"] for item in carrito])
 
@@ -765,6 +953,8 @@ def punto_venta_eliminar(id):
         form=form2,
         carrito=carrito,
         total=total,
+        efectivo_caja=efectivo_caja,
+        form_devolucion=form_devolucion,
     )
 
 
@@ -773,6 +963,14 @@ def punto_venta_eliminar(id):
 def punto_venta_cancelar():
     form = forms.busquedaRecetaPuntoVenta(request.form)
     form2 = forms.agregarProductoPuntoVenta(request.form)
+    form_devolucion = forms.devolucionForm(request.form)
+
+    efectivo_caja = (
+        db.session.query(CorteCaja.monto_final)
+        .filter(CorteCaja.fecha_corte == datetime.now().date())
+        .first()
+    )
+    efectivo_caja = efectivo_caja[0] if efectivo_caja else 0
     # galletas debe contener elnombre de la receta, id, cantidad de stock, imagen
     galletas = db.session.query(Receta).filter(Receta.estatus == 1).all()
     for galleta in galletas:
@@ -786,6 +984,7 @@ def punto_venta_cancelar():
 
         galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
 
+    global carrito
     carrito = []
 
     total = sum([item["subtotal"] for item in carrito])
@@ -797,14 +996,14 @@ def punto_venta_cancelar():
         form=form2,
         carrito=carrito,
         total=total,
+        efectivo_caja=efectivo_caja,
+        form_devolucion=form_devolucion,
     )
 
 
 @venta.route("/punto_venta/confirmar", methods=["POST"])
 @requires_role("vendedor")
 def punto_venta_confirmar():
-    form = forms.busquedaRecetaPuntoVenta(request.form)
-    form2 = forms.agregarProductoPuntoVenta(request.form)
     # galletas debe contener elnombre de la receta, id, cantidad de stock, imagen
 
     global carrito
@@ -822,8 +1021,7 @@ def punto_venta_confirmar():
 
         galleta.imagen = galleta.imagen if galleta.imagen else "galleta 1.png"
 
-    corte_de_hoy = CorteCaja.query.filter_by(
-        fecha_corte=datetime.now().date()).first()
+    corte_de_hoy = CorteCaja.query.filter_by(fecha_corte=datetime.now().date()).first()
 
     transaccion = TransaccionCaja(
         monto_ingreso=total,
@@ -879,7 +1077,14 @@ def punto_venta_confirmar():
                 db.session.add(lote)
                 lote.cantidad = 0
             db.session.commit()
-
+    carrito = []
+    caja = (
+        db.session.query(CorteCaja)
+        .filter(CorteCaja.fecha_corte == datetime.now().date())
+        .first()
+    )
+    caja.monto_final += total
+    db.session.commit()
     flash("Venta registrada correctamente", "success")
 
     return redirect(url_for("venta.punto_venta"))

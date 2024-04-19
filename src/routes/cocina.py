@@ -1,31 +1,37 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from importlib.metadata import requires
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import login_required
 
 from database.models import (
     Compra,
     Insumo,
     InsumosReceta,
     LoteInsumo,
+    Proveedor,
     Receta,
     SolicitudProduccion,
     Usuario,
     db,
 )
 from forms import forms
+from logger import logger as log
+from routes.auth import requires_role
 
 cocina = Blueprint("cocina", __name__, url_prefix="/cocina")
 
 
 @cocina.route("/cocinar")
-@login_required
+@requires_role("cocinero")
 def cocinar():
     solicitudesProduccion = SolicitudProduccion.query.all()
     print(solicitudesProduccion)
 
     return render_template(
-        "modulos/cocina/cocinar.html", solicitudesProduccion=solicitudesProduccion, current_datetime=datetime.now()
+        "modulos/cocina/cocinar.html",
+        solicitudesProduccion=solicitudesProduccion,
+        current_datetime=datetime.now(),
     )
 
 
@@ -80,10 +86,13 @@ def finalizarProduccion(idSolicitud):
 
         db.session.commit()
 
-        flash("Solicitud finalizada correctamente", 'success')
+        flash("Solicitud finalizada correctamente", "success")
         return redirect(url_for("cocina.cocinar"))
     else:
-        flash("La solicitud se encuentra en un status diferente a solicitud en preparación, no se puede finalizar", 'error')
+        flash(
+            "La solicitud se encuentra en un status diferente a solicitud en preparación, no se puede finalizar",
+            "error",
+        )
         return redirect(url_for("cocina.cocinar"))
 
 
@@ -93,15 +102,18 @@ def rechazarSolicitud(idSolicitud):
     solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
 
     if solicitudProduccion.estatus == 1:
-        solicitudProduccion.mensaje = request.form.get('mensaje')
+        solicitudProduccion.mensaje = request.form.get("mensaje")
         solicitudProduccion.estatus = 5
 
         db.session.commit()
 
-        flash("Solicitud rechazada correctamente", 'success')
+        flash("Solicitud rechazada correctamente", "success")
         return redirect(url_for("cocina.cocinar"))
     else:
-        flash("La solicitud se encuentra en un status diferente a solicitud realizada, no se puede rechazar", 'error')
+        flash(
+            "La solicitud se encuentra en un status diferente a solicitud realizada, no se puede rechazar",
+            "error",
+        )
         return redirect(url_for("cocina.cocinar"))
 
 
@@ -111,15 +123,18 @@ def posponerSolicitud(idSolicitud):
     solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
 
     if solicitudProduccion.estatus == 1:
-        solicitudProduccion.mensaje = request.form.get('mensaje')
+        solicitudProduccion.mensaje = request.form.get("mensaje")
         solicitudProduccion.estatus = 6
 
         db.session.commit()
 
-        flash("Solicitud pospuesta correctamente", 'success')
+        flash("Solicitud pospuesta correctamente", "success")
         return redirect(url_for("cocina.cocinar"))
     else:
-        flash("La solicitud se encuentra en un status diferente a solicitud realizada, no se puede posponer", 'error')
+        flash(
+            "La solicitud se encuentra en un status diferente a solicitud realizada, no se puede posponer",
+            "error",
+        )
         return redirect(url_for("cocina.cocinar"))
 
 
@@ -131,10 +146,32 @@ def lotes_insumos():
         (insumo.id, insumo.nombre) for insumo in Insumo.query.all()
     ]
 
-    if request.method == "POST" and form.validate():
-        fecha_inicio = form.fecha_inicio.data
-        fecha_fin = form.fecha_fin.data
-        insumo = form.insumo.data
+    if request.method == "POST":
+        fecha_inicio_default = datetime.now().date()
+        fecha_fin_default = datetime.now().date() + timedelta(
+            days=365 * 1000
+        )  # Ajusta el valor según sea necesario
+        insumo_default = 0
+
+        # Validación y asignación de valores
+        try:
+            fecha_inicio = (
+                form.fecha_inicio.data
+                if form.fecha_inicio.data
+                else fecha_inicio_default
+            )
+
+        except ValueError:
+            fecha_inicio = fecha_inicio_default
+
+        try:
+            fecha_fin = (
+                form.fecha_fin.data if form.fecha_fin.data else fecha_fin_default
+            )
+        except ValueError:
+            fecha_fin = fecha_fin_default
+
+        insumo = form.insumo.data if form.insumo.data else insumo_default
         lotes = []
 
         if insumo == "0":
@@ -143,6 +180,7 @@ def lotes_insumos():
                 .join(Insumo, LoteInsumo.idInsumo == Insumo.id)
                 .join(Compra, LoteInsumo.idCompra == Compra.id)
                 .join(Usuario, Compra.idUsuario == Usuario.id)
+                .join(Proveedor, Compra.id == Proveedor.id)
                 .filter(
                     LoteInsumo.cantidad > 0,
                     LoteInsumo.fecha_caducidad >= fecha_inicio,
@@ -157,6 +195,7 @@ def lotes_insumos():
                 .join(Insumo, LoteInsumo.idInsumo == Insumo.id)
                 .join(Compra, LoteInsumo.idCompra == Compra.id)
                 .join(Usuario, Compra.idUsuario == Usuario.id)
+                .join(Proveedor, Compra.id == Proveedor.id)
                 .filter(
                     LoteInsumo.cantidad > 0,
                     LoteInsumo.fecha_caducidad >= fecha_inicio,
@@ -172,10 +211,11 @@ def lotes_insumos():
         )
 
     lotes = (
-        db.session.query(LoteInsumo, Insumo, Usuario.nombre)
+        db.session.query(LoteInsumo, Insumo, Usuario.nombre, Proveedor.empresa)
         .join(Insumo, LoteInsumo.idInsumo == Insumo.id)
         .join(Compra, LoteInsumo.idCompra == Compra.id)
         .join(Usuario, Compra.idUsuario == Usuario.id)
+        .join(Proveedor, Compra.id == Proveedor.id)
         .filter(
             LoteInsumo.cantidad > 0,
             LoteInsumo.fecha_caducidad >= datetime.now(),
@@ -184,9 +224,54 @@ def lotes_insumos():
         .all()
     )
 
+    log.info(lotes)
     return render_template(
         "modulos/cocina/insumos.html", form=form, lotes=lotes, lista=True
     )
+
+
+@cocina.route("/insumos", methods=["GET"])
+@requires_role("cocinero")
+def lotes_insumos_agrupados():
+
+    insumos = Insumo.query.all()
+
+    for insumo in insumos:
+        lotes = (
+            LoteInsumo.query.filter(
+                LoteInsumo.idInsumo == insumo.id,
+                LoteInsumo.fecha_caducidad >= datetime.now().date(),
+                LoteInsumo.cantidad > 0,
+            )
+            .order_by(LoteInsumo.fecha_caducidad)
+            .all()
+        )
+        insumo.num_lotes = len(lotes)
+        insumo.proxima_caducidad = lotes[0].fecha_caducidad if lotes else "No hay lotes"
+        insumo.cantidad = sum(lote.cantidad for lote in lotes)
+        insumo.coste_promedio = (
+            sum(lote.precio_unidad * lote.cantidad for lote in lotes) / insumo.cantidad
+            if insumo.cantidad
+            else 1
+        )
+        # agregar flash para los insumos que estan por agotarse
+        if insumo.cantidad < insumo.cantidad_minima:
+            flash(f"(Escacez) El insumo {insumo.nombre} esta por agotarse", "warning")
+        # agregar flash para los insumos que sobrepasan la capacidad de almacenamiento
+        if insumo.cantidad > insumo.cantidad_maxima:
+            flash(
+                f"(Exceso) El insumo {insumo.nombre} sobrepasa la capacidad de almacenamiento",
+                "info",
+            )
+        # agregar flash par los lotes del insumo que estan por caducar en los proximos 3 dias
+        for lote in lotes:
+            if lote.fecha_caducidad <= datetime.now().date() + timedelta(days=3):
+                flash(
+                    f"(Caducidad) El lote {lote.id} del insumo {insumo.nombre} esta por caducar",
+                    "danger",
+                )
+
+    return render_template("modulos/cocina/insumo_individual.html", insumos=insumos)
 
 
 @cocina.route("/merma/insumos/<int:id>", methods=["GET", "POST"])
