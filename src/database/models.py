@@ -13,6 +13,12 @@ asignacion_rol_usuario = db.Table(
     db.Column("idRol", db.Integer, db.ForeignKey("roles.id")),
 )
 
+class RecetaLoteInsumo(db.Model):
+    __tablename__ = "receta_lotes_insumos"
+    idSolicitud = db.Column(db.Integer, db.ForeignKey("solicitudes_produccion.id"), primary_key=True)
+    idReceta = db.Column(db.Integer, db.ForeignKey("recetas.id"), primary_key=True)
+    idLoteInsumo = db.Column(db.Integer, db.ForeignKey("lotes_insumo.id"), primary_key=True)
+    cantidad = db.Column(db.Float, nullable=False)
 
 class InsumosReceta(db.Model):
     __tablename__ = "insumos_receta"
