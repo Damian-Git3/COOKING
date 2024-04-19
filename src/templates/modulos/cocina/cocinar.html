@@ -190,9 +190,10 @@
 
       {% if solicitudProduccion.estatus == 2 %}
       <form action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
-        id="formFinalizarProduccion{{solicitudProduccion.id}}">
-        <button type="button" class="boton btn-aceptar"
-          onclick="finalizarSolicitud('{{ solicitudProduccion.id }}', '{{ solicitudProduccion.tandas * solicitudProduccion.receta.piezas }}')">
+        id="formFinalizarSolicitud{{solicitudProduccion.id}}">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+        <input type="hidden" name="mensaje" id="cantidadMerma{{solicitudProduccion.id}}" />
+        <button type="button" class="boton btn-aceptar" onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')">
           Finalizar producción
         </button>
       </form>
