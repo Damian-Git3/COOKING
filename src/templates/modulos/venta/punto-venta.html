@@ -477,8 +477,10 @@ render_field_nolabel %} {% block content %}
         <div
           style="display: flex; justify-content: center; align-items: center"
         >
-          Total: $ {{ total | round(2) }}
-          <p id="total" style="display: none">{{ total | round(2) }}</p>
+          Total: $ {% if total %}{{ total | round(2) }}{% endif %}
+          <p id="total" style="display: none">
+            {% if total %}{{ total | round(2) }}{% endif %}
+          </p>
         </div>
         <form
           id="form-borrar-todo"
