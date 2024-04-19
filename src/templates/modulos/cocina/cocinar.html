@@ -191,7 +191,8 @@
       {% if solicitudProduccion.estatus == 2 %}
       <form action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
         id="formFinalizarProduccion{{solicitudProduccion.id}}">
-        <button type="button" class="boton btn-aceptar" onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')">
+        <button type="button" class="boton btn-aceptar"
+          onclick="finalizarSolicitud('{{ solicitudProduccion.id }}', '{{ solicitudProduccion.tandas * solicitudProduccion.receta.piezas }}')">
           Finalizar producción
         </button>
       </form>
@@ -276,7 +277,7 @@
     });
   }
 
-  function finalizarSolicitud(id) {
+  function finalizarSolicitud(id, cantidadMaxima) {
     Swal.fire({
       title: "¿Estás seguro de finalizar la producción?",
       showCancelButton: true,
@@ -284,12 +285,37 @@
       cancelButtonText: "Cancelar",
       icon: "question",
     }).then((result) => {
-      let formFinalizarProduccion = document.getElementById(
-        "formFinalizarProduccion" + id
-      );
-      formFinalizarProduccion.submit();
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Merma en producción',
+          text: '¿Tuviste merma en esta producción? Coloca las piezas de merma.',
+          input: 'number', // Permite al usuario introducir un número
+          inputPlaceholder: 'Número de piezas de merma',
+          inputValidator: (value) => {
+            // Validación opcional, puedes personalizar el mensaje de error
+            if (!value) {
+              return 'Debes ingresar un número de piezas de merma';
+            }
+
+            if (value > cantidadMaxima){
+              return 'La merma no puede ser mayor que la cantidad producida';
+            }
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Aceptar',
+          cancelButtonText: 'Cancelar'
+        }).then((mermaResult) => {
+          if (mermaResult.isConfirmed) {
+            // Aquí puedes hacer algo con la cantidad de merma ingresada
+            console.log('Piezas de merma:', mermaResult.value);
+            let formFinalizarProduccion = document.getElementById("formFinalizarProduccion" + id);
+            formFinalizarProduccion.submit();
+          }
+        });
+      }
     });
   }
+
 
   function posponerSolicitud(id) {
     Swal.fire({
