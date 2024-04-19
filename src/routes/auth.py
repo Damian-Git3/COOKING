@@ -12,7 +12,6 @@ auth = Blueprint("auth", __name__)
 
 @auth.route("/login")
 def login():
-
     corte_de_hoy = CorteCaja.query.filter_by(fecha_corte=datetime.now().date()).first()
 
     if not corte_de_hoy:
