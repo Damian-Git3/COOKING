@@ -9,6 +9,8 @@ from pymysql import IntegrityError
 from sassutils.wsgi import SassMiddleware
 from sqlalchemy.exc import SQLAlchemyError
 
+from flask_socketio import SocketIO, send
+
 from configu.admin_config import setup_admin
 from configu.config import DevelopmentConfig
 from database.models import Usuario, db
@@ -34,6 +36,13 @@ if __name__ == "__main__":
     app = Flask(__name__)
     app.config.from_object(DevelopmentConfig)
     CORS(app, resources={r"/*": {"origins": "http://localhost:*"}})
+
+    socketio = SocketIO(app)
+
+    @socketio.on('message')
+    def handleMessage(msg):
+        print(msg)
+        send(msg, broadcast=True)
 
     app.wsgi_app = SassMiddleware(
         app.wsgi_app,
@@ -136,4 +145,4 @@ if __name__ == "__main__":
 
     app.jinja_env.globals.update(get_field_type=get_field_type)
 
-    app.run(port=4000)
+    socketio.run(app, port=4000)

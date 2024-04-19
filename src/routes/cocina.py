@@ -25,8 +25,7 @@ cocina = Blueprint("cocina", __name__, url_prefix="/cocina")
 @cocina.route("/cocinar")
 @requires_role("cocinero")
 def cocinar():
-    solicitudesProduccion = SolicitudProduccion.query.all()
-    print(solicitudesProduccion)
+    solicitudesProduccion = SolicitudProduccion.query.filter(SolicitudProduccion.estatus != 4).all()
 
     return render_template(
         "modulos/cocina/cocinar.html",

@@ -51,23 +51,41 @@
         localStorage.setItem("mensaje", "{{mensaje}}");
       </script>
 
-        <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
-        <script>
-          Toast.fire({
-            icon: "success",
-            title: localStorage.getItem("mensaje"),
-          });
-        </script>
-        {% endblock %}
-      </div>
+      <script src="{{ url_for('static', filename='js/menu.js')}}"></script>
+      <script>
+        Toast.fire({
+          icon: "success",
+          title: localStorage.getItem("mensaje"),
+        });
+      </script>
+      {% endblock %}
     </div>
-    
-    {% block bootstrap_modals %}{% endblock %}
-    <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
-    
-    <!-- BLOQUE PARA CODIGO -->
-    {% block jscode %} {% endblock %}
-    
-    {% include 'alertas/alertas.html' %}
-  </body>
+  </div>
+
+  {% block bootstrap_modals %}{% endblock %}
+  <script src="{{ url_for('static', filename='js/sidebar.js')}}"></script>
+
+  <!-- BLOQUE PARA CODIGO -->
+  {% block jscode %} {% endblock %}
+
+  {% include 'alertas/alertas.html' %}
+
+  <script>
+    const socket = io();
+
+    socket.on('message', msg => {
+      Toast.fire({
+        icon: "success",
+        title: msg,
+      });
+    });
+  </script>
+
+  <script>
+    function mandarMensaje(mensaje) {
+      socket.emit('message', mensaje);
+    }
+  </script>
+</body>
+
 </html>

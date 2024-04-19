@@ -31,7 +31,6 @@ from routes.auth import requires_role
 
 venta = Blueprint("venta", __name__, url_prefix="/venta")
 
-
 @venta.route("/compras")
 @requires_role("vendedor")
 def compras():
@@ -132,9 +131,6 @@ def solicitud_produccion_nuevo():
                         .all()
                     )
 
-                    print("------------------")
-                    print("que más pues")
-
                     if len(lotesInsumosReceta) > 0:
                         for loteInsumo in lotesInsumosReceta:
                             if loteInsumo.cantidad >= cantidadNecesaria:
@@ -207,12 +203,15 @@ def solicitud_produccion_nuevo():
                 if not recetaSePuedeProcesar:
                     print("hola desde no se puede procesar")
 
-                    flash(f"La receta no se puede procesar debido a los siguientes productos faltantes: \n\n{mensajeInsumosCantidadesFaltantes}", 'receta-error')
+                    flash(
+                        f"La receta no se puede procesar debido a los siguientes productos faltantes: \n\n{mensajeInsumosCantidadesFaltantes}", 'receta-error')
                     return redirect(url_for("venta.solicitud_produccion_nuevo"))
 
                 # Termina FOR DE INSUMOS
 
                 db.session.commit()
+
+                #socketio.emit('message', "Tienes una nueva solicitud", broadcast=True)
 
                 flash("Solicitud de producción creada correctamente", "success")
 
@@ -259,7 +258,7 @@ def aceptar_solicitud_produccion(id):
 @requires_role("vendedor")
 def reintentar_solicitud_produccion(id):
     solicitud = SolicitudProduccion.query.get(id)
-    
+
     solicitud.estatus = 1
     solicitud.fecha_solicitud = datetime.now()
     db.session.commit()
@@ -686,15 +685,23 @@ def compras_crear():
         db.session.commit()
 
         for lote_insumo_form in form.lotes_insumos:
+            insumo = Insumo.find(lote_insumo_form.insumos.data)
+
+            porcentaje_merma = insumo.merma / 100
+            cantidad_descontada = lote_insumo_form.cantidad.data * porcentaje_merma
+
+            cantidad_ajustada = lote_insumo_form.cantidad.data - cantidad_descontada
+
+            # Crear un nuevo lote de insumo
             lote_insumo = LoteInsumo(
                 idCompra=compra.id,
                 idInsumo=lote_insumo_form.insumos.data,
-                cantidad=lote_insumo_form.cantidad.data,
+                cantidad=cantidad_ajustada,
                 fecha_caducidad=lote_insumo_form.fecha_caducidad.data,
-                precio_unidad=lote_insumo_form.costo_lote.data
-                / lote_insumo_form.cantidad.data,
+                precio_unidad=lote_insumo_form.costo_lote.data / lote_insumo_form.cantidad.data,
                 fecha_compra=datetime.now(),
             )
+
             db.session.add(lote_insumo)
 
         db.session.commit()
