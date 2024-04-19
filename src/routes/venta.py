@@ -1,25 +1,11 @@
 import math
 from datetime import datetime, timedelta
 
-from flask import (
-    Blueprint,
-    Flask,
-    Response,
-    flash,
-    g,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    send_file,
-    url_for,
-)
-from flask_login import current_user, login_required
-from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import asc, desc, extract, func, text
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user
+from sqlalchemy import asc, desc, func
 from sqlalchemy.orm import joinedload
 
-from configu.config import DevelopmentConfig
 from database.models import (
     Compra,
     CorteCaja,

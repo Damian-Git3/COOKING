@@ -1,5 +1,7 @@
 """ Modulo que se encarga de manejar los errores de la aplicacion """
 
+import traceback
+
 from flask import render_template
 
 from logger import logger as log
@@ -91,7 +93,8 @@ def not_implemented_error(e):
 
 def type_error(e):
     """Funcion que se encarga de manejar los errores de tipo de dato"""
-    log.error(e)
+    stack_trace = traceback.format_exc()
+    log.error(f"Error en el tipo de dato: {e}\n{stack_trace}")
     return (
         render_template(
             "error_page.html", error="500", mensaje="Error en el tipo de dato"

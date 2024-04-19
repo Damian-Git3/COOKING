@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask_login import login_required
 
 from database.models import (
     Compra,
     Insumo,
     InsumosReceta,
     LoteInsumo,
+    Proveedor,
     Receta,
     SolicitudProduccion,
     Usuario,
@@ -175,6 +176,7 @@ def lotes_insumos():
                 .join(Insumo, LoteInsumo.idInsumo == Insumo.id)
                 .join(Compra, LoteInsumo.idCompra == Compra.id)
                 .join(Usuario, Compra.idUsuario == Usuario.id)
+                .join(Proveedor, Compra.id == Proveedor.id)
                 .filter(
                     LoteInsumo.cantidad > 0,
                     LoteInsumo.fecha_caducidad >= fecha_inicio,

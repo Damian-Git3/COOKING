@@ -98,6 +98,7 @@ messages %}
     <thead>
       <tr>
         <th scope="col">Insumo</th>
+        <th scope="col">Proveedor</th>
         <th scope="col">ID del Lote</th>
         <th scope="col">Fecha de Compra</th>
         <th scope="col">Fecha de Caducidad</th>
@@ -111,6 +112,7 @@ messages %}
       {% for lot, insumo, usuario_nombre in lotes %}
       <tr>
         <td>{{ insumo.nombre }}</td>
+        <td>{{ insumo.proveedor }}</td>
         <td>{{ lot.id }}</td>
         <td>{{ lot.fecha_compra }}</td>
         <td>{{ lot.fecha_caducidad }}</td>
