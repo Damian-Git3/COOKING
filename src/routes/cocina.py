@@ -59,7 +59,26 @@ def aceptarSolicitud(idSolicitud):
 
         for insumoReceta in insumosReceta:
             insumo = Insumo.query.get_or_404(insumoReceta.idInsumo)
-            mensajeReceta += f"{insumo.nombre}: {insumoReceta.cantidad * solicitudProduccion.tandas:.2f} {insumo.unidad_medida}\n"
+            
+            cantidadNecesaria = insumoReceta.cantidad * solicitudProduccion.tandas
+            
+            if insumo.unidad_medida == "Kilos":
+                if cantidadNecesaria >= 1:
+                    unidadMedida = "kg"
+                    cantidadFormateada = cantidadNecesaria
+                else:
+                    unidadMedida = "g"
+                    cantidadFormateada = cantidadNecesaria * 1000
+
+            elif insumo.unidad_medida == "Litros":
+                if cantidadNecesaria >= 1:
+                    unidadMedida = "l"
+                    cantidadFormateada = cantidadNecesaria
+                else:
+                    unidadMedida = "ml"
+                    cantidadFormateada = cantidadNecesaria * 1000
+            
+            mensajeReceta += f"{insumo.nombre}: {cantidadFormateada:.2f} {unidadMedida}\n"
 
         db.session.commit()
 
