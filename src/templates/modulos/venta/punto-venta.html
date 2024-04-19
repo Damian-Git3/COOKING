@@ -34,7 +34,7 @@ render_field_nolabel %} {% block content %}
         color: #ffffff;
       "
     >
-      <h5 style="margin: auto">Caja: ${{ efectivo_caja }}</h5>
+      <h5 style="margin: auto">Caja: ${{ efectivo_caja|round(2) }}</h5>
       <div><i class="fa-solid fa-outdent"></i></div>
     </div>
   </div>

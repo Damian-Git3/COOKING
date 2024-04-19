@@ -15,6 +15,7 @@ asignacion_rol_usuario = db.Table(
 
 
 class RecetaLoteInsumo(db.Model):
+
     __tablename__ = "receta_lotes_insumos"
     idSolicitud = db.Column(
         db.Integer, db.ForeignKey("solicitudes_produccion.id"), primary_key=True
@@ -192,6 +193,9 @@ class Compra(db.Model):
 
     __table_args__ = (Index("idx_fecha_compra", "fecha_compra"),)
 
+    def __str__(self):
+        return f"Compra: {self.id}, Pago Proveedor: {self.pago_proveedor}, Estatus: {self.estatus}, Fecha Compra: {self.fecha_compra}, ID Usuario: {self.idUsuario}, ID Proveedor: {self.idProveedores}, ID Transaccion Caja: {self.idTransaccionCaja}"
+
 
 class Venta(db.Model):
     __tablename__ = "ventas"
@@ -206,6 +210,9 @@ class Venta(db.Model):
     )
     __table_args__ = (Index("idx_fecha_venta", "fecha_venta"),)
 
+    def __str__(self):
+        return f"Venta: {self.id}, Fecha Venta: {self.fecha_venta}, Total Venta: {self.total_venta}, ID Usuario: {self.idUsuario}, ID Transaccion Caja: {self.idTransaccionCaja}"
+
 
 class CorteCaja(db.Model):
     __tablename__ = "cortes_caja"
@@ -214,6 +221,9 @@ class CorteCaja(db.Model):
     monto_final = db.Column(db.Float)
     monto_inicial = db.Column(db.Float)
     fecha_corte = db.Column(db.Date)
+
+    def __str__(self):
+        return f"Corte Caja: {self.id}, Monto Final: {self.monto_final}, Monto Inicial: {self.monto_inicial}, Fecha Corte: {self.fecha_corte}"
 
 
 class DetalleVenta(db.Model):
@@ -226,6 +236,9 @@ class DetalleVenta(db.Model):
     idVenta = db.Column(db.Integer, db.ForeignKey("ventas.id"))
     idStock = db.Column(db.Integer, db.ForeignKey("lotes_galletas.id"))
 
+    def __str__(self):
+        return f"Detalle Venta: {self.id}, Precio: {self.precio}, Cantidad: {self.cantidad}, ID Venta: {self.idVenta}, ID Stock: {self.idStock}"
+
 
 class LogAccion(db.Model):
     __tablename__ = "logs_acciones"
@@ -236,6 +249,9 @@ class LogAccion(db.Model):
     detalles = db.Column(db.String(200), nullable=False)
 
     idUsuario = db.Column(db.Integer, db.ForeignKey("usuarios.id"), nullable=False)
+
+    def __str__(self):
+        return f"Log Accion: {self.id}, Fecha: {self.fecha}, Modulo: {self.modulo}, Detalles: {self.detalles}, ID Usuario: {self.idUsuario}"
 
 
 class LogLogin(db.Model):
@@ -270,6 +286,9 @@ class LoteGalleta(db.Model):
         backref=db.backref("lotes_receta", lazy="dynamic"),
     )
 
+    def __str__(self):
+        return f"Lote Galleta: {self.id}, Fecha Entrada: {self.fecha_entrada}, Cantidad: {self.cantidad}, Merma: {self.merma}, Tipo Venta: {self.tipo_venta}, ID Produccion: {self.idProduccion}, ID Receta: {self.idReceta}, ID Usuario: {self.idUsuarios}"
+
 
 class LoteInsumo(db.Model):
     __tablename__ = "lotes_insumo"
@@ -294,6 +313,9 @@ class LoteInsumo(db.Model):
         foreign_keys=[idInsumo],
         backref=db.backref("lotes_insumo", lazy="dynamic"),
     )
+
+    def __str__(self):
+        return f"Lote Insumo: {self.id}, Fecha Caducidad: {self.fecha_caducidad}, Cantidad: {self.cantidad}, Fecha Compra: {self.fecha_compra}, Precio Unidad: {self.precio_unidad}, Merma: {self.merma}, ID Insumo: {self.idInsumo}, ID Compra: {self.idCompra}"
 
 
 class SolicitudProduccion(db.Model):
@@ -336,6 +358,9 @@ class SolicitudProduccion(db.Model):
         backref=db.backref("solicitudes_produccion_cocinero", lazy="dynamic"),
     )
 
+    def __str__(self):
+        return f"Solicitud Produccion: {self.id}, Fecha Produccion: {self.fecha_produccion}, Mensaje: {self.mensaje}, Estatus: {self.estatus}, Tandas: {self.tandas}, Merma: {self.merma}, Fecha Solicitud: {self.fecha_solicitud}, ID Receta: {self.idReceta}, ID Usuario Solicitud: {self.idUsuarioSolicitud}, ID Usuario Produccion: {self.idUsuarioProduccion}"
+
     @staticmethod
     def get_next_position():
         # Obtiene la siguiente posición disponible
@@ -359,3 +384,6 @@ class TransaccionCaja(db.Model):
     fecha_transaccion = db.Column(db.Date)
 
     idCorteCaja = db.Column(db.Integer, db.ForeignKey("cortes_caja.id"), nullable=False)
+
+    def __str__(self):
+        return f"Transaccion Caja: {self.id}, Monto Egreso: {self.monto_egreso}, Monto Ingreso: {self.monto_ingreso}, Fecha Transaccion: {self.fecha_transaccion}, ID Corte Caja: {self.idCorteCaja}"

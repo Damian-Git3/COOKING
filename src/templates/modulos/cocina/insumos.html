@@ -109,10 +109,11 @@ messages %}
       </tr>
     </thead>
     <tbody>
-      {% for lot, insumo, usuario_nombre in lotes %}
+      
+      {% for lot, insumo, usuario_nombre, proveedor_empresa in lotes %}
       <tr>
         <td>{{ insumo.nombre }}</td>
-        <td>{{ insumo.proveedor }}</td>
+        <td>{{ proveedor_empresa }}</td>
         <td>{{ lot.id }}</td>
         <td>{{ lot.fecha_compra }}</td>
         <td>{{ lot.fecha_caducidad }}</td>
