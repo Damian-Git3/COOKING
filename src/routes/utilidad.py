@@ -34,7 +34,9 @@ def obtener_ingredientes():
     id_receta = form.receta.data
 
     ingredientes_receta = (
-        db.session.query(InsumosReceta, Insumo.nombre)  # Añadir Insumo.nombre aquí
+        db.session.query(
+            InsumosReceta, Insumo.nombre, Insumo.unidad_medida
+        )  # Añadir Insumo.nombre aquí
         .join(Insumo, InsumosReceta.idInsumo == Insumo.id)  # Unir las tablas
         .filter(InsumosReceta.idReceta == id_receta)
         .all()
@@ -44,13 +46,14 @@ def obtener_ingredientes():
 
     ingredientes_con_nombres = []
 
-    for insumo_receta, nombre_insumo in ingredientes_receta:
+    for insumo_receta, nombre_insumo, unidad_medida in ingredientes_receta:
         ingredientes_con_nombres.append(
             {
                 "insumo": nombre_insumo,
                 "inventario": calcular_precio_total(insumo_receta.idInsumo)[
                     "cantidad_total"
                 ],
+                "unidad": unidad_medida,
                 "precio_total": calcular_precio_total(insumo_receta.idInsumo)[
                     "precio_total"
                 ],
