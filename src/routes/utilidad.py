@@ -30,7 +30,7 @@ def obtener_ingredientes():
     """Ruta para obtener los ingredientes de una receta"""
     form = utilidad_form.GetRecetaForm(request.form)
     form_utilidad = utilidad_form.UtilidadForm(request.form)
-    log.debug(form)
+
     id_receta = form.receta.data
 
     ingredientes_receta = (
@@ -41,8 +41,6 @@ def obtener_ingredientes():
         .filter(InsumosReceta.idReceta == id_receta)
         .all()
     )
-
-    log.debug(ingredientes_receta)
 
     ingredientes_con_nombres = []
 
@@ -66,15 +64,20 @@ def obtener_ingredientes():
             }
         )
 
-    log.debug(ingredientes_con_nombres)
     receta_seleccionada = Receta.query.get(id_receta)
     titulo_receta = receta_seleccionada.nombre if receta_seleccionada else None
     utilidad_receta = receta_seleccionada.utilidad if receta_seleccionada else None
+    cantidad_galletas = receta_seleccionada.piezas if receta_seleccionada else None
+
     form_utilidad.id_receta.data = id_receta
     form_utilidad.costo_total.data = round(
         sum(ingrediente["costo_total"] for ingrediente in ingredientes_con_nombres), 2
     )
     form_utilidad.costo_venta.data = utilidad_receta
+    form_utilidad.costo_unitario.data = round(
+        form_utilidad.costo_total.data / cantidad_galletas, 2
+    )
+    form_utilidad.cantidad_galletas.data = cantidad_galletas
 
     return render_template(
         "utilidad/utilidad.html",
@@ -83,7 +86,6 @@ def obtener_ingredientes():
         ingredientes=ingredientes_con_nombres,
         titulo_receta=titulo_receta,
         receta_seleccionada=id_receta,
-        utilidad_receta=utilidad_receta,
     )
 
 

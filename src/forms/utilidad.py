@@ -60,7 +60,15 @@ class UtilidadForm(Form):
             validators.NumberRange(min=1, message="Ingresa un ID Válido"),
         ],
     )
-    costo_total = FloatField("Costo Total", render_kw={"disabled": True})
+    costo_unitario = FloatField(
+        "Costo Unitario",
+        render_kw={"disabled": ""},
+    )
+    cantidad_galletas = IntegerField(
+        "Cantidad de Galletas",
+        render_kw={"disabled": ""},
+    )
+    costo_total = FloatField("Costo Total", render_kw={"disabled": ""})
     costo_venta = FloatField(
         "Costo de Venta",
         [
