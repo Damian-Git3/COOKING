@@ -75,13 +75,16 @@ def aceptarSolicitud(idSolicitud):
         return redirect(url_for("cocina.cocinar"))
 
 
-@cocina.route("/finalizar-produccion/<int:idSolicitud>")
+@cocina.route("/finalizar-solicitud/<int:idSolicitud>", methods=["POST"])
 @login_required
-def finalizarProduccion(idSolicitud):
+def finalizarSolicitud(idSolicitud):
     solicitudProduccion = SolicitudProduccion.query.get_or_404(idSolicitud)
 
     if solicitudProduccion.estatus == 2:
-        solicitudProduccion.merma = request.form.get('cantidadMerma')
+        print("MERMA GALLETA")
+        print(request.form.get("mermaGalleta"))
+
+        solicitudProduccion.merma = request.form.get("mermaGalleta")
         solicitudProduccion.estatus = 3
 
         db.session.commit()
@@ -250,13 +253,15 @@ def lotes_insumos_agrupados():
         insumo.proxima_caducidad = lotes[0].fecha_caducidad if lotes else "No hay lotes"
         insumo.cantidad = sum(lote.cantidad for lote in lotes)
         insumo.coste_promedio = (
-            sum(lote.precio_unidad * lote.cantidad for lote in lotes) / insumo.cantidad
+            sum(lote.precio_unidad * lote.cantidad for lote in lotes) /
+            insumo.cantidad
             if insumo.cantidad
             else 1
         )
         # agregar flash para los insumos que estan por agotarse
         if insumo.cantidad < insumo.cantidad_minima:
-            flash(f"(Escacez) El insumo {insumo.nombre} esta por agotarse", "warning")
+            flash(
+                f"(Escacez) El insumo {insumo.nombre} esta por agotarse", "warning")
         # agregar flash para los insumos que sobrepasan la capacidad de almacenamiento
         if insumo.cantidad > insumo.cantidad_maxima:
             flash(

@@ -189,11 +189,12 @@
       {% endif %}
 
       {% if solicitudProduccion.estatus == 2 %}
-      <form action="{{ url_for('cocina.finalizarProduccion', idSolicitud = solicitudProduccion.id) }}"
-        id="formFinalizarSolicitud{{solicitudProduccion.id}}">
+      <form action="{{ url_for('cocina.finalizarSolicitud', idSolicitud = solicitudProduccion.id) }}"
+        id="formFinalizarSolicitud{{solicitudProduccion.id}}" method="POST">
         <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
-        <input type="hidden" name="mensaje" id="cantidadMerma{{solicitudProduccion.id}}" />
-        <button type="button" class="boton btn-aceptar" onclick="finalizarSolicitud('{{ solicitudProduccion.id }}')">
+        <input type="hidden" name="mermaGalleta" id="mermaGalleta{{solicitudProduccion.id}}" />
+        <button type="button" class="boton btn-aceptar"
+          onclick="finalizarSolicitud('{{ solicitudProduccion.id }}', '{{ solicitudProduccion.tandas * solicitudProduccion.receta.piezas}}')">
           Finalizar producción
         </button>
       </form>
@@ -298,8 +299,12 @@
               return 'Debes ingresar un número de piezas de merma';
             }
 
-            if (value > cantidadMaxima){
-              return 'La merma no puede ser mayor que la cantidad producida';
+            if (parseInt(value) > parseInt(cantidadMaxima)) {
+              return 'La merma no puede ser mayor que las piezas producidas ' + cantidadMaxima;
+            }
+
+            if (parseInt(value) < 0) {
+              return 'La merma no puede ser menor que 0 piezas';
             }
           },
           showCancelButton: true,
@@ -307,10 +312,11 @@
           cancelButtonText: 'Cancelar'
         }).then((mermaResult) => {
           if (mermaResult.isConfirmed) {
-            // Aquí puedes hacer algo con la cantidad de merma ingresada
-            console.log('Piezas de merma:', mermaResult.value);
-            let formFinalizarProduccion = document.getElementById("formFinalizarProduccion" + id);
-            formFinalizarProduccion.submit();
+            document.getElementById('mermaGalleta' + id).value = mermaResult.value
+
+            let formFinalizarSolicitud = document.getElementById("formFinalizarSolicitud" + id);
+
+            formFinalizarSolicitud.submit();
           }
         });
       }
