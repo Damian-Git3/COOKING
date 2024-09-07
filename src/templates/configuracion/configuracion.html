@@ -1,0 +1,40 @@
+{% import '_macros.html' as macro %}
+
+{% extends 'inicio.html' %} 
+
+{% block title %}Configuración{% endblock %} 
+
+{% block styles %} 
+
+{% endblock %} 
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12 h1 text-uppercase text-center">
+      <h1>Configuración de Usuario</h>
+    </div>
+  </div>
+
+  <div class="row">
+    <form
+      action="{{ url_for('configuracion.guardar_informacion_usuario') }}"
+      method="POST"
+      novalidate
+    >
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+      
+      {{ macro.input_float(formUsuario.correo) }}
+      {{ macro.input_float(formUsuario.contrasenia) }}
+      {{ macro.input_float(formUsuario.confirmacion) }}
+      {{ macro.submit_button(formUsuario.submit ) }}
+      
+    </form>
+  </div>
+</div>
+
+{% endblock %} 
+
+{% block jscode %}
+
+{% endblock %}

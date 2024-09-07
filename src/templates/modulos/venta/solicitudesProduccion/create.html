@@ -1,0 +1,170 @@
+{% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock%}
+{% block styles %} {% endblock %} {%from "_macros.html" import render_field%} {%
+block content %}
+<div style="width: 100%; text-align: center">
+  <h1>Solicitudes de producción</h1>
+</div>
+
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a
+      href="{{ url_for('venta.solicitud_produccion') }}"
+      style="text-decoration: none; color: black"
+      ><button
+        class="nav-link {%if not nuevo %}active{%endif%}"
+        id="nav-home-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-home"
+        type="button"
+        role="tab"
+        aria-controls="nav-home"
+        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}"
+      >
+        Pendientes
+      </button>
+    </a>
+    <a
+      href="{{ url_for('venta.solicitud_produccion_nuevo') }}"
+      style="text-decoration: none; color: black"
+    >
+      <button
+        class="nav-link {%if nuevo %}active{%endif%}"
+        id="nav-profile-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-profile"
+        type="button"
+        role="tab"
+        aria-controls="nav-profile"
+        aria-selected="{%if nuevo %}true{%else%}false{%endif%}"
+      >
+        Nueva
+      </button>
+    </a>
+
+    {% if editar %}
+    <button
+      class="nav-link"
+      id="nav-edit-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#nav-edit"
+      type="button"
+      role="tab"
+      aria-controls="nav-edit"
+      aria-selected="false"
+    >
+      Editar
+    </button>
+    {% endif %}
+  </div>
+</nav>
+
+<div>
+  <br />
+  <form name="solicitud" id="solicitud" method="POST">
+    <div class="row">
+      <div class="col-md-4">
+        <img
+          id="imagen"
+          alt="Imagen de la receta"
+          src=""
+          style="max-width: 100%; height: auto; border-radius: 10px"
+        />
+      </div>
+      <div class="col-md-8">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+        <div class="row control-group">
+          <div class="form-group col-xs-12 float-label-form-group controls">
+            {{render_field(form.receta, class="form-control", id="receta")}}
+          </div>
+        </div>
+
+        <div class="row control-group mt-5">
+          <div class="form-group col-xs-12 float-label-form-group controls">
+            {{render_field(form.tandas, class="form-control")}}
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <p>
+            Las galletas a pedir serán:
+            <span id="piezasTotales">Esperando tandas...</span>
+          </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        {% if category == 'receta-error' %}
+        <div class="text-danger mt-3">
+          {{ message.replace('\n', '<br>') | safe }}
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endwith %}
+      </div>
+    </div>
+    <hr />
+    <input type="submit" class="btn btn-primary" value="Solicitar" />
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      href="{{ url_for('venta.solicitud_produccion') }}"
+    >
+      Cancelar
+    </button>
+  </form>
+</div>
+
+<script>
+  cerrarNuevaSolicitud = function () {
+    document.getElementById("nav-home-tab").click();
+    document.getElementById("solicitud").reset();
+  };
+</script>
+
+<script>
+  var recetas = {{ recetas | tojson }};
+
+  var staticUrl = "{{ url_for('static', filename='') }}";
+</script>
+
+<script>
+  let recetaSeleccionada;
+  const inputTandas = document.getElementById("tandas");
+  const piezasTotales = document.getElementById("piezasTotales");
+
+  document.getElementById("receta").addEventListener("change", function () {
+    var id = this.value;
+
+    recetaSeleccionada = recetas.find((receta) => receta[0] == id);
+
+    document.getElementById("imagen").src =
+      staticUrl + "img/cookies/" + recetaSeleccionada[1];
+
+    if (inputTandas.value != "") {
+      validarInputTandas();
+    }
+  });
+  document.getElementById("receta").dispatchEvent(new Event("change"));
+
+  inputTandas.addEventListener("input", (event) => {
+    validarInputTandas();
+  });
+
+  function validarInputTandas() {
+    const tandas = parseFloat(inputTandas.value);
+
+    if (!isNaN(tandas) && Number.isInteger(tandas)) {
+      piezasTotales.innerHTML = tandas * recetaSeleccionada[2] + " piezas";
+    } else {
+      piezasTotales.innerHTML = "Esperando tandas...";
+
+      Toast.fire({
+        icon: "error",
+        title: "El valor de tandas no es un número entero",
+      });
+    }
+  }
+</script>
+
+{% endblock %}

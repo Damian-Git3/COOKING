@@ -1,0 +1,7 @@
+h1, label, option, select{
+    text-transform: uppercase;
+}
+
+h1 {
+    font-weight: bold;
+}

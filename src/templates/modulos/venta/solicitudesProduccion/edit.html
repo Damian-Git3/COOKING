@@ -1,0 +1,79 @@
+{% extends 'inicio.html' %} {% block title %}Solicitudes Producción{% endblock%}
+{% block styles %} {% endblock %} {%from "_macros.html" import render_field%} {%
+block content %}
+<div style="width: 100%; text-align: center">
+  <h1>Solicitud de {{ solicitud.receta.nombre }}</h1>
+</div>
+{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
+messages %}
+<div class="alert alert-success" style="width: 90%">{{ message }}</div>
+{% endfor %} {% endif %} {% endwith %}
+
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a
+      href="{{ url_for('venta.solicitud_produccion') }}"
+      style="text-decoration: none; color: black"
+      ><button
+        class="nav-link {%if not nuevo %}active{%endif%}"
+        id="nav-home-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-home"
+        type="button"
+        role="tab"
+        aria-controls="nav-home"
+        aria-selected="{%if not nuevo %}true{%else%}false{%endif%}"
+      >
+        Pendientes
+      </button>
+    </a>
+
+    <a class="nav-link" type="button"> Editar </a>
+  </div>
+</nav>
+
+<form name="solicitud-editar" id="solicitud-editar" method="POST">
+  <div class="row">
+    <div class="col-md-6">
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+      <div class="row control-group">
+        <div class="form-group col-xs-12 float-label-form-group controls">
+          {{render_field(form.tandas, class="form-control")}}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 d-flex align-items-center justify-content-center">
+      <div
+        style="
+          width: 200px;
+          height: 200px;
+          overflow: hidden;
+          border: 1px solid black;
+        "
+      >
+        <img
+          src="{{ url_for('static', filename='img/cookies/' + solicitud.receta.imagen) }}"
+          style="max-width: 100%; max-height: 100%"
+        />
+      </div>
+    </div>
+  </div>
+  <hr />
+  <input type="submit" class="btn btn-primary" value="Actualizar" />
+  <script>
+    cerrarNuevaSolicitud = function () {
+      document.getElementById("nav-home-tab").click();
+      document.getElementById("solicitud").reset();
+    };
+  </script>
+
+  <a
+    type="button"
+    class="btn btn-secondary"
+    href="{{ url_for('venta.solicitud_produccion') }}"
+  >
+    Cancelar
+  </a>
+</form>
+{% endblock %}

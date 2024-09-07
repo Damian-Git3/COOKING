@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/404.css')}}" />
+  <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='img/cookie_1.png')}}"
+    />
+</head>
+
+<body>
+  <div class="hero-bg">
+    <div class="particles-container">
+      <canvas id="hero-particles"></canvas>
+    </div>
+  </div>
+  
+  <div class="error-container">
+    <div class="cookie">
+      <img
+            src="{{ url_for('static', filename='img/cookie_19.png')}}"
+            alt="Logo de la empresa"
+            class="que busca compa"
+        />
+    </div>
+    <div class="error">
+      <div class="error__title">
+        <div class="words">
+          <span>4</span>
+          <span>0</span>
+          <span>4</span>
+        </div>
+      </div>
+      <div class="error__subtitle">Hmmm...</div>
+      <div class="error__description">¿Quieres ver una página que si existe?</div>
+      <div class="button-group">
+        <div class="button">
+          <a href="{{ url_for('auth.login' )}}"> Si </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script src="{{ url_for('static', filename='js/404.js')}}"></script>
+</body>
+
+</html>

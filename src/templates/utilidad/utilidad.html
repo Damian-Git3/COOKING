@@ -1,0 +1,162 @@
+{% import '_macros.html' as macro %} 
+
+{% extends "inicio.html" %} 
+
+{% block title %} UTILIDADES {% endblock %} 
+
+{% block content %}
+<div>
+    <div class="text-center h1">
+        <h1>UTILIDADES</h1>
+    </div>
+    <div class="row text-center">
+        <div class="col-12">
+            <form id="ingredientesForm" action="{{ url_for('utilidad.obtener_ingredientes')}}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+                {% set valor_seleccionado = receta_seleccionada if receta_seleccionada else '' %}
+
+                {{ macro.select(form.receta, valor_seleccionado) }}                        
+                <!-- {{ macro.submit_button(form.submit) }} -->
+
+            </form>
+            
+        </div>
+        
+    </div>
+    <div class="col-12 text-center my-3">
+        <h1>{{ titulo_receta }}</h1>
+    </div>
+    <div class="row mx-5 my-5">
+        <div class="card p-0">
+            <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead >
+                    <tr>
+                        <th scope="col">INSUMO</th>
+                        <th scope="col">INVENTARIO</th>
+                        <th scope="col">PRECIO X KILO</th>
+                        <th scope="col">CANTIDAD NECESARIA</th>
+                        <th scope="col">COSTO TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+
+                    {% for ingrediente in ingredientes %}
+                    <tr>
+                        <td>{{ ingrediente.insumo }}</td>
+                        <td>{{ ingrediente.inventario }} {{ ingrediente.unidad }}</td>
+                        <td>$ {{ ingrediente.precio_total }}</td>
+                        <td>{{ ingrediente.cantidad }} {{ ingrediente.unidad }}</td>
+                        <td>$ {{ ingrediente.costo_total }}</td>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+        </div>
+        </div>
+        
+    </div>
+
+    <form action="{{ url_for('utilidad.guardar')}}" method="POST" class="p-0">
+            <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+            <input id="{{ formUtilidad.id_receta.name }}" type="hidden" name="id_receta" {% if formUtilidad.id_receta.data %}
+                value="{{ formUtilidad.id_receta.data }}"
+            {% endif %}>
+            <div class="row mx-5">
+                <div class="col-6">                
+                    {{ macro.input_float(formUtilidad.costo_unitario) }}
+                </div>
+                <div class="col-6">            
+                    {{ macro.input_float(formUtilidad.cantidad_galletas) }}                
+                </div>
+            </div>
+                        
+            <div class="row mx-5">
+                <div class="col-6">                    
+                    {{ macro.input_float(formUtilidad.costo_total) }}
+                </div>
+                <div class="col-6">                    
+                    {{ macro.input_float(formUtilidad.costo_venta) }}
+                    <div id="errorContainer" class="mx-5"></div>
+                </div>
+            </div>
+            <div class="col-12 my-2">
+                <div class="text-center">
+                    <button id="btnGuardarUtilidad" type="submit" class="btn btn-primary">GUARDAR</button>
+                </div>
+            </div>
+        </form>
+        
+        
+</div>
+{% endblock %} 
+
+{% block jscode %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('select[name="receta"]').addEventListener('change', function() {
+        document.getElementById('ingredientesForm').submit();
+    });
+    document.querySelector('input[name="costo_total"]').disabled = true;
+    document.querySelector('input[name="costo_unitario"]').disabled = true;
+    document.querySelector('input[name="cantidad_galletas"]').disabled = true;
+    document.querySelector('input[name="costo_venta"]').addEventListener('keypress', function(event) {
+        console.log("SCRIPT PARA NO PERMITIR LETRAS")
+        // Obtener el código de la tecla presionada
+        let keyCode = event.keyCode || event.which;
+
+        // Permitir solo números (0-9), el punto (.) y la tecla de retroceso (Backspace)
+        if (!(keyCode >= 48 && keyCode <= 57) && // Números del 0 al 9
+            !(keyCode >= 96 && keyCode <= 105) && // Números numéricos del teclado
+            keyCode !== 190 && // Punto (.)
+            keyCode !== 8) { // Tecla de retroceso (Backspace)
+            // Cancelar el evento si la tecla no es un número o un punto
+            event.preventDefault();
+        }
+    });
+    
+    
+});
+</script>
+
+<script>
+    document.getElementById('btnGuardarUtilidad').disabled = true;
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Obtener los elementos del DOM
+        const txtPrecio = document.getElementById('costo_venta');
+        const txtCosto = document.getElementById('costo_unitario');
+        const errorContainer = document.getElementById('errorContainer');
+
+        // Función para validar el precio final
+        function validarPrecioFinal() {
+            console.log("SCRIPT PARA VALIDAR EL PRECIO FINAL")
+            const precioFinal = parseFloat(txtPrecio.value);
+            const costoProduccion = parseFloat(txtCosto.value);
+
+            // Verificar si el precio final es menor que el costo de producción
+            if (precioFinal < costoProduccion || isNaN(precioFinal)) {
+                // Agregar clase de error al campo de precio final
+                txtPrecio.classList.add('is-invalid');
+                document.getElementById('btnGuardarUtilidad').disabled = true;
+                // Mostrar mensaje de error
+                errorContainer.innerHTML = '<div class="invalid-feedback text-uppercase" style="display: block">El precio final no puede ser menor que el costo unitario.</div>';
+            } else {
+                // Remover clase de error si el precio es válido
+                txtPrecio.classList.remove('is-invalid');
+                errorContainer.innerHTML = '';
+                document.getElementById('btnGuardarUtilidad').disabled = false;
+            }
+        }
+
+        // Escuchar el evento 'input' en el campo de precio final para validar mientras el usuario escribe
+        txtPrecio.addEventListener('input', validarPrecioFinal);
+
+        txtPrecio.focus();
+        validarPrecioFinal();
+    });
+
+        
+</script>
+
+{% endblock %}

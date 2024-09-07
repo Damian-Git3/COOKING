@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CooKing - El Rey de las Galletas</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Heebo:400,700|Oxygen:700"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../static/css/index_decorator.css" />
+    <link rel="icon" type="image/png" href="../static/img/cookie_1.png" />
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    
+    <script src="https://unpkg.com/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+  </head>
+  <body class="is-boxed has-animations">
+    <div class="body-wrap">
+      <main>
+        <section class="hero text-center text-light">
+          <div class="hero-bg">
+            <div class="particles-container">
+              <canvas id="hero-particles"></canvas>
+            </div>
+          </div>
+          <div class="container-sm">
+            <div class="hero-inner">
+              <div class="hero-copy">
+                <div class="words">
+                  <span>C</span>
+                  <span>O</span>
+                  <span>O</span>
+                  <span>K</span>
+                  <span>I</span>
+                  <span>N</span>
+                  <span>G</span>
+                </div>
+                <div class="button">
+                  <a href="{{ url_for('auth.login' )}}"> INGRESAR </a>
+                </div>
+              </div>
+              <div class="mockup-container">
+                <img
+                  class="device-mockup"
+                  src="../static/img/cooking_1.png"
+                  alt="Galleta de CooKing"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="features-extended section">
+          <div class="features-extended-inner section-inner">
+            <div class="features-extended-wrap">
+              <div class="container">
+                <div class="feature-extended">
+                  <div class="feature-extended-image">
+                    <div class="mockup-bg">
+                      <img
+                        src="../static/img/index_decorator/fondo1.svg"
+                        alt="Ilustración de iPhone"
+                      />
+                    </div>
+                    <img
+                      class="device-mockup is-revealing"
+                      src="../static/img/index_decorator/arco_calzada.png"
+                      alt="Galleta de CooKing"
+                    />
+                  </div>
+                  <div class="feature-extended-body is-revealing">
+                    <h3 class="mt-0 mb-16">
+                      El orgullo de León en cada galleta
+                    </h3>
+                    <p class="m-0">
+                      CooKing es más que una tienda de galletas, es un sistema
+                      de gestión que te permite llevar el control de la
+                      producción y venta de tus galletas artesanales con
+                      facilidad.
+                    </p>
+                  </div>
+                </div>
+                <div class="feature-extended">
+                  <div class="feature-extended-image">
+                    <div class="mockup-bg">
+                      <img
+                        src="../static/img/index_decorator/fondo0.svg"
+                        alt="Ilustración de iPhone"
+                      />
+                    </div>
+                    <img
+                      class="device-mockup is-revealing feature-image"
+                      src="../static/img/cookie_17.png"
+                      alt="Galleta de CooKing"
+                    />
+                  </div>
+                  <div class="feature-extended-body is-revealing">
+                    <h3 class="mt-0 mb-16">
+                      Innovación y calidad en cada paso
+                    </h3>
+                    <p class="m-0">
+                      Con CooKing, cada paso de la producción de tus galletas
+                      artesanales está optimizado para garantizar la mejor
+                      calidad y sabor. Nuestro sistema te permite innovar y
+                      crecer.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="particles-container">
+          <canvas id="footer-particles"></canvas>
+        </div>
+        <div class="site-footer-top">
+          <section class="cta section text-light">
+            <div class="container-sm">
+              <div class="cta-inner section-inner">
+                <div class="cta-header text-center">
+                  <h2 class="section-title mt-0">
+                    Únete a la revolución de las galletas
+                  </h2>
+                  <p class="section-paragraph">
+                    Descubre cómo CooKing puede transformar tu negocio de
+                    galletas artesanales y llevarlo al siguiente nivel.
+                  </p>
+                  <div class="cta-cta">
+                    <a class="" href="{{ url_for('auth.login') }}"
+                      >
+                      <button class="btn btn-outline-primary">Accede al sistema</button></a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="site-footer-bottom">
+          <div class="container">
+            <div class="site-footer-inner">
+              <div class="brand footer-brand">
+                <a href="#">
+                  <img
+                    src="../static/img/logo.png"
+                    style="height: 80px"
+                    alt="Logo de CooKing"
+                  />
+                </a>
+              </div>
+              <ul class="footer-links list-reset">
+                <li>
+                  <a href="#">Contacto</a>
+                </li>
+                <li>
+                  <a href="#">Sobre nosotros</a>
+                </li>
+                <li>
+                  <a href="#">Preguntas frecuentes</a>
+                </li>
+                <li>
+                  <a href="#">Soporte</a>
+                </li>
+              </ul>
+              <ul class="footer-social-links list-reset">
+                <!-- Aquí puedes agregar los enlaces a las redes sociales -->
+              </ul>
+              <div class="footer-copyright">
+                &copy; 2024 CooKing, todos los derechos reservados
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="../static/js/index_decorator.js"></script>
+  </body>
+</html>

@@ -1,0 +1,166 @@
+{% extends 'inicio.html' %} {% block title %}Almacen{% endblock %} {% block
+styles %} {% endblock %} {%from "_macros.html" import render_field%} {% block
+content %}
+<div style="width: 100%; text-align: center">
+  <h1>Inventario Lotes de Insumos</h1>
+</div>
+{% with messages = get_flashed_messages() %} {% if messages %} {% for message in
+messages %}
+<div class="alert alert-success" style="width: 90%">{{ message }}</div>
+{% endfor %} {% endif %} {% endwith %}
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a
+      href="{{url_for('cocina.lotes_insumos_agrupados')}}"
+      style="text-decoration: none"
+    >
+      <button
+        class="nav-link"
+        id="nav-lote1-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-lote1"
+        type="button"
+        role="tab"
+        aria-controls="nav-lote1"
+        aria-selected="false"
+      >
+        Insumos
+      </button>
+    </a>
+    <a href="{{url_for('cocina.lotes_insumos')}}" style="text-decoration: none">
+      <button
+        class="nav-link {% if lista %}active{% endif %}"
+        id="nav-lote1-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-lote1"
+        type="button"
+        role="tab"
+        aria-controls="nav-lote1"
+        aria-selected="{% if lista %}true{% else %}false{% endif %}"
+      >
+        Lotes Insumos
+      </button>
+    </a>
+    {% if not lista %}
+    <a href="{{url_for('cocina.lotes_insumos')}}" style="text-decoration: none">
+      <button
+        class="nav-link active"
+        id="nav-lote2-tab"
+        data-bs-toggle="tab"
+        data-bs-target="#nav-lote2"
+        type="button"
+        role="tab"
+        aria-controls="nav-profile"
+        aria-selected="true"
+      >
+        Merma
+      </button>
+    </a>
+    {% endif %}
+  </div>
+</nav>
+{% if lista %}
+<div class="container">
+  <form method="POST" class="form-inline mt-3">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+    <div class="row">
+      <div class="col-md-3">
+        <div class="row control-group">
+          <div class="form-group col-xs-12 float-label-form-group controls">
+            {{render_field(form.fecha_inicio, class="form-control")}}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row control-group">
+          <div class="form-group col-xs-12 float-label-form-group controls">
+            {{render_field(form.fecha_fin, class="form-control")}}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row control-group">
+          <div class="form-group col-xs-12 float-label-form-group controls">
+            {{render_field(form.insumo, class="form-control")}}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <br />
+        <button type="submit" class="btn btn-primary ml-2" style="width: 100%">
+          Buscar
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <table class="table table-striped table-bordered mt-5">
+    <thead>
+      <tr>
+        <th scope="col">Insumo</th>
+        <th scope="col">Proveedor</th>
+        <th scope="col">ID del Lote</th>
+        <th scope="col">Fecha de Compra</th>
+        <th scope="col">Fecha de Caducidad</th>
+        <th scope="col">Cantidad Disponible</th>
+        <th scope="col">Precio Unidad</th>
+        <th scope="col">Merma</th>
+        <th scope="col">Comprado por</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+      {% for lot, insumo, usuario_nombre, proveedor_empresa in lotes %}
+      <tr>
+        <td>{{ insumo.nombre }}</td>
+        <td>{{ proveedor_empresa }}</td>
+        <td>{{ lot.id }}</td>
+        <td>{{ lot.fecha_compra }}</td>
+        <td>{{ lot.fecha_caducidad }}</td>
+        <td>{{ lot.cantidad }} {{insumo.unidad_medida}}</td>
+        <td>$ {{ lot.precio_unidad|round(2) }}</td>
+        <td>
+          <a href="{{ url_for('cocina.merma_insumos', id=lot.id) }}"
+            ><i class="fa-solid fa-fire"></i></a
+          >{{ lot.merma }}
+        </td>
+        <td>{{ usuario_nombre }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %} {% if not lista %}
+<form name="merma_insumo" id="merma_insumo" method="POST">
+  <br />
+  <div class="row">
+    <div class="col-md-12">
+      <p>Máximo {{ cantidad_maxima }} {{ tipo_medida}}</p>
+      <br />
+      <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+
+      <div class="row control-group">
+        <div class="form-group col-xs-12 float-label-form-group controls">
+          {{render_field(form.cantidad, class="form-control")}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr />
+  <input type="submit" class="btn btn-primary" value="Registrar" />
+  <script>
+    cerrarNuevaSolicitud = function () {
+      document.getElementById("nav-lote1-tab").click();
+      document.getElementById("merma_insumo").reset();
+    };
+  </script>
+
+  <a
+    type="button"
+    class="btn btn-secondary"
+    href="{{ url_for('cocina.lotes_insumos') }}"
+  >
+    Cancelar
+  </a>
+</form>
+{% endif %} {% endblock %}

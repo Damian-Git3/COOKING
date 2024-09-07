@@ -1,0 +1,208 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap");
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", sans-serif;
+  color: #333333;
+  background: #eaeef6;
+}
+.Menu {
+  display: grid;
+  grid-template-columns: 100px auto;
+  grid-template-rows: 100px auto;
+  grid-gap: 1rem;
+  padding: 1rem;
+  height: 100vh;
+  background: #eaeef6;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.logo-container > a > img {
+  height: auto;
+  width: 110px;
+}
+
+.barra,
+.main-content {
+  z-index: 1;
+  position: relative;
+  background: rgb(255, 255, 255);
+  border-radius: 9px;
+  box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
+  padding: 10px;
+  height: calc(100%);
+  overflow: auto;
+}
+
+.logo-container {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.barra {
+  grid-column: 1;
+  grid-row: 2;
+  overflow: hidden;
+}
+.main-content {
+  grid-column: 2;
+  grid-row: span 2;
+}
+
+.barra > .barra__menu > .barra__item > .barra__link {
+  list-style-type: none;
+  width: 56px;
+  min-width: 56px;
+  height: 56px;
+  min-height: 56px;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #6a778e;
+  transition: all 1s ease;
+}
+
+.barra > .barra__menu > .barra__item > .barra__link:hover {
+  color: white;
+}
+
+.barra > .barra__menu > .barra__item > .barra__link > i {
+  width: 56px;
+  height: 56px;
+  display: flex; /* Habilita el uso de flexbox */
+  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center;
+  cursor: pointer;
+}
+
+.barra > .barra__menu {
+  align-items: center;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  gap: 10px;
+  height: calc(100%);
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+.barra > .barra__menu::-webkit-scrollbar {
+  width: 8px; /* Ancho del scrollbar */
+  height: 8px; /* Alto del scrollbar */
+}
+
+/* Estilo para el pulgar (la parte que se desplaza) */
+.barra > .barra__menu::-webkit-scrollbar-thumb {
+  background: #e9cb94; /* Color de fondo del pulgar */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+/* Estilo para el track (la parte sobre la que se desplaza el pulgar) */
+.barra > .barra__menu::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color de fondo del track */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+/* Cambiar el estilo del pulgar al pasar el cursor */
+.barra > .barra__menu::-webkit-scrollbar-thumb:hover {
+  background: #e6b252; /* Color de fondo del pulgar al pasar el cursor */
+}
+
+.barra > .barra__menu > .barra__item > .barra__link > span {
+  display: none;
+}
+
+.barra > .barra__menu > .barra__item {
+  text-decoration: none;
+  color: #6a778e;
+}
+
+@media (max-width: 768px) {
+  .barra > .barra__menu {
+    flex-direction: row;
+    align-items: center;
+  }
+  .barra {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .main-content {
+    grid-row: 2;
+    grid-column: 1 / span 2;
+  }
+}
+
+@keyframes Effect {
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.5, 1.5);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+.Active {
+  color: white !important;
+}
+
+.HoverBox {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto;
+  background: #e6b252;
+  border-radius: 10px;
+  position: absolute;
+  z-index: 0;
+  transition: 250ms;
+}
+
+.HoverTip {
+  position: absolute;
+  display: none;
+  white-space: nowrap;
+  border: solid 1px #e6b252;
+  font-family: "Open Sans", sans-serif;
+  font-weight: bold;
+  color: #e6b252;
+  background: #fff;
+  border-radius: 17.5px;
+  line-height: 0;
+  opacity: 0;
+  padding: 20px 15px;
+  z-index: 3;
+}
+
+@keyframes fadeRight {
+  0% {
+    opacity: 0;
+    left: 94px;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes fadeDown {
+  0% {
+    opacity: 0;
+    top: 120px;
+  }
+  100% {
+    opacity: 1;
+  }
+}
